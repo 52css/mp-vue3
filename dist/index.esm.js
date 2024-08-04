@@ -1447,4 +1447,252 @@ function traverse(value, depth = Number.POSITIVE_INFINITY, seen) {
     return value;
 }
 
-export { EffectScope, ReactiveEffect, computed, customRef, effect, effectScope, getCurrentScope, isProxy, isReactive, isReadonly, isRef, isShallow, markRaw, onScopeDispose, proxyRefs, reactive, readonly, ref, shallowReactive, shallowReadonly, shallowRef, stop, toRaw, toRef, toRefs, toValue, triggerRef, unref, watch, watchEffect, watchPostEffect, watchSyncEffect };
+let _context;
+/**
+ * 使用 Hook 函数并将结果与上下文关联
+ * @param context - 当前上下文
+ * @param hook - Hook 函数
+ */
+function useHook(context, hook) {
+    _context = context;
+    const splitFieldsAndMethods = (obj) => {
+        const fields = {};
+        const methods = {};
+        for (const k in obj) {
+            if (typeof obj[k] === "function") {
+                methods[k] = obj[k];
+            }
+            else {
+                fields[k] = obj[k];
+            }
+        }
+        return {
+            fields,
+            methods,
+        };
+    };
+    const setData = (result) => {
+        const { fields, methods } = splitFieldsAndMethods(result);
+        Object.keys(methods).forEach((key) => {
+            context[key] = methods[key];
+        });
+        context.setData(fields);
+    };
+    const result = proxyRefs(hook.call(context));
+    watch(() => result, (newVal) => {
+        setData(newVal);
+    }, {
+        deep: true,
+        immediate: true,
+    });
+}
+/**
+ * 创建页面并关联生命周期函数
+ * @param hook - Hook 函数或包含 setup 的对象
+ */
+function definePage(hook) {
+    let observers = {};
+    let behaviors = [];
+    if (typeof hook !== "function") {
+        observers = hook.observers ?? observers;
+        behaviors = hook.behaviors ?? behaviors;
+        hook = hook.setup;
+    }
+    //@ts-ignore 微信小程序自带方法
+    Page({
+        behaviors,
+        observers,
+        onLoad(...args) {
+            useHook(this, hook);
+            hooksEmit.call(this, "onLoad", args);
+        },
+        onShow(...args) {
+            hooksEmit.call(this, "onShow", args);
+        },
+        onReady(...args) {
+            hooksEmit.call(this, "onReady", args);
+        },
+        onHide(...args) {
+            hooksEmit.call(this, "onHide", args);
+        },
+        onUnload(...args) {
+            hooksEmit.call(this, "onUnload", args);
+        },
+        onRouteDone(...args) {
+            hooksEmit.call(this, "onRouteDone", args);
+        },
+        onPullDownRefresh(...args) {
+            hooksEmit.call(this, "onPullDownRefresh", args);
+        },
+        onReachBottom(...args) {
+            hooksEmit.call(this, "onReachBottom", args);
+        },
+        onPageScroll(...args) {
+            hooksEmit.call(this, "onPageScroll", args);
+        },
+        onAddToFavorites(...args) {
+            hooksEmit.call(this, "onAddToFavorites", args);
+        },
+        onShareAppMessage(...args) {
+            hooksEmit.call(this, "onShareAppMessage", args);
+        },
+        onShareTimeline(...args) {
+            hooksEmit.call(this, "onShareTimeline", args);
+        },
+        onResize(...args) {
+            hooksEmit.call(this, "onResize", args);
+        },
+        onTabItemTap(...args) {
+            hooksEmit.call(this, "onTabItemTap", args);
+        },
+        onSaveExitState(...args) {
+            hooksEmit.call(this, "onSaveExitState", args);
+        },
+    });
+}
+/**
+ * 获取属性并将其转换为组件属性格式
+ * @param props - 组件的属性
+ * @returns 转换后的属性对象
+ */
+function getProperties(props) {
+    return Object.keys(props).reduce((prev, item) => {
+        const value = props[item].default ?? props[item].value;
+        prev[item] = value
+            ? {
+                type: props[item].type,
+                value,
+            }
+            : props[item];
+        return prev;
+    }, {});
+}
+/**
+ * 创建组件并关联生命周期函数
+ * @param hook - Hook 函数或包含 setup 的对象
+ */
+function defineComponent(hook) {
+    let props = {};
+    let observers = {};
+    let behaviors = [];
+    let componentGenerics = {};
+    if (typeof hook !== "function") {
+        props = hook.props ?? props;
+        observers = hook.observers ?? observers;
+        behaviors = hook.behaviors ?? behaviors;
+        componentGenerics = hook.componentGenerics ?? componentGenerics;
+        hook = hook.setup;
+    }
+    //@ts-ignore 微信自带方法
+    Component({
+        observers,
+        behaviors,
+        componentGenerics,
+        options: {
+            virtualHost: true,
+            styleIsolation: "apply-shared",
+            dynamicSlots: true,
+            multipleSlots: true,
+        },
+        externalClasses: ["class"],
+        properties: getProperties(props),
+        data: {},
+        lifetimes: {
+            attached() {
+                const emit = (key, value) => {
+                    // @ts-ignore 微信自带触发
+                    this.triggerEvent(key, { value });
+                };
+                //@ts-ignore 自定义 emit 方法
+                this.emit = emit;
+                // @ts-ignore 微信自带属性
+                useHook(this, hook.bind(this, this.properties, this));
+            },
+            ready(...args) {
+                hooksEmit.call(this, "ready", args);
+            },
+            moved(...args) {
+                hooksEmit.call(this, "moved", args);
+            },
+            detached(...args) {
+                hooksEmit.call(this, "detached", args);
+            },
+            error(...args) {
+                hooksEmit.call(this, "error", args);
+            },
+        },
+        methods: {},
+    });
+}
+const getCurrentPage = () => {
+    //@ts-ignore 微信自带方法
+    const pages = getCurrentPages();
+    return pages[pages.length - 1];
+};
+function hooksEmit(lifetimesKey, args) {
+    if (!this[`$${lifetimesKey}`]) {
+        return;
+    }
+    this[`$${lifetimesKey}`].forEach((fn) => {
+        fn.apply(this, args);
+    });
+}
+const useObserver = (key, fn) => {
+    const defineReactive = (obj, key, callback) => {
+        let val = obj[key];
+        Object.defineProperty(obj, key, {
+            get() {
+                return val;
+            },
+            set(newVal) {
+                val = newVal;
+                callback?.(newVal);
+            },
+        });
+    };
+    if (key in _context.properties) {
+        defineReactive(_context.properties, key, fn);
+    }
+    else if (key in _context.data) {
+        defineReactive(_context.data, key, fn);
+    }
+    else {
+        throw new Error(`未找到可以 observer ${key}`);
+    }
+};
+const getCurrentInstance = () => {
+    return {
+        proxy: _context,
+    };
+};
+function hooksOn(hook, lifetimesKey) {
+    const isPageLifetime = /^on/.test(lifetimesKey);
+    const context = isPageLifetime ? getCurrentPage() : _context;
+    if (!context) {
+        return;
+    }
+    if (!context[`$${lifetimesKey}`]) {
+        context[`$${lifetimesKey}`] = [];
+    }
+    context[`$${lifetimesKey}`].push(hook.bind(context));
+}
+const onShow = (hook) => hooksOn(hook, "onShow");
+const onReady = (hook) => hooksOn(hook, "onReady");
+const onHide = (hook) => hooksOn(hook, "onHide");
+const onUnload = (hook) => hooksOn(hook, "onUnload");
+const onRouteDone = (hook) => hooksOn(hook, "onRouteDone");
+const onPullDownRefresh = (hook) => hooksOn(hook, "onPullDownRefresh");
+const onReachBottom = (hook) => hooksOn(hook, "onReachBottom");
+const onPageScroll = (hook) => hooksOn(hook, "onPageScroll");
+const onAddToFavorites = (hook) => hooksOn(hook, "onAddToFavorites");
+const onShareAppMessage = (hook) => hooksOn(hook, "onShareAppMessage");
+const onShareTimeline = (hook) => hooksOn(hook, "onShareTimeline");
+const onResize = (hook) => hooksOn(hook, "onResize");
+const onTabItemTap = (hook) => hooksOn(hook, "onTabItemTap");
+const onSaveExitState = (hook) => hooksOn(hook, "onSaveExitState");
+const ready = (hook) => hooksOn(hook, "ready");
+const moved = (hook) => hooksOn(hook, "moved");
+const detached = (hook) => hooksOn(hook, "detached");
+const error = (hook) => hooksOn(hook, "error");
+
+export { EffectScope, ReactiveEffect, computed, customRef, defineComponent, definePage, detached, effect, effectScope, error, getCurrentInstance, getCurrentPage, getCurrentScope, isProxy, isReactive, isReadonly, isRef, isShallow, markRaw, moved, onAddToFavorites, onHide, onPageScroll, onPullDownRefresh, onReachBottom, onReady, onResize, onRouteDone, onSaveExitState, onScopeDispose, onShareAppMessage, onShareTimeline, onShow, onTabItemTap, onUnload, proxyRefs, reactive, readonly, ready, ref, shallowReactive, shallowReadonly, shallowRef, stop, toRaw, toRef, toRefs, toValue, triggerRef, unref, useObserver, watch, watchEffect, watchPostEffect, watchSyncEffect };

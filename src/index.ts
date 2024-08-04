@@ -35,6 +35,4 @@ export {
 } from "@vue/reactivity";
 export { watch, watchEffect, watchPostEffect, watchSyncEffect } from "./watch";
 
-export type Test = {
-  color: string;
-};
+export * from "./mp";
