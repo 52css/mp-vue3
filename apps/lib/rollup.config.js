@@ -3,19 +3,15 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
 import replace from "@rollup/plugin-replace";
 import babel from '@rollup/plugin-babel';
+import { terser } from 'rollup-plugin-terser';
 
 export default {
   input: "src/index.ts", // 入口文件
   output: [
     {
-      file: "dist/index.cjs.js",
-      format: "cjs", // CommonJS 格式
-      sourcemap: true,
-    },
-    {
-      file: "dist/index.esm.js",
-      format: "esm", // ES module 格式
-      sourcemap: true,
+      name: 'MpVue3',
+      file: "dist/mp-vue3.min.js",
+      format: "umd",
     },
   ],
   plugins: [
@@ -32,6 +28,7 @@ export default {
     babel({
       babelHelpers: 'bundled',
       exclude: 'node_modules/**' // 仅编译我们的源代码
-    })
+    }),
+    terser() // 压缩代码
   ],
 };

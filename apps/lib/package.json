@@ -1,9 +1,8 @@
 {
   "name": "@52css/mp-vue3",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/mp-vue3.min.js",
   "types": "types/index.d.ts",
   "devDependencies": {
     "@types/bun": "latest"
@@ -23,6 +22,7 @@
     "rollup": "^4.20.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.36.0",
     "typescript": "^5.5.4"
   }
