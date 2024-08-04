@@ -1,0 +1,2 @@
+<!-- components/hello/hello.wxml -->
+<view>hello {{name}}</view>
