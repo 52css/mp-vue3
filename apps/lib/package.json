@@ -1,12 +1,11 @@
 {
   "name": "@52css/mp-vue3",
-  "version": "1.0.5",
+  "version": "1.0.8",
   "type": "module",
   "main": "dist/mp-vue3.min.js",
   "types": "types/index.d.ts",
   "devDependencies": {
     "@types/bun": "latest",
-    "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.7",

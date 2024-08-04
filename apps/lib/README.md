@@ -1,15 +1,18 @@
-# my-reactivity
+# MP-VUE3
 
-To install dependencies:
+* 组合api好处就是方便集中处理逻辑，而微信小程序还是`options`方式，有什么方式可以直接使用`vue3`响应数据吗？首选是使用`uni-app` 直接选择 `vue3` 模版，使用过的都知道有2大通病
+  * 性能问题
+  * 体积问题
+* 如何解决这个问题，我们可以在`ts`中拦截处理，通过响应式数据拦截处理，而`wxml` 和 `wxss` 保持一致
+  * 体积很小
+  * 通过`组合api` 集中处理逻辑
 
-```bash
-bun install
+## 如何安装
+
+```sh
+bun add @52css/mp-vue3
 ```
 
-To run:
+## 通过`npm`构建
 
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.21. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+![alt text](build.png)

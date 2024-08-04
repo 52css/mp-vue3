@@ -62,8 +62,8 @@ export function definePage(
   let observers: Record<string, any> = {};
   let behaviors: any[] = [];
   if (typeof hook !== "function") {
-    observers = hook.observers ?? observers;
-    behaviors = hook.behaviors ?? behaviors;
+    observers = hook.observers || observers;
+    behaviors = hook.behaviors || behaviors;
     hook = hook.setup;
   }
 
@@ -127,7 +127,7 @@ export function definePage(
  */
 function getProperties(props: Record<string, any>) {
   return Object.keys(props).reduce((prev, item) => {
-    const value = props[item].default ?? props[item].value;
+    const value = props[item].default || props[item].value;
     prev[item] = value
       ? {
           type: props[item].type,
@@ -158,10 +158,10 @@ export function defineComponent(
   let behaviors: any[] = [];
   let componentGenerics: Record<string, any> = {};
   if (typeof hook !== "function") {
-    props = hook.props ?? props;
-    observers = hook.observers ?? observers;
-    behaviors = hook.behaviors ?? behaviors;
-    componentGenerics = hook.componentGenerics ?? componentGenerics;
+    props = hook.props || props;
+    observers = hook.observers || observers;
+    behaviors = hook.behaviors || behaviors;
+    componentGenerics = hook.componentGenerics || componentGenerics;
     hook = hook.setup;
   }
 
@@ -233,7 +233,7 @@ export const useObserver = (key: string, fn: Function) => {
       },
       set(newVal) {
         val = newVal;
-        callback?.(newVal);
+        callback && callback(newVal);
       },
     });
   };
