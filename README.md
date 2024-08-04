@@ -7,89 +7,186 @@
   * 体积很小
   * 通过`组合api` 集中处理逻辑
 
-## 如何安装
+## 安装
+
+### 运行脚本
 
 ```sh
 bun add @52css/mp-vue3
 ```
 
-## 通过`npm`构建
+### 通过`npm`构建
 
 ![alt text](./docs/build.png)
 
-## 如何写页面
+## 响应式API
 
-* `index.ts`
+### Page 页面
 
 ```ts
-import { ref, definePage } from "@52css/mp-vue3";
+import { definePage } from '@52css/mp-vue3'
 
-// 通过definePage，定义响应式页面
 definePage(() => {
-  const count = ref(0);
-  const onIncrease = () => {
-    count.value++;
-  };
-
-  return {
-    // 返回响应式数据
-    count,
-    // 返回事件
-    onIncrease,
-  };
-});
-
+  // 里面使用hooks方法
+})
 ```
 
-* `index.wxml`
-
-```html
-<view>count: {{count}}</view>
-<button bind:tap="onIncrease">增加</button>
-```
-
-* 效果
-
-![效果图](./docs/2024-08-04%2021.31.21.gif)
-
-## 如何写组件
-
-* `index.ts`
+### Component 组件
 
 ```ts
-import { defineComponent } from "@52css/mp-vue3";
+import { defineComponent } from '@52css/mp-vue3'
 
+// 方式一，直接是hooks方法
+defineComponent(() => {
+  // 里面使用hooks方法
+})
+
+// 方式二，传递options
 defineComponent({
-  // 属性名称和 vue 一致
   props: {
-    // 定义单类型
-    name: String,
-    // 定义对象，通过default控制默认值
-    border: {
-      type: Boolean,
-      default: false,
-    },
+    type: String
   },
-  setup(props, { emit }) {
-    // props 即 小程序 this.properties
-    // emit 即 小程序 this.triggerEvent
-
-    // 需要返回响应式数据、方法
-    return {};
-  },
-});
-
+  setup(props, ctx) {
+    // 这里是hooks方法
+  }
+})
 ```
 
-* `index.wxml`
+### 定义常量、方法
+
+ts
+
+```ts
+import { definePage } from '@52css/mp-vue3'
+
+definePage(() => {
+  const text = 'hello weapp vue3'
+  const onClick = () => {
+    console.log('text', text)
+  }
+
+  // 所有定义必须返回
+  return { text, onClick }
+})
+```
+
+wxml
 
 ```html
-<view>hello {{name}}</view>
+<view bind:tap="onClick">
+  text:{{text}}
+</view>
 ```
 
-* `效果`
+### ref
 
-![alt text](./docs/hello.png)
+ts
+
+```ts
+import { definePage, ref } from '@52css/mp-vue3'
+
+definePage(() => {
+  const count = ref(0)
+  const onIncrease = () => {
+    count.value ++
+  }
+
+  // 所有定义必须返回
+  return { count, onIncrease }
+})
+```
+
+wxml
+
+```html
+<view bind:tap="onIncrease">
+  count: {{count}}
+</view>
+```
+
+### reactive
+
+ts
+
+```ts
+import { definePage, reactive, toRefs } from '@52css/mp-vue3'
+
+definePage(() => {
+  const state = reactive({loading: false})
+  const onTap = () => {
+      state.loading = !state.loading
+  }
+
+  // 所有定义必须返回
+  return { ...toRefs(state), onTap }
+})
+```
+
+wxml
+
+```html
+<view bind:tap="onTap">
+  loading:{{loading}}
+</view>
+```
+
+### computed
+
+ts
+
+```ts
+import { definePage, ref, computed } from '@52css/mp-vue3'
+
+definePage(() => {
+  const count = ref(0)
+  const doubleCount = computed(() => count.value * 2)
+  const onIncrease = () => {
+    count.value ++
+  }
+
+  // 所有定义必须返回
+  return { count, doubleCount, onIncrease }
+})
+```
+
+wxml
+
+```html
+<view bind:tap="onIncrease">
+    <view>count: {{count}}</view>
+    <view>doubleCount: {{doubleCount}}</view>
+</view>
+```
+
+### watch
+
+ts
+
+```ts
+import { definePage, ref, watch } from '@52css/mp-vue3'
+
+definePage(() => {
+  const count = ref(0)
+  const handleClick = () => {
+    count.value ++
+  }
+
+  watch(() => count.value, (newVal, oldVal) => {
+    console.log('newVal', newVal, 'oldVal', oldVal)
+  })
+
+  // 所有定义必须返回
+  return { count, handleClick }
+})
+```
+
+wxml
+
+```html
+<view bind:tap="handleClick">
+    count: {{count}}
+</view>
+```
 
 ## API
 
