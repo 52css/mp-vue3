@@ -2,6 +2,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
 import replace from "@rollup/plugin-replace";
+import babel from '@rollup/plugin-babel';
 
 export default {
   input: "src/index.ts", // 入口文件
@@ -9,10 +10,12 @@ export default {
     {
       file: "dist/index.cjs.js",
       format: "cjs", // CommonJS 格式
+      sourcemap: true,
     },
     {
       file: "dist/index.esm.js",
       format: "esm", // ES module 格式
+      sourcemap: true,
     },
   ],
   plugins: [
@@ -26,5 +29,9 @@ export default {
       tsconfig: "tsconfig.json", // 指定 tsconfig.json 文件
       useTsconfigDeclarationDir: true
     }),
+    babel({
+      babelHelpers: 'bundled',
+      exclude: 'node_modules/**' // 仅编译我们的源代码
+    })
   ],
 };

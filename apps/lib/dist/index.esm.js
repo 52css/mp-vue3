@@ -1696,3 +1696,4 @@ const detached = (hook) => hooksOn(hook, "detached");
 const error = (hook) => hooksOn(hook, "error");
 
 export { EffectScope, ReactiveEffect, computed, customRef, defineComponent, definePage, detached, effect, effectScope, error, getCurrentInstance, getCurrentPage, getCurrentScope, isProxy, isReactive, isReadonly, isRef, isShallow, markRaw, moved, onAddToFavorites, onHide, onPageScroll, onPullDownRefresh, onReachBottom, onReady, onResize, onRouteDone, onSaveExitState, onScopeDispose, onShareAppMessage, onShareTimeline, onShow, onTabItemTap, onUnload, proxyRefs, reactive, readonly, ready, ref, shallowReactive, shallowReadonly, shallowRef, stop, toRaw, toRef, toRefs, toValue, triggerRef, unref, useObserver, watch, watchEffect, watchPostEffect, watchSyncEffect };
+//# sourceMappingURL=index.esm.js.map
