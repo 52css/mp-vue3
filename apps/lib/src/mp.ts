@@ -50,72 +50,125 @@ function useHook(context: Context, hook: Hook) {
   );
 }
 
+// 定义页面生命周期函数类型
+export type PageLifeCycle = {
+  // 生命周期回调函数
+  onLoad(query?: Record<string, string>): void;
+  onShow(): void;
+  onReady(): void;
+  onHide(): void;
+  onUnload(): void;
+  onRouteDone(): void;
+  // 页面事件处理函数
+  onPullDownRefresh(): void;
+  onReachBottom(): void;
+  onPageScroll(event?: { scrollTop: number }): void;
+  onAddToFavorites(event?: { webViewUrl: string }): {
+    title: string;
+    imageUrl: string;
+    query: string;
+  };
+  onShareAppMessage(event?: {
+    from: string;
+    target?: any;
+    webViewUrl?: string;
+  }): {
+    title: string; // 转发标题	当前小程序名称
+    path: string; // 转发路径	当前页面 path ，必须是以 / 开头的完整路径
+    imageUrl?: string; // 自定义图片路径，可以是本地文件路径、代码包文件路径或者网络图片路径。支持PNG及JPG。显示图片长宽比是 5:4。	使用默认截图	1.5.0
+    promise?: Promise<{
+      title: string; // 转发标题	当前小程序名称
+      path: string; // 转发路径	当前页面 path ，必须是以 / 开头的完整路径
+      imageUrl?: string; // 自定义图片路径，可以是本地文件路径、代码包文件路径或者网络图片路径。支持PNG及JPG。显示图片长宽比是 5:4。	使用默认截图	1.5.0
+    }>;
+  };
+  onShareTimeline(): {
+    title: string; // 自定义标题，即朋友圈列表页上显示的标题	当前小程序名称
+    query: string; // 自定义页面路径中携带的参数，如 path?a=1&b=2 的 “?” 后面部分	当前页面路径携带的参数
+    imageUrl: string; // 自定义图片路径，可以是本地文件或者网络图片。支持 PNG 及 JPG，显示图片长宽比是 1:1。	默认使用小程序 Logo
+  };
+  onResize(event?: {
+    size: { windowWidth: number; windowHeight: number };
+  }): void;
+  onTabItemTap(item?: { index: string; pagePath: string; text: string }): void;
+  onSaveExitState(): void;
+};
+
+// 定义自定义方法类型
+export type CustomMethods = {
+  [key: string]: (...args: any[]) => any;
+};
+
+// 定义页面选项类型
+export type PageOptions = {
+  data?: Record<string, any>;
+} & PageLifeCycle &
+  CustomMethods;
+
+// 定义页面函数类型
+export type PageFunction = (options: PageOptions) => void;
+
+// 定义页面
+declare const Page: PageFunction;
+
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export function definePage(
-  hook:
-    | Hook
-    | { observers?: Record<string, any>; behaviors?: any[]; setup: Hook }
-) {
-  let observers: Record<string, any> = {};
-  let behaviors: any[] = [];
+export function definePage(hook: Hook | (PageOptions & { setup: Hook })) {
   if (typeof hook !== "function") {
-    observers = hook.observers || observers;
-    behaviors = hook.behaviors || behaviors;
     hook = hook.setup;
   }
 
   //@ts-ignore 微信小程序自带方法
   Page({
-    behaviors,
-    observers,
-    onLoad(...args: any[]) {
+    // 生命周期回调函数
+    onLoad(query) {
       useHook(this, hook);
-      hooksEmit.call(this, "onLoad", args);
+      hooksEmit.call(this, "onLoad", [query]);
     },
-    onShow(...args: any[]) {
-      hooksEmit.call(this, "onShow", args);
+    onShow() {
+      hooksEmit.call(this, "onShow");
     },
-    onReady(...args: any[]) {
-      hooksEmit.call(this, "onReady", args);
+    onReady() {
+      hooksEmit.call(this, "onReady");
     },
-    onHide(...args: any[]) {
-      hooksEmit.call(this, "onHide", args);
+    onHide() {
+      hooksEmit.call(this, "onHide");
     },
-    onUnload(...args: any[]) {
-      hooksEmit.call(this, "onUnload", args);
+    onUnload() {
+      hooksEmit.call(this, "onUnload");
     },
-    onRouteDone(...args: any[]) {
-      hooksEmit.call(this, "onRouteDone", args);
+    onRouteDone() {
+      hooksEmit.call(this, "onRouteDone");
     },
-    onPullDownRefresh(...args: any[]) {
-      hooksEmit.call(this, "onPullDownRefresh", args);
+    // 页面事件处理函数
+    onPullDownRefresh() {
+      hooksEmit.call(this, "onPullDownRefresh");
     },
-    onReachBottom(...args: any[]) {
-      hooksEmit.call(this, "onReachBottom", args);
+    onReachBottom() {
+      hooksEmit.call(this, "onReachBottom");
     },
-    onPageScroll(...args: any[]) {
-      hooksEmit.call(this, "onPageScroll", args);
+    onPageScroll(object) {
+      hooksEmit.call(this, "onPageScroll", [object]);
     },
-    onAddToFavorites(...args: any[]) {
-      hooksEmit.call(this, "onAddToFavorites", args);
+    onAddToFavorites(object) {
+      return hooksOnce.call(this, "onAddToFavorites", [object]);
     },
-    onShareAppMessage(...args: any[]) {
-      hooksEmit.call(this, "onShareAppMessage", args);
+    onShareAppMessage(object) {
+      return hooksOnce.call(this, "onShareAppMessage", [object]);
     },
-    onShareTimeline(...args: any[]) {
-      hooksEmit.call(this, "onShareTimeline", args);
+    onShareTimeline() {
+      return hooksOnce.call(this, "onShareTimeline");
     },
     onResize(...args: any[]) {
       hooksEmit.call(this, "onResize", args);
     },
-    onTabItemTap(...args: any[]) {
-      hooksEmit.call(this, "onTabItemTap", args);
+    onTabItemTap(object) {
+      hooksEmit.call(this, "onTabItemTap", [object]);
     },
-    onSaveExitState(...args: any[]) {
-      hooksEmit.call(this, "onSaveExitState", args);
+    onSaveExitState() {
+      hooksEmit.call(this, "onSaveExitState");
     },
   });
 }
@@ -213,7 +266,7 @@ export const getCurrentPage = () => {
   return pages[pages.length - 1];
 };
 
-function hooksEmit(this: any, lifetimesKey: string, args: any[]) {
+function hooksEmit(this: any, lifetimesKey: string, args?: any[]) {
   if (!this[`$${lifetimesKey}`]) {
     return;
   }
@@ -221,6 +274,18 @@ function hooksEmit(this: any, lifetimesKey: string, args: any[]) {
   this[`$${lifetimesKey}`].forEach((fn: Function) => {
     fn.apply(this, args);
   });
+}
+
+function hooksOnce(this: any, lifetimesKey: string, args?: any[]) {
+  if (!this[`$${lifetimesKey}`]) {
+    return;
+  }
+
+  if (this[`$${lifetimesKey}`].length) {
+    throw new Error(`一个page只能配置一个${lifetimesKey}`);
+  }
+
+  return this[`$${lifetimesKey}`][0].apply(this, args);
 }
 
 export const useObserver = (key: string, fn: Function) => {
@@ -267,24 +332,33 @@ function hooksOn(hook: Function, lifetimesKey: string) {
   context[`$${lifetimesKey}`].push(hook.bind(context));
 }
 
-export const onShow = (hook: Function) => hooksOn(hook, "onShow");
-export const onReady = (hook: Function) => hooksOn(hook, "onReady");
-export const onHide = (hook: Function) => hooksOn(hook, "onHide");
-export const onUnload = (hook: Function) => hooksOn(hook, "onUnload");
-export const onRouteDone = (hook: Function) => hooksOn(hook, "onRouteDone");
-export const onPullDownRefresh = (hook: Function) =>
+export const onShow = (hook: PageLifeCycle["onShow"]) =>
+  hooksOn(hook, "onShow");
+export const onReady = (hook: PageLifeCycle["onReady"]) =>
+  hooksOn(hook, "onReady");
+export const onHide = (hook: PageLifeCycle["onHide"]) =>
+  hooksOn(hook, "onHide");
+export const onUnload = (hook: PageLifeCycle["onUnload"]) =>
+  hooksOn(hook, "onUnload");
+export const onRouteDone = (hook: PageLifeCycle["onRouteDone"]) =>
+  hooksOn(hook, "onRouteDone");
+export const onPullDownRefresh = (hook: PageLifeCycle["onPullDownRefresh"]) =>
   hooksOn(hook, "onPullDownRefresh");
-export const onReachBottom = (hook: Function) => hooksOn(hook, "onReachBottom");
-export const onPageScroll = (hook: Function) => hooksOn(hook, "onPageScroll");
-export const onAddToFavorites = (hook: Function) =>
+export const onReachBottom = (hook: PageLifeCycle["onReachBottom"]) =>
+  hooksOn(hook, "onReachBottom");
+export const onPageScroll = (hook: PageLifeCycle["onPageScroll"]) =>
+  hooksOn(hook, "onPageScroll");
+export const onAddToFavorites = (hook: PageLifeCycle["onAddToFavorites"]) =>
   hooksOn(hook, "onAddToFavorites");
-export const onShareAppMessage = (hook: Function) =>
+export const onShareAppMessage = (hook: PageLifeCycle["onShareAppMessage"]) =>
   hooksOn(hook, "onShareAppMessage");
-export const onShareTimeline = (hook: Function) =>
+export const onShareTimeline = (hook: PageLifeCycle["onShareTimeline"]) =>
   hooksOn(hook, "onShareTimeline");
-export const onResize = (hook: Function) => hooksOn(hook, "onResize");
-export const onTabItemTap = (hook: Function) => hooksOn(hook, "onTabItemTap");
-export const onSaveExitState = (hook: Function) =>
+export const onResize = (hook: PageLifeCycle["onResize"]) =>
+  hooksOn(hook, "onResize");
+export const onTabItemTap = (hook: PageLifeCycle["onTabItemTap"]) =>
+  hooksOn(hook, "onTabItemTap");
+export const onSaveExitState = (hook: PageLifeCycle["onSaveExitState"]) =>
   hooksOn(hook, "onSaveExitState");
 
 export const ready = (hook: Function) => hooksOn(hook, "ready");
