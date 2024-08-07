@@ -1,13 +1,9 @@
 import { proxyRefs } from "@vue/reactivity";
 import { watch } from "./watch";
-import {
-  type PageFunctionOptions,
-  type PageFunction,
-  type PageLifeCycle,
-} from "./type";
+import "miniprogram-api-typings";
 
 // 定义页面
-declare const Page: PageFunction;
+// declare const Page: PageFunction;
 
 type Hook = () => any;
 type Context = any;
@@ -63,7 +59,12 @@ function useHook(context: Context, hook: Hook) {
  * @param hook - Hook 函数或包含 setup 的对象
  */
 export function definePage(
-  hook: Hook | (PageFunctionOptions & { setup: Hook })
+  hook:
+    | Hook
+    | (WechatMiniprogram.Page.Options<
+        WechatMiniprogram.Page.DataOption,
+        WechatMiniprogram.Page.CustomOption
+      > & { setup: Hook })
 ) {
   let option = {};
   if (typeof hook !== "function") {
@@ -170,7 +171,6 @@ export function defineComponent(
     hook = hook.setup;
   }
 
-  //@ts-ignore 微信自带方法
   Component({
     observers,
     behaviors,
@@ -284,33 +284,39 @@ function hooksOn(hook: Function, lifetimesKey: string) {
   context[`$${lifetimesKey}`].push(hook.bind(context));
 }
 
-export const onShow = (hook: PageLifeCycle["onShow"]) =>
+export const onShow = (hook: WechatMiniprogram.Page.ILifetime["onShow"]) =>
   hooksOn(hook, "onShow");
-export const onReady = (hook: PageLifeCycle["onReady"]) =>
+export const onReady = (hook: WechatMiniprogram.Page.ILifetime["onReady"]) =>
   hooksOn(hook, "onReady");
-export const onHide = (hook: PageLifeCycle["onHide"]) =>
+export const onHide = (hook: WechatMiniprogram.Page.ILifetime["onHide"]) =>
   hooksOn(hook, "onHide");
-export const onUnload = (hook: PageLifeCycle["onUnload"]) =>
+export const onUnload = (hook: WechatMiniprogram.Page.ILifetime["onUnload"]) =>
   hooksOn(hook, "onUnload");
-export const onRouteDone = (hook: PageLifeCycle["onRouteDone"]) =>
-  hooksOn(hook, "onRouteDone");
-export const onPullDownRefresh = (hook: PageLifeCycle["onPullDownRefresh"]) =>
-  hooksOn(hook, "onPullDownRefresh");
-export const onReachBottom = (hook: PageLifeCycle["onReachBottom"]) =>
-  hooksOn(hook, "onReachBottom");
-export const onPageScroll = (hook: PageLifeCycle["onPageScroll"]) =>
-  hooksOn(hook, "onPageScroll");
-export const onAddToFavorites = (hook: PageLifeCycle["onAddToFavorites"]) =>
-  hooksOn(hook, "onAddToFavorites");
-export const onShareAppMessage = (hook: PageLifeCycle["onShareAppMessage"]) =>
-  hooksOn(hook, "onShareAppMessage");
-export const onShareTimeline = (hook: PageLifeCycle["onShareTimeline"]) =>
-  hooksOn(hook, "onShareTimeline");
-export const onResize = (hook: PageLifeCycle["onResize"]) =>
+export const onRouteDone = (hook: () => void) => hooksOn(hook, "onRouteDone");
+export const onPullDownRefresh = (
+  hook: WechatMiniprogram.Page.ILifetime["onPullDownRefresh"]
+) => hooksOn(hook, "onPullDownRefresh");
+export const onReachBottom = (
+  hook: WechatMiniprogram.Page.ILifetime["onReachBottom"]
+) => hooksOn(hook, "onReachBottom");
+export const onPageScroll = (
+  hook: WechatMiniprogram.Page.ILifetime["onPageScroll"]
+) => hooksOn(hook, "onPageScroll");
+export const onAddToFavorites = (
+  hook: WechatMiniprogram.Page.ILifetime["onAddToFavorites"]
+) => hooksOn(hook, "onAddToFavorites");
+export const onShareAppMessage = (
+  hook: WechatMiniprogram.Page.ILifetime["onShareAppMessage"]
+) => hooksOn(hook, "onShareAppMessage");
+export const onShareTimeline = (
+  hook: WechatMiniprogram.Page.ILifetime["onShareTimeline"]
+) => hooksOn(hook, "onShareTimeline");
+export const onResize = (hook: WechatMiniprogram.Page.ILifetime["onResize"]) =>
   hooksOn(hook, "onResize");
-export const onTabItemTap = (hook: PageLifeCycle["onTabItemTap"]) =>
-  hooksOn(hook, "onTabItemTap");
-export const onSaveExitState = (hook: PageLifeCycle["onSaveExitState"]) =>
+export const onTabItemTap = (
+  hook: WechatMiniprogram.Page.ILifetime["onTabItemTap"]
+) => hooksOn(hook, "onTabItemTap");
+export const onSaveExitState = (hook: () => void) =>
   hooksOn(hook, "onSaveExitState");
 
 export const ready = (hook: Function) => hooksOn(hook, "ready");
