@@ -66,15 +66,15 @@ export function definePage(
         WechatMiniprogram.Page.CustomOption
       > & { setup: Hook })
 ) {
-  let option = {};
+  let options = {};
   if (typeof hook !== "function") {
     const { setup, ...other } = hook;
-    option = other || {};
+    options = other || {};
     hook = setup;
   }
 
   Page({
-    ...option,
+    ...options,
     // 生命周期回调函数
     onLoad(query) {
       useHook(this, hook);
@@ -153,62 +153,49 @@ export function defineComponent(
     | Hook
     | {
         props?: Record<string, any>;
-        observers?: Record<string, any>;
-        behaviors?: any[];
-        componentGenerics?: Record<string, any>;
         setup: Hook;
       }
 ) {
-  let props: Record<string, any> = {};
-  let observers: Record<string, any> = {};
-  let behaviors: any[] = [];
-  let componentGenerics: Record<string, any> = {};
+  let options = {};
+  let properties: Record<string, any> = {};
   if (typeof hook !== "function") {
-    props = hook.props || props;
-    observers = hook.observers || observers;
-    behaviors = hook.behaviors || behaviors;
-    componentGenerics = hook.componentGenerics || componentGenerics;
-    hook = hook.setup;
+    const { setup, props, ...other } = hook;
+
+    options = other;
+    properties = getProperties(props);
+    hook = setup;
   }
 
   Component({
-    observers,
-    behaviors,
-    componentGenerics,
+    ...options,
     options: {
       virtualHost: true,
       styleIsolation: "apply-shared",
-      dynamicSlots: true,
       multipleSlots: true,
     },
-    externalClasses: ["class"],
-    properties: getProperties(props),
-    data: {},
+    properties,
     lifetimes: {
       attached() {
         const emit = (key: string, value: any) => {
-          // @ts-ignore 微信自带触发
           this.triggerEvent(key, { value });
         };
-        //@ts-ignore 自定义 emit 方法
         this.emit = emit;
-        // @ts-ignore 微信自带属性
         useHook(this, hook.bind(this, this.properties, this));
+        hooksEmit.call(this, "attached");
       },
-      ready(...args: any[]) {
-        hooksEmit.call(this, "ready", args);
+      ready() {
+        hooksEmit.call(this, "ready");
       },
-      moved(...args: any[]) {
-        hooksEmit.call(this, "moved", args);
+      moved() {
+        hooksEmit.call(this, "moved");
       },
-      detached(...args: any[]) {
-        hooksEmit.call(this, "detached", args);
+      detached() {
+        hooksEmit.call(this, "detached");
       },
-      error(...args: any[]) {
-        hooksEmit.call(this, "error", args);
+      error(err: WechatMiniprogram.Error) {
+        hooksEmit.call(this, "error", [err]);
       },
     },
-    methods: {},
   });
 }
 
@@ -319,7 +306,15 @@ export const onTabItemTap = (
 export const onSaveExitState = (hook: () => void) =>
   hooksOn(hook, "onSaveExitState");
 
-export const ready = (hook: Function) => hooksOn(hook, "ready");
-export const moved = (hook: Function) => hooksOn(hook, "moved");
-export const detached = (hook: Function) => hooksOn(hook, "detached");
-export const error = (hook: Function) => hooksOn(hook, "error");
+export const attached = (
+  hook: WechatMiniprogram.Component.Lifetimes["attached"]
+) => hooksOn(hook, "attached");
+export const ready = (hook: WechatMiniprogram.Component.Lifetimes["ready"]) =>
+  hooksOn(hook, "ready");
+export const moved = (hook: WechatMiniprogram.Component.Lifetimes["moved"]) =>
+  hooksOn(hook, "moved");
+export const detached = (
+  hook: WechatMiniprogram.Component.Lifetimes["detached"]
+) => hooksOn(hook, "detached");
+export const error = (hook: WechatMiniprogram.Component.Lifetimes["error"]) =>
+  hooksOn(hook, "error");
