@@ -1,10 +1,11 @@
 {
   "name": "@52css/mp-vue3",
-  "version": "1.0.10",
+  "version": "1.0.14",
   "type": "module",
   "main": "dist/mp-vue3.min.js",
   "types": "types/index.d.ts",
   "devDependencies": {
+    "miniprogram-api-typings": "^3.12.2",
     "@types/bun": "latest",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
@@ -23,7 +24,7 @@
   "peerDependencies": {
     "typescript": "^5.5.4"
   },
-  "dependencies": { "miniprogram-api-typings": "^3.12.2" },
+  "dependencies": {},
   "files": [
     "dist/",
     "types/",

@@ -7,9 +7,9 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "@52css/mp-vue3": "^1.0.9"
+    "@52css/mp-vue3": "^1.0.14"
   },
   "devDependencies": {
-    "miniprogram-api-typings": "^2.8.3-1"
+    "miniprogram-api-typings": "^3.12.2"
   }
 }

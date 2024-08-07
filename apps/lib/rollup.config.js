@@ -6,7 +6,7 @@ import { terser } from "rollup-plugin-terser";
 
 export default {
   input: "src/index.ts", // 入口文件
-  // external: ['@vue/reactivity'],
+  // external: ["miniprogram-api-typings"],
   output: [
     {
       name: "MpVue3",

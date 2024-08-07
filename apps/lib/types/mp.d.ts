@@ -1,45 +1,58 @@
-type Hook = () => any;
+import "miniprogram-api-typings";
+export type ComponentPropType = StringConstructor | NumberConstructor | BooleanConstructor | null;
+type ComponentPropInferValueType<T> = T extends StringConstructor ? string : T extends NumberConstructor ? number : T extends BooleanConstructor ? boolean : any;
+export type ComponentPropDefinition<T> = {
+    type: T | T[];
+    optionalTypes?: ComponentPropType[];
+    default?: ComponentPropInferValueType<T>;
+    value?: ComponentPropInferValueType<T>;
+    observer?(newVal: ComponentPropInferValueType<T>, oldVal: ComponentPropInferValueType<T>): void;
+};
+export type ComponentProps = {
+    [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
+};
+export type ComponentEmit = {
+    emit?(key: string, val: any): void;
+};
+export type Hook = (props?: ComponentProps, context?: Context & ComponentEmit) => Record<string, any>;
+export type Context = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, Record<string, any>, WechatMiniprogram.Component.MethodOption, {}, false> | WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare function definePage(hook: Hook | {
-    observers?: Record<string, any>;
-    behaviors?: any[];
+export declare function definePage(hook: Hook | (WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption> & {
     setup: Hook;
-}): void;
+})): void;
 /**
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
 export declare function defineComponent(hook: Hook | {
-    props?: Record<string, any>;
-    observers?: Record<string, any>;
-    behaviors?: any[];
-    componentGenerics?: Record<string, any>;
+    props?: ComponentProps;
     setup: Hook;
 }): void;
-export declare const getCurrentPage: () => any;
+export declare const getCurrentPage: () => WechatMiniprogram.Page.Instance<WechatMiniprogram.IAnyObject, WechatMiniprogram.IAnyObject>;
 export declare const useObserver: (key: string, fn: Function) => void;
 export declare const getCurrentInstance: () => {
-    proxy: any;
+    proxy: Context;
 };
-export declare const onShow: (hook: Function) => void;
-export declare const onReady: (hook: Function) => void;
-export declare const onHide: (hook: Function) => void;
-export declare const onUnload: (hook: Function) => void;
-export declare const onRouteDone: (hook: Function) => void;
-export declare const onPullDownRefresh: (hook: Function) => void;
-export declare const onReachBottom: (hook: Function) => void;
-export declare const onPageScroll: (hook: Function) => void;
-export declare const onAddToFavorites: (hook: Function) => void;
-export declare const onShareAppMessage: (hook: Function) => void;
-export declare const onShareTimeline: (hook: Function) => void;
-export declare const onResize: (hook: Function) => void;
-export declare const onTabItemTap: (hook: Function) => void;
-export declare const onSaveExitState: (hook: Function) => void;
-export declare const ready: (hook: Function) => void;
-export declare const moved: (hook: Function) => void;
-export declare const detached: (hook: Function) => void;
-export declare const error: (hook: Function) => void;
+export declare const onShow: (hook: WechatMiniprogram.Page.ILifetime["onShow"]) => void;
+export declare const onReady: (hook: WechatMiniprogram.Page.ILifetime["onReady"]) => void;
+export declare const onHide: (hook: WechatMiniprogram.Page.ILifetime["onHide"]) => void;
+export declare const onUnload: (hook: WechatMiniprogram.Page.ILifetime["onUnload"]) => void;
+export declare const onRouteDone: (hook: () => void) => void;
+export declare const onPullDownRefresh: (hook: WechatMiniprogram.Page.ILifetime["onPullDownRefresh"]) => void;
+export declare const onReachBottom: (hook: WechatMiniprogram.Page.ILifetime["onReachBottom"]) => void;
+export declare const onPageScroll: (hook: WechatMiniprogram.Page.ILifetime["onPageScroll"]) => void;
+export declare const onAddToFavorites: (hook: WechatMiniprogram.Page.ILifetime["onAddToFavorites"]) => void;
+export declare const onShareAppMessage: (hook: WechatMiniprogram.Page.ILifetime["onShareAppMessage"]) => void;
+export declare const onShareTimeline: (hook: WechatMiniprogram.Page.ILifetime["onShareTimeline"]) => void;
+export declare const onResize: (hook: WechatMiniprogram.Page.ILifetime["onResize"]) => void;
+export declare const onTabItemTap: (hook: WechatMiniprogram.Page.ILifetime["onTabItemTap"]) => void;
+export declare const onSaveExitState: (hook: () => void) => void;
+export declare const attached: (hook: WechatMiniprogram.Component.Lifetimes["attached"]) => void;
+export declare const ready: (hook: WechatMiniprogram.Component.Lifetimes["ready"]) => void;
+export declare const moved: (hook: WechatMiniprogram.Component.Lifetimes["moved"]) => void;
+export declare const detached: (hook: WechatMiniprogram.Component.Lifetimes["detached"]) => void;
+export declare const error: (hook: WechatMiniprogram.Component.Lifetimes["error"]) => void;
 export {};
