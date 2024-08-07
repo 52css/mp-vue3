@@ -42,19 +42,36 @@ export type PageLifeCycle = {
   onSaveExitState(): void;
 };
 
+export type PageData = {
+  data?: Record<string, any>;
+};
+
+export type PageOptions = {
+  options?: {
+    addGlobalClass?: boolean;
+    pureDataPattern?: RegExp;
+    styleIsolation?: "apply-shared" | "isolated" | "shared";
+  };
+};
+
+export type PageBehaviors = {
+  behaviors?: string | string[];
+};
+
 // 定义自定义方法类型
 export type CustomMethods = {
   [key: string]: (...args: any[]) => any;
 };
 
 // 定义页面选项类型
-export type PageOptions = {
-  data?: Record<string, any>;
-} & PageLifeCycle &
+export type PageFunctionOptions = PageData &
+  PageOptions &
+  PageBehaviors &
+  PageLifeCycle &
   CustomMethods;
 
 // 定义页面函数类型
-export type PageFunction = (options: PageOptions) => void;
+export type PageFunction = (options: PageFunctionOptions) => void;
 
-// 定义页面
-declare const Page: PageFunction;
+// // 定义页面
+// declare const Page: PageFunction;

@@ -1,7 +1,7 @@
 import { proxyRefs } from "@vue/reactivity";
 import { watch } from "./watch";
 import {
-  type PageOptions,
+  type PageFunctionOptions,
   type PageFunction,
   type PageLifeCycle,
 } from "./type";
@@ -62,7 +62,9 @@ function useHook(context: Context, hook: Hook) {
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export function definePage(hook: Hook | (PageOptions & { setup: Hook })) {
+export function definePage(
+  hook: Hook | (PageFunctionOptions & { setup: Hook })
+) {
   let option = {};
   if (typeof hook !== "function") {
     const { setup, ...other } = hook;
