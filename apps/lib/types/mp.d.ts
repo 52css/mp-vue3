@@ -1,7 +1,7 @@
 import "miniprogram-api-typings";
-export type ComponentPropType = StringConstructor | NumberConstructor | BooleanConstructor | null;
-type ComponentPropInferValueType<T> = T extends StringConstructor ? string : T extends NumberConstructor ? number : T extends BooleanConstructor ? boolean : any;
-export type ComponentPropDefinition<T> = {
+export type ComponentPropType = StringConstructor | NumberConstructor | BooleanConstructor | ArrayConstructor | ObjectConstructor | null;
+type ComponentPropInferValueType<T> = T extends StringConstructor ? string : T extends NumberConstructor ? number : T extends BooleanConstructor ? boolean : T extends ArrayConstructor ? any[] : T extends ObjectConstructor ? Record<string, any> : any;
+export type ComponentPropDefinition<T extends ComponentPropType> = {
     type: T | T[];
     optionalTypes?: ComponentPropType[];
     default?: ComponentPropInferValueType<T>;
@@ -14,28 +14,30 @@ export type ComponentProps = {
 export type ComponentEmit = {
     emit?(key: string, val: any): void;
 };
-export type Hook = (props?: ComponentProps, context?: Context & ComponentEmit) => Record<string, any>;
+export type PageHook = () => Record<string, any>;
+export type ComponentHook = (props: ComponentProps, context: Context & ComponentEmit) => Record<string, any>;
 export type Context = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, Record<string, any>, WechatMiniprogram.Component.MethodOption, {}, false> | WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare function definePage(hook: Hook | (WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption> & {
-    setup: Hook;
+export declare function definePage(hook: PageHook | (WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption> & {
+    setup: PageHook;
 })): void;
 /**
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare function defineComponent(hook: Hook | {
+export declare function defineComponent(hook: ComponentHook | {
     props?: ComponentProps;
-    setup: Hook;
+    setup: ComponentHook;
 }): void;
 export declare const getCurrentPage: () => WechatMiniprogram.Page.Instance<WechatMiniprogram.IAnyObject, WechatMiniprogram.IAnyObject>;
 export declare const useObserver: (key: string, fn: Function) => void;
 export declare const getCurrentInstance: () => {
     proxy: Context;
 };
+export declare const onLoad: (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) => void;
 export declare const onShow: (hook: WechatMiniprogram.Page.ILifetime["onShow"]) => void;
 export declare const onReady: (hook: WechatMiniprogram.Page.ILifetime["onReady"]) => void;
 export declare const onHide: (hook: WechatMiniprogram.Page.ILifetime["onHide"]) => void;

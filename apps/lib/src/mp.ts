@@ -3,11 +3,12 @@ import { watch } from "./watch";
 import "miniprogram-api-typings";
 
 // 定义页面
-// declare const Page: PageFunction;
 export type ComponentPropType =
   | StringConstructor
   | NumberConstructor
   | BooleanConstructor
+  | ArrayConstructor
+  | ObjectConstructor
   | null;
 
 type ComponentPropInferValueType<T> = T extends StringConstructor
@@ -16,9 +17,13 @@ type ComponentPropInferValueType<T> = T extends StringConstructor
   ? number
   : T extends BooleanConstructor
   ? boolean
+  : T extends ArrayConstructor
+  ? any[]
+  : T extends ObjectConstructor
+  ? Record<string, any>
   : any;
 
-export type ComponentPropDefinition<T> = {
+export type ComponentPropDefinition<T extends ComponentPropType> = {
   type: T | T[];
   optionalTypes?: ComponentPropType[];
   default?: ComponentPropInferValueType<T>;
@@ -37,9 +42,11 @@ export type ComponentEmit = {
   emit?(key: string, val: any): void;
 };
 
-export type Hook = (
-  props?: ComponentProps,
-  context?: Context & ComponentEmit
+export type PageHook = () => Record<string, any>;
+
+export type ComponentHook = (
+  props: ComponentProps,
+  context: Context & ComponentEmit
 ) => Record<string, any>;
 
 export type Context =
@@ -61,7 +68,7 @@ let _context: Context;
  * @param context - 当前上下文
  * @param hook - Hook 函数
  */
-function useHook(context: Context, hook: Hook) {
+function useHook<T>(context: Context, hook: T) {
   _context = context;
   const splitFieldsAndMethods = (obj: WechatMiniprogram.Page.DataOption) => {
     const fields: WechatMiniprogram.Page.DataOption = {};
@@ -87,7 +94,7 @@ function useHook(context: Context, hook: Hook) {
 
     context.setData(fields);
   };
-  const result = proxyRefs(hook.call(context));
+  const result = proxyRefs((hook as Function).call(context));
   watch(
     () => result,
     (newVal) => {
@@ -106,11 +113,11 @@ function useHook(context: Context, hook: Hook) {
  */
 export function definePage(
   hook:
-    | Hook
+    | PageHook
     | (WechatMiniprogram.Page.Options<
         WechatMiniprogram.Page.DataOption,
         WechatMiniprogram.Page.CustomOption
-      > & { setup: Hook })
+      > & { setup: PageHook })
 ) {
   let options = {};
   if (typeof hook !== "function") {
@@ -123,7 +130,7 @@ export function definePage(
     ...options,
     // 生命周期回调函数
     onLoad(query) {
-      useHook(this, hook);
+      useHook<PageHook>(this, hook);
       methodEmit.call(this, "onLoad", [query]);
     },
     onShow() {
@@ -205,10 +212,10 @@ function getProperties(props?: ComponentProps) {
  */
 export function defineComponent(
   hook:
-    | Hook
+    | ComponentHook
     | {
         props?: ComponentProps;
-        setup: Hook;
+        setup: ComponentHook;
       }
 ) {
   let options = {};
@@ -238,7 +245,7 @@ export function defineComponent(
           this.triggerEvent(key, { value });
         };
         this.emit = emit;
-        useHook(this, hook.bind(this, this.properties, this));
+        useHook<ComponentHook>(this, hook.bind(this, this.properties, this));
         methodEmit.call(this, "attached");
       },
       ready() {
@@ -329,6 +336,8 @@ function methodOn(hook: Function, lifetimesKey: string) {
   context[`$${lifetimesKey}`].push(hook.bind(context));
 }
 
+export const onLoad = (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) =>
+  methodOn(hook, "onLoad");
 export const onShow = (hook: WechatMiniprogram.Page.ILifetime["onShow"]) =>
   methodOn(hook, "onShow");
 export const onReady = (hook: WechatMiniprogram.Page.ILifetime["onReady"]) =>
