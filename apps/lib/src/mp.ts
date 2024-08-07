@@ -4,10 +4,40 @@ import "miniprogram-api-typings";
 
 // 定义页面
 // declare const Page: PageFunction;
+export type ComponentPropertiesType =
+  | StringConstructor
+  | NumberConstructor
+  | BooleanConstructor
+  | null;
 
-type Hook = () => any;
-type Context = any;
+type InferValueType<T> = T extends StringConstructor
+  ? string
+  : T extends NumberConstructor
+  ? number
+  : T extends BooleanConstructor
+  ? boolean
+  : any;
 
+export type PropertyDefinition<T> = {
+  type: T | T[];
+  // optionalTypes?: ComponentPropertiesType[];
+  default?: InferValueType<T>;
+  observer?(newVal: InferValueType<T>, oldVal: InferValueType<T>): void;
+};
+
+export type Properties = {
+  [key: string]:
+    | ComponentPropertiesType
+    | PropertyDefinition<ComponentPropertiesType>;
+};
+
+export type Context2 = {
+  emit(): void;
+};
+
+export type Hook = (props?: Properties, context?: Context2) => void;
+
+export type Context = any;
 let _context: Context;
 
 /**
@@ -17,8 +47,8 @@ let _context: Context;
  */
 function useHook(context: Context, hook: Hook) {
   _context = context;
-  const splitFieldsAndMethods = (obj: Record<string, any>) => {
-    const fields: Record<string, any> = {};
+  const splitFieldsAndMethods = (obj: WechatMiniprogram.Page.DataOption) => {
+    const fields: WechatMiniprogram.Page.DataOption = {};
     const methods: Record<string, Function> = {};
     for (const k in obj) {
       if (typeof obj[k] === "function") {
@@ -32,7 +62,7 @@ function useHook(context: Context, hook: Hook) {
       methods,
     };
   };
-  const setData = (result: Record<string, any>) => {
+  const setData = (result: WechatMiniprogram.Page.DataOption) => {
     const { fields, methods } = splitFieldsAndMethods(result);
 
     Object.keys(methods).forEach((key) => {
@@ -131,17 +161,14 @@ export function definePage(
  * @param props - 组件的属性
  * @returns 转换后的属性对象
  */
-function getProperties(props: Record<string, any>) {
-  return Object.keys(props).reduce((prev, item) => {
-    const value = props[item].default || props[item].value;
-    prev[item] = value
-      ? {
-          type: props[item].type,
-          value,
-        }
-      : props[item];
-    return prev;
-  }, {} as Record<string, any>);
+function getProperties(props: Properties) {
+  for (let prop in props) {
+    if (props[prop] && props[prop].type) {
+      props[prop].value = props[prop].default;
+    }
+  }
+
+  return props;
 }
 
 /**
