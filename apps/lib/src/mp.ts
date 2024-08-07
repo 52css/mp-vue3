@@ -4,13 +4,13 @@ import "miniprogram-api-typings";
 
 // 定义页面
 // declare const Page: PageFunction;
-export type ComponentPropertiesType =
+export type ComponentPropType =
   | StringConstructor
   | NumberConstructor
   | BooleanConstructor
   | null;
 
-type InferValueType<T> = T extends StringConstructor
+type ComponentPropInferValueType<T> = T extends StringConstructor
   ? string
   : T extends NumberConstructor
   ? number
@@ -18,26 +18,42 @@ type InferValueType<T> = T extends StringConstructor
   ? boolean
   : any;
 
-export type PropertyDefinition<T> = {
+export type ComponentPropDefinition<T> = {
   type: T | T[];
-  // optionalTypes?: ComponentPropertiesType[];
-  default?: InferValueType<T>;
-  observer?(newVal: InferValueType<T>, oldVal: InferValueType<T>): void;
+  optionalTypes?: ComponentPropType[];
+  default?: ComponentPropInferValueType<T>;
+  value?: ComponentPropInferValueType<T>;
+  observer?(
+    newVal: ComponentPropInferValueType<T>,
+    oldVal: ComponentPropInferValueType<T>
+  ): void;
 };
 
-export type Properties = {
-  [key: string]:
-    | ComponentPropertiesType
-    | PropertyDefinition<ComponentPropertiesType>;
+export type ComponentProps = {
+  [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
 };
 
-export type Context2 = {
-  emit(): void;
+export type ComponentEmit = {
+  emit?(key: string, val: any): void;
 };
 
-export type Hook = (props?: Properties, context?: Context2) => void;
+export type Hook = (
+  props?: ComponentProps,
+  context?: Context & ComponentEmit
+) => Record<string, any>;
 
-export type Context = any;
+export type Context =
+  | WechatMiniprogram.Component.Instance<
+      WechatMiniprogram.Component.DataOption,
+      Record<string, any>,
+      WechatMiniprogram.Component.MethodOption,
+      {},
+      false
+    >
+  | WechatMiniprogram.Page.Instance<
+      WechatMiniprogram.Page.DataOption,
+      WechatMiniprogram.Page.CustomOption
+    >;
 let _context: Context;
 
 /**
@@ -108,50 +124,50 @@ export function definePage(
     // 生命周期回调函数
     onLoad(query) {
       useHook(this, hook);
-      hooksEmit.call(this, "onLoad", [query]);
+      methodEmit.call(this, "onLoad", [query]);
     },
     onShow() {
-      hooksEmit.call(this, "onShow");
+      methodEmit.call(this, "onShow");
     },
     onReady() {
-      hooksEmit.call(this, "onReady");
+      methodEmit.call(this, "onReady");
     },
     onHide() {
-      hooksEmit.call(this, "onHide");
+      methodEmit.call(this, "onHide");
     },
     onUnload() {
-      hooksEmit.call(this, "onUnload");
+      methodEmit.call(this, "onUnload");
     },
     onRouteDone() {
-      hooksEmit.call(this, "onRouteDone");
+      methodEmit.call(this, "onRouteDone");
     },
     // 页面事件处理函数
     onPullDownRefresh() {
-      hooksEmit.call(this, "onPullDownRefresh");
+      methodEmit.call(this, "onPullDownRefresh");
     },
     onReachBottom() {
-      hooksEmit.call(this, "onReachBottom");
+      methodEmit.call(this, "onReachBottom");
     },
     onPageScroll(object) {
-      hooksEmit.call(this, "onPageScroll", [object]);
+      methodEmit.call(this, "onPageScroll", [object]);
     },
     onAddToFavorites(object) {
-      return hooksOnce.call(this, "onAddToFavorites", [object]);
+      return methodOnce.call(this, "onAddToFavorites", [object]);
     },
     onShareAppMessage(event) {
-      return hooksOnce.call(this, "onShareAppMessage", [event]);
+      return methodOnce.call(this, "onShareAppMessage", [event]);
     },
     onShareTimeline() {
-      return hooksOnce.call(this, "onShareTimeline");
+      return methodOnce.call(this, "onShareTimeline");
     },
     onResize(event) {
-      hooksEmit.call(this, "onResize", [event]);
+      methodEmit.call(this, "onResize", [event]);
     },
     onTabItemTap(object) {
-      hooksEmit.call(this, "onTabItemTap", [object]);
+      methodEmit.call(this, "onTabItemTap", [object]);
     },
     onSaveExitState() {
-      hooksEmit.call(this, "onSaveExitState");
+      methodEmit.call(this, "onSaveExitState");
     },
   });
 }
@@ -161,10 +177,22 @@ export function definePage(
  * @param props - 组件的属性
  * @returns 转换后的属性对象
  */
-function getProperties(props: Properties) {
+function getProperties(props?: ComponentProps) {
+  if (!props) {
+    return {};
+  }
   for (let prop in props) {
-    if (props[prop] && props[prop].type) {
-      props[prop].value = props[prop].default;
+    const val = props[prop] as ComponentPropDefinition<ComponentPropType>;
+    if (val && val.type) {
+      val.value = typeof val.default !== "undefined" ? val.default : val.value;
+      if (Array.isArray(val.type)) {
+        const optionalTypes = val.type;
+        val.type = optionalTypes[0];
+        val.optionalTypes =
+          typeof val.optionalTypes !== "undefined"
+            ? val.optionalTypes
+            : optionalTypes;
+      }
     }
   }
 
@@ -179,18 +207,21 @@ export function defineComponent(
   hook:
     | Hook
     | {
-        props?: Record<string, any>;
+        props?: ComponentProps;
         setup: Hook;
       }
 ) {
   let options = {};
-  let properties: Record<string, any> = {};
+  let properties = {};
   if (typeof hook !== "function") {
     const { setup, props, ...other } = hook;
 
     options = other;
     properties = getProperties(props);
     hook = setup;
+    if ("properties" in other) {
+      console.warn(`属性使用"props"`);
+    }
   }
 
   Component({
@@ -208,19 +239,19 @@ export function defineComponent(
         };
         this.emit = emit;
         useHook(this, hook.bind(this, this.properties, this));
-        hooksEmit.call(this, "attached");
+        methodEmit.call(this, "attached");
       },
       ready() {
-        hooksEmit.call(this, "ready");
+        methodEmit.call(this, "ready");
       },
       moved() {
-        hooksEmit.call(this, "moved");
+        methodEmit.call(this, "moved");
       },
       detached() {
-        hooksEmit.call(this, "detached");
+        methodEmit.call(this, "detached");
       },
       error(err: WechatMiniprogram.Error) {
-        hooksEmit.call(this, "error", [err]);
+        methodEmit.call(this, "error", [err]);
       },
     },
   });
@@ -232,7 +263,7 @@ export const getCurrentPage = () => {
   return pages[pages.length - 1];
 };
 
-function hooksEmit(this: any, lifetimesKey: string, args?: any[]) {
+function methodEmit(this: any, lifetimesKey: string, args?: any[]) {
   if (!this[`$${lifetimesKey}`]) {
     return;
   }
@@ -242,7 +273,7 @@ function hooksEmit(this: any, lifetimesKey: string, args?: any[]) {
   });
 }
 
-function hooksOnce(this: any, lifetimesKey: string, args?: any[]) {
+function methodOnce(this: any, lifetimesKey: string, args?: any[]) {
   if (!this[`$${lifetimesKey}`]) {
     return;
   }
@@ -283,7 +314,7 @@ export const getCurrentInstance = () => {
   };
 };
 
-function hooksOn(hook: Function, lifetimesKey: string) {
+function methodOn(hook: Function, lifetimesKey: string) {
   const isPageLifetime = /^on/.test(lifetimesKey);
   const context = isPageLifetime ? getCurrentPage() : _context;
 
@@ -299,49 +330,49 @@ function hooksOn(hook: Function, lifetimesKey: string) {
 }
 
 export const onShow = (hook: WechatMiniprogram.Page.ILifetime["onShow"]) =>
-  hooksOn(hook, "onShow");
+  methodOn(hook, "onShow");
 export const onReady = (hook: WechatMiniprogram.Page.ILifetime["onReady"]) =>
-  hooksOn(hook, "onReady");
+  methodOn(hook, "onReady");
 export const onHide = (hook: WechatMiniprogram.Page.ILifetime["onHide"]) =>
-  hooksOn(hook, "onHide");
+  methodOn(hook, "onHide");
 export const onUnload = (hook: WechatMiniprogram.Page.ILifetime["onUnload"]) =>
-  hooksOn(hook, "onUnload");
-export const onRouteDone = (hook: () => void) => hooksOn(hook, "onRouteDone");
+  methodOn(hook, "onUnload");
+export const onRouteDone = (hook: () => void) => methodOn(hook, "onRouteDone");
 export const onPullDownRefresh = (
   hook: WechatMiniprogram.Page.ILifetime["onPullDownRefresh"]
-) => hooksOn(hook, "onPullDownRefresh");
+) => methodOn(hook, "onPullDownRefresh");
 export const onReachBottom = (
   hook: WechatMiniprogram.Page.ILifetime["onReachBottom"]
-) => hooksOn(hook, "onReachBottom");
+) => methodOn(hook, "onReachBottom");
 export const onPageScroll = (
   hook: WechatMiniprogram.Page.ILifetime["onPageScroll"]
-) => hooksOn(hook, "onPageScroll");
+) => methodOn(hook, "onPageScroll");
 export const onAddToFavorites = (
   hook: WechatMiniprogram.Page.ILifetime["onAddToFavorites"]
-) => hooksOn(hook, "onAddToFavorites");
+) => methodOn(hook, "onAddToFavorites");
 export const onShareAppMessage = (
   hook: WechatMiniprogram.Page.ILifetime["onShareAppMessage"]
-) => hooksOn(hook, "onShareAppMessage");
+) => methodOn(hook, "onShareAppMessage");
 export const onShareTimeline = (
   hook: WechatMiniprogram.Page.ILifetime["onShareTimeline"]
-) => hooksOn(hook, "onShareTimeline");
+) => methodOn(hook, "onShareTimeline");
 export const onResize = (hook: WechatMiniprogram.Page.ILifetime["onResize"]) =>
-  hooksOn(hook, "onResize");
+  methodOn(hook, "onResize");
 export const onTabItemTap = (
   hook: WechatMiniprogram.Page.ILifetime["onTabItemTap"]
-) => hooksOn(hook, "onTabItemTap");
+) => methodOn(hook, "onTabItemTap");
 export const onSaveExitState = (hook: () => void) =>
-  hooksOn(hook, "onSaveExitState");
+  methodOn(hook, "onSaveExitState");
 
 export const attached = (
   hook: WechatMiniprogram.Component.Lifetimes["attached"]
-) => hooksOn(hook, "attached");
+) => methodOn(hook, "attached");
 export const ready = (hook: WechatMiniprogram.Component.Lifetimes["ready"]) =>
-  hooksOn(hook, "ready");
+  methodOn(hook, "ready");
 export const moved = (hook: WechatMiniprogram.Component.Lifetimes["moved"]) =>
-  hooksOn(hook, "moved");
+  methodOn(hook, "moved");
 export const detached = (
   hook: WechatMiniprogram.Component.Lifetimes["detached"]
-) => hooksOn(hook, "detached");
+) => methodOn(hook, "detached");
 export const error = (hook: WechatMiniprogram.Component.Lifetimes["error"]) =>
-  hooksOn(hook, "error");
+  methodOn(hook, "error");
