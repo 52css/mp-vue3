@@ -21,6 +21,18 @@ bun add @52css/mp-vue3
 
 ## 响应式API
 
+### App
+
+```ts
+import { createApp } from '@52css/mp-vue3'
+
+createApp(() => {
+  return {
+  }
+})
+```
+
+
 ### Page 页面
 
 ```ts
@@ -190,14 +202,26 @@ wxml
 
 ## API
 
+### App
+
+* createApp 创建app
+* onLaunch
+* onShow
+* onHide
+* onError
+* onPageNotFound
+* onUnhandledRejection
+* onThemeChange
+* useApp 获取当前app === getApp()
+
 ### 页面
 
 * definePage 定义页面
-* getCurrentPage 获取当前页面
+* usePage 获取当前页面 === getCurrentPages().at(-1)
 
 ### 页码生命周期
 
-* onLoad => setup
+* onLoad
 * onShow
 * onReady
 * onHide
@@ -216,12 +240,12 @@ wxml
 ### 组件
 
 * defineComponent 定义组件
-* getCurrentInstance 获取当前示例
+* useComponent 获取当前组件，必须在setup下运行，不能if判断
 * useObserver 监控属性变化(props和data)
 
 ### 组件生命周期
 
-* attached => setup
+* attached
 * ready
 * moved
 * detached

@@ -1,5 +1,7 @@
 import { ref, definePage } from "@52css/mp-vue3";
 
+var app = getApp();
+
 definePage(() => {
   const count = ref(0);
   const onIncrease = () => {
