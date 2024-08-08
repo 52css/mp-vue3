@@ -213,12 +213,24 @@ function getProperties(props?: ComponentProps) {
 export function defineComponent(
   hook:
     | ComponentHook
-    | {
+    | (WechatMiniprogram.Component.Options<
+        WechatMiniprogram.Component.DataOption,
+        {},
+        WechatMiniprogram.Component.MethodOption,
+        {},
+        false
+      > & {
         props?: ComponentProps;
         setup: ComponentHook;
-      }
+      })
 ) {
-  let options = {};
+  let options: WechatMiniprogram.Component.Options<
+    WechatMiniprogram.Component.DataOption,
+    {},
+    WechatMiniprogram.Component.MethodOption,
+    {},
+    false
+  > = {};
   let properties = {};
   if (typeof hook !== "function") {
     const { setup, props, ...other } = hook;
@@ -230,13 +242,25 @@ export function defineComponent(
       console.warn(`属性使用"props"`);
     }
   }
+  const optionsOptions = options.options;
+  const getOptionsValue = (key: string, defaultValue: string | boolean) => {
+    if (
+      !optionsOptions ||
+      typeof (optionsOptions as any)[key] === "undefined"
+    ) {
+      return defaultValue;
+    }
+
+    return (optionsOptions as any)[key];
+  };
 
   Component({
     ...options,
     options: {
-      virtualHost: true,
-      styleIsolation: "apply-shared",
-      multipleSlots: true,
+      ...optionsOptions,
+      virtualHost: getOptionsValue("virtualHost", true),
+      styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
+      multipleSlots: getOptionsValue("multipleSlots", true),
     },
     properties,
     lifetimes: {
