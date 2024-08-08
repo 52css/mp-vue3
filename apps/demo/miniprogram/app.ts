@@ -1,10 +1,9 @@
-import { createApp, onLaunch, onShow } from "@52css/mp-vue3";
-
-createApp(() => {
-  const pages = getCurrentPages();
-  console.log("🚀 ~ createApp ~ pages:", pages);
-  console.log("🚀 ~ onLaunch ~ onLaunch:", onLaunch);
-  onLaunch(() => {
+import { createApp } from "@52css/mp-vue3";
+// app.ts
+App<IAppOption>({
+  globalData: {},
+  onLaunch() {
+    console.log("111");
     // 展示本地存储能力
     const logs = wx.getStorageSync("logs") || [];
     logs.unshift(Date.now());
@@ -17,11 +16,5 @@ createApp(() => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
       },
     });
-  });
-  onShow(() => {
-    console.log("🚀 ~ onShow ~ onShow:", onShow);
-    console.log("onAppShow");
-  });
-
-  return {};
+  },
 });

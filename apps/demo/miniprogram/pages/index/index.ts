@@ -1,17 +1,26 @@
-import { ref, definePage } from "@52css/mp-vue3";
+import { ref, definePage, onShow } from "@52css/mp-vue3";
 
 var app = getApp();
 
-definePage(() => {
-  const count = ref(0);
-  const onIncrease = () => {
-    count.value++;
-  };
+definePage({
+  onShow() {
+    console.log("onNativePageShow");
+  },
+  setup: () => {
+    const count = ref(0);
+    const onIncrease = () => {
+      count.value++;
+    };
 
-  return {
-    // 返回响应式数据
-    count,
-    // 返回事件
-    onIncrease,
-  };
+    onShow(() => {
+      console.log("onPageShow");
+    });
+
+    return {
+      // 返回响应式数据
+      count,
+      // 返回事件
+      onIncrease,
+    };
+  },
 });

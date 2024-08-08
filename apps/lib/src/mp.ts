@@ -66,7 +66,15 @@ export type Context =
     >;
 let _context: Context;
 
-function methodEmit(this: any, lifetimesKey: string, args?: any[]) {
+function methodEmit(
+  this: any,
+  options: any,
+  lifetimesKey: string,
+  args?: any[]
+) {
+  if (options && options[lifetimesKey]) {
+    options[lifetimesKey].apply(this, args);
+  }
   if (!this[`$${lifetimesKey}`]) {
     return;
   }
@@ -76,7 +84,15 @@ function methodEmit(this: any, lifetimesKey: string, args?: any[]) {
   });
 }
 
-function methodOnce(this: any, lifetimesKey: string, args?: any[]) {
+function methodOnce(
+  this: any,
+  options: any,
+  lifetimesKey: string,
+  args?: any[]
+) {
+  if (options && options[lifetimesKey]) {
+    return options[lifetimesKey].apply(this, args);
+  }
   if (!this[`$${lifetimesKey}`]) {
     return;
   }
@@ -105,7 +121,7 @@ function methodOn(hook: Function, lifetimesKey: string, context: Context) {
  * @param context - 当前上下文
  * @param hook - Hook 函数
  */
-function useHook<T>(context: Context, hook: T) {
+function useHook<T>(context: Context, hook?: T) {
   _context = context;
   const splitFieldsAndMethods = (obj: WechatMiniprogram.Page.DataOption) => {
     const fields: WechatMiniprogram.Page.DataOption = {};
@@ -185,7 +201,7 @@ export function createApp(
   hook:
     | AppHook
     | {
-        setup: AppHook;
+        setup?: AppHook;
       }
 ) {
   let options = {};
@@ -199,20 +215,20 @@ export function createApp(
     ...options,
     // 生命周期回调函数
     onLaunch(object) {
-      useHook<AppHook>(this, hook);
-      methodEmit.call(this, "onLaunch", [object]);
+      hook && useHook<AppHook>(this, hook);
+      methodEmit.call(this, options, "onLaunch", [object]);
     },
     onShow() {
-      methodEmit.call(this, "onShow");
+      methodEmit.call(this, options, "onShow");
     },
     onHide() {
-      methodEmit.call(this, "onHide");
+      methodEmit.call(this, options, "onHide");
     },
     onError(error) {
-      methodEmit.call(this, "onError", [error]);
+      methodEmit.call(this, options, "onError", [error]);
     },
     onPageNotFound(object) {
-      methodEmit.call(this, "onPageNotFound", [object]);
+      methodEmit.call(this, options, "onPageNotFound", [object]);
     },
   });
 }
@@ -237,7 +253,7 @@ export function definePage(
     | (WechatMiniprogram.Page.Options<
         WechatMiniprogram.Page.DataOption,
         WechatMiniprogram.Page.CustomOption
-      > & { setup: PageHook })
+      > & { setup?: PageHook })
 ) {
   let options = {};
   if (typeof hook !== "function") {
@@ -250,51 +266,51 @@ export function definePage(
     ...options,
     // 生命周期回调函数
     onLoad(query) {
-      useHook<PageHook>(this, hook);
-      methodEmit.call(this, "onLoad", [query]);
+      hook && useHook<PageHook>(this, hook);
+      methodEmit.call(this, options, "onLoad", [query]);
     },
     onShow() {
-      methodEmit.call(this, "onShow");
+      methodEmit.call(this, options, "onShow");
     },
     onReady() {
-      methodEmit.call(this, "onReady");
+      methodEmit.call(this, options, "onReady");
     },
     onHide() {
-      methodEmit.call(this, "onHide");
+      methodEmit.call(this, options, "onHide");
     },
     onUnload() {
-      methodEmit.call(this, "onUnload");
+      methodEmit.call(this, options, "onUnload");
     },
     onRouteDone() {
-      methodEmit.call(this, "onRouteDone");
+      methodEmit.call(this, options, "onRouteDone");
     },
     // 页面事件处理函数
     onPullDownRefresh() {
-      methodEmit.call(this, "onPullDownRefresh");
+      methodEmit.call(this, options, "onPullDownRefresh");
     },
     onReachBottom() {
-      methodEmit.call(this, "onReachBottom");
+      methodEmit.call(this, options, "onReachBottom");
     },
     onPageScroll(object) {
-      methodEmit.call(this, "onPageScroll", [object]);
+      methodEmit.call(this, options, "onPageScroll", [object]);
     },
     onAddToFavorites(object) {
-      return methodOnce.call(this, "onAddToFavorites", [object]);
+      return methodOnce.call(this, options, "onAddToFavorites", [object]);
     },
     onShareAppMessage(event) {
-      return methodOnce.call(this, "onShareAppMessage", [event]);
+      return methodOnce.call(this, options, "onShareAppMessage", [event]);
     },
     onShareTimeline() {
-      return methodOnce.call(this, "onShareTimeline");
+      return methodOnce.call(this, options, "onShareTimeline");
     },
     onResize(event) {
-      methodEmit.call(this, "onResize", [event]);
+      methodEmit.call(this, options, "onResize", [event]);
     },
     onTabItemTap(object) {
-      methodEmit.call(this, "onTabItemTap", [object]);
+      methodEmit.call(this, options, "onTabItemTap", [object]);
     },
     onSaveExitState() {
-      methodEmit.call(this, "onSaveExitState");
+      methodEmit.call(this, options, "onSaveExitState");
     },
   });
 }
@@ -365,7 +381,7 @@ export function defineComponent(
         false
       > & {
         props?: ComponentProps;
-        setup: ComponentHook;
+        setup?: ComponentHook;
       })
 ) {
   let options: WechatMiniprogram.Component.Options<
@@ -413,20 +429,21 @@ export function defineComponent(
           this.triggerEvent(key, { value });
         };
         this.emit = emit;
-        useHook<ComponentHook>(this, hook.bind(this, this.properties, this));
-        methodEmit.call(this, "attached");
+        hook &&
+          useHook<ComponentHook>(this, hook.bind(this, this.properties, this));
+        methodEmit.call(this, options, "attached");
       },
       ready() {
-        methodEmit.call(this, "ready");
+        methodEmit.call(this, options, "ready");
       },
       moved() {
-        methodEmit.call(this, "moved");
+        methodEmit.call(this, options, "moved");
       },
       detached() {
-        methodEmit.call(this, "detached");
+        methodEmit.call(this, options, "detached");
       },
       error(err: WechatMiniprogram.Error) {
-        methodEmit.call(this, "error", [err]);
+        methodEmit.call(this, options, "error", [err]);
       },
     },
   });
