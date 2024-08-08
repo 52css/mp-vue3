@@ -197,7 +197,7 @@ wxml
 
 ### 页码生命周期
 
-* onLoad => setup
+* onLoad
 * onShow
 * onReady
 * onHide
@@ -221,7 +221,7 @@ wxml
 
 ### 组件生命周期
 
-* attached => setup
+* attached
 * ready
 * moved
 * detached

@@ -28,10 +28,10 @@ export declare function definePage(hook: PageHook | (WechatMiniprogram.Page.Opti
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare function defineComponent(hook: ComponentHook | {
+export declare function defineComponent(hook: ComponentHook | (WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false> & {
     props?: ComponentProps;
     setup: ComponentHook;
-}): void;
+})): void;
 export declare const getCurrentPage: () => WechatMiniprogram.Page.Instance<WechatMiniprogram.IAnyObject, WechatMiniprogram.IAnyObject>;
 export declare const useObserver: (key: string, fn: Function) => void;
 export declare const getCurrentInstance: () => {

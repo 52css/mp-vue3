@@ -289,7 +289,6 @@ export function defineComponent(
 }
 
 export const getCurrentPage = () => {
-  //@ts-ignore 微信自带方法
   const pages = getCurrentPages();
   return pages[pages.length - 1];
 };
