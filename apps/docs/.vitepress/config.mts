@@ -4,7 +4,7 @@ import { getSidebar } from "vitepress-plugin-auto-sidebar";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "MP Vue3",
+  title: "🅥 MP Vue3",
   description: "基于 Vue 3 的小程序框架：轻松构建高效应用",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
