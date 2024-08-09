@@ -23,7 +23,7 @@ defineComponent(() => {
 });
 ```
 
-## 对象默认下扩充 `setup` 方法
+## 👍 对象默认下扩充 `setup` 方法
 
 ```ts
 import { defineComponent, ref } from '@52css/mp-vue3'

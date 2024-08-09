@@ -4,7 +4,7 @@
 * 👍 扩充支持 `Function`
 * 对象默认下扩充 `setup` 方法
 
-## 扩充支持 `Function`
+## 👍 扩充支持 `Function`
 
 ```ts
 import { definePage, ref } from '@52css/mp-vue3'

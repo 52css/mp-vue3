@@ -9,10 +9,10 @@ hero:
   actions:
     - theme: brand
       text: 开始
-      link: /markdown-examples
+      link: /guide/快速上手.md
     - theme: alt
       text: 在Github上查看
-      link: /api-examples
+      link: https://github.com/52css/mp-vue3
 
 features:
   - icon: 📝
