@@ -19,13 +19,10 @@ cp -r .vitepress/dist/* .
 git add .
 
 # 提交更改
-git commit -m 'deploy'
+git commit -m "Update gh-pages"
 
-# 如果你是要部署到 https://<USERNAME>.github.io
-# git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git main
+# 推送到远程仓库
+git push origin gh-pages
 
-# 如果你是要部署到 https://<USERNAME>.github.io/<REPO>
-# git push -f git@github.com:52css/base-vue.git master:gh-pages
-git push -f https://github.com/52css/mp-vue3.git main:gh-pages
-
-# cd -
+# 切换回主分支
+git checkout main
