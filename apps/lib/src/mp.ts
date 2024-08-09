@@ -196,14 +196,16 @@ function getProperties(props?: ComponentProps) {
 
   return props;
 }
-
 export function createApp(
-  hook:
+  hook?:
     | AppHook
     | {
         setup?: AppHook;
       }
 ) {
+  if (!hook) {
+    return App({});
+  }
   let options = {};
   if (typeof hook !== "function") {
     const { setup, ...other } = hook;
@@ -215,7 +217,7 @@ export function createApp(
     ...options,
     // 生命周期回调函数
     onLaunch(object) {
-      hook && useHook<AppHook>(this, hook);
+      hook && useHook<AppHook>(this, hook as AppHook);
       methodEmit.call(this, options, "onLaunch", [object]);
     },
     onShow() {
@@ -233,7 +235,7 @@ export function createApp(
   });
 }
 
-export const useApp = () => getApp();
+export const useApp = getApp;
 
 export const onLaunch = (hook: Function) =>
   methodOn(hook, "onLaunch", useApp());
@@ -248,13 +250,17 @@ export const onUnhandledRejection = (hook: Function) =>
  * @param hook - Hook 函数或包含 setup 的对象
  */
 export function definePage(
-  hook:
+  hook?:
     | PageHook
     | (WechatMiniprogram.Page.Options<
         WechatMiniprogram.Page.DataOption,
         WechatMiniprogram.Page.CustomOption
       > & { setup?: PageHook })
 ) {
+  if (!hook) {
+    return Page({});
+  }
+
   let options = {};
   if (typeof hook !== "function") {
     const { setup, ...other } = hook;
@@ -266,7 +272,7 @@ export function definePage(
     ...options,
     // 生命周期回调函数
     onLoad(query) {
-      hook && useHook<PageHook>(this, hook);
+      hook && useHook<PageHook>(this, hook as PageHook);
       methodEmit.call(this, options, "onLoad", [query]);
     },
     onShow() {
@@ -371,7 +377,7 @@ export const onSaveExitState = (hook: () => void) =>
  * @param hook - Hook 函数或包含 setup 的对象
  */
 export function defineComponent(
-  hook:
+  hook?:
     | ComponentHook
     | (WechatMiniprogram.Component.Options<
         WechatMiniprogram.Component.DataOption,
@@ -384,6 +390,16 @@ export function defineComponent(
         setup?: ComponentHook;
       })
 ) {
+  if (!hook) {
+    return Component({
+      options: {
+        virtualHost: true,
+        styleIsolation: "apply-shared",
+        multipleSlots: true,
+      },
+    });
+  }
+
   let options: WechatMiniprogram.Component.Options<
     WechatMiniprogram.Component.DataOption,
     {},
@@ -430,7 +446,10 @@ export function defineComponent(
         };
         this.emit = emit;
         hook &&
-          useHook<ComponentHook>(this, hook.bind(this, this.properties, this));
+          useHook<ComponentHook>(
+            this,
+            (hook as ComponentHook).bind(this, this.properties, this)
+          );
         methodEmit.call(this, options, "attached");
       },
       ready() {
