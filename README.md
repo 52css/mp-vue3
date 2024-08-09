@@ -9,4 +9,4 @@
 
 ## 查看文档
 
-* [在线文档](https://52css.github.ios/mp-vue3/)
+* [在线文档](https://52css.github.io/mp-vue3/)
