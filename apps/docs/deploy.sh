@@ -4,25 +4,23 @@
 set -e
 
 # 构建
-bun run docs:build
+npm run docs:build
 
-# 切换到 gh-pages 分支
-git checkout gh-pages
+# 进入生成的构建文件夹
+cd .vitepress/dist
 
-# 清空当前分支
-git rm -rf .
+# 如果你是要部署到自定义域名
+# echo 'www.example.com' > CNAME
 
-# 将构建结果拷贝到当前分支
-cp -r .vitepress/dist/* .
+git init
+git add -A
+git commit -m 'deploy'
 
-# 添加所有更改
-git add .
+# 如果你是要部署到 https://<USERNAME>.github.io
+# git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git main
 
-# 提交更改
-git commit -m "Update gh-pages"
+# 如果你是要部署到 https://<USERNAME>.github.io/<REPO>
+# git push -f git@github.com:52css/base-vue.git master:gh-pages
+git push -f https://github.com/52css/mp-vue3.git HEAD:gh-pages
 
-# 推送到远程仓库
-git push origin gh-pages
-
-# 切换回主分支
-git checkout main
+# cd -
