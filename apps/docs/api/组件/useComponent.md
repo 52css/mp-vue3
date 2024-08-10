@@ -7,11 +7,14 @@
 ```ts
 import { defineComponent, useComponent } from '@52css/mp-vue3'
 
-defineComponent(() => {
-  const comp = useComponent();
-  console.log("🚀 ~ defineComponent ~ comp:", comp)
+defineComponent({
+  props: {},
+  setup() {
+    const comp = useComponent();
+    console.log("🚀 ~ defineComponent ~ comp:", comp)
 
-  return {
+    return {
+    }
   }
 });
 ```
