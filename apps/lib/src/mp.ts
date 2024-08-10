@@ -261,7 +261,10 @@ export function definePage(
     return Page({});
   }
 
-  let options = {};
+  let options: WechatMiniprogram.Page.Options<
+    WechatMiniprogram.Page.DataOption,
+    WechatMiniprogram.Page.CustomOption
+  > = {};
   if (typeof hook !== "function") {
     const { setup, ...other } = hook;
     options = other || {};
@@ -270,6 +273,9 @@ export function definePage(
 
   Page({
     ...options,
+    data: {
+      ...options.data,
+    },
     // 生命周期回调函数
     onLoad(query) {
       hook && useHook<PageHook>(this, hook as PageHook);
@@ -431,6 +437,9 @@ export function defineComponent(
       multipleSlots: getOptionsValue("multipleSlots", true),
     },
     properties,
+    data: {
+      ...options.data,
+    },
     lifetimes: {
       attached() {
         const emit = (key: string, value: any) => {
