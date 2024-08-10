@@ -196,54 +196,54 @@ function getProperties(props?: ComponentProps) {
 
   return props;
 }
-export function createApp(
-  hook?:
-    | AppHook
-    | {
-        setup?: AppHook;
-      }
-) {
-  if (!hook) {
-    return App({});
-  }
-  let options = {};
-  if (typeof hook !== "function") {
-    const { setup, ...other } = hook;
-    options = other || {};
-    hook = setup;
-  }
+// export function createApp(
+//   hook?:
+//     | AppHook
+//     | {
+//         setup?: AppHook;
+//       }
+// ) {
+//   if (!hook) {
+//     return App({});
+//   }
+//   let options = {};
+//   if (typeof hook !== "function") {
+//     const { setup, ...other } = hook;
+//     options = other || {};
+//     hook = setup;
+//   }
 
-  App({
-    ...options,
-    // 生命周期回调函数
-    onLaunch(object) {
-      hook && useHook<AppHook>(this, hook as AppHook);
-      methodEmit.call(this, options, "onLaunch", [object]);
-    },
-    onShow() {
-      methodEmit.call(this, options, "onShow");
-    },
-    onHide() {
-      methodEmit.call(this, options, "onHide");
-    },
-    onError(error) {
-      methodEmit.call(this, options, "onError", [error]);
-    },
-    onPageNotFound(object) {
-      methodEmit.call(this, options, "onPageNotFound", [object]);
-    },
-  });
-}
+//   App({
+//     ...options,
+//     // 生命周期回调函数
+//     onLaunch(object) {
+//       hook && useHook<AppHook>(this, hook as AppHook);
+//       methodEmit.call(this, options, "onLaunch", [object]);
+//     },
+//     onShow() {
+//       methodEmit.call(this, options, "onShow");
+//     },
+//     onHide() {
+//       methodEmit.call(this, options, "onHide");
+//     },
+//     onError(error) {
+//       methodEmit.call(this, options, "onError", [error]);
+//     },
+//     onPageNotFound(object) {
+//       methodEmit.call(this, options, "onPageNotFound", [object]);
+//     },
+//   });
+// }
 
-export const useApp = getApp;
+// export const useApp = getApp;
 
-export const onLaunch = (hook: Function) =>
-  methodOn(hook, "onLaunch", useApp());
-export const onError = (hook: Function) => methodOn(hook, "onError", useApp());
-export const onPageNotFound = (hook: Function) =>
-  methodOn(hook, "onPageNotFound", useApp());
-export const onUnhandledRejection = (hook: Function) =>
-  methodOn(hook, "onUnhandledRejection", useApp());
+// export const onLaunch = (hook: Function) =>
+//   methodOn(hook, "onLaunch", useApp());
+// export const onError = (hook: Function) => methodOn(hook, "onError", useApp());
+// export const onPageNotFound = (hook: Function) =>
+//   methodOn(hook, "onPageNotFound", useApp());
+// export const onUnhandledRejection = (hook: Function) =>
+//   methodOn(hook, "onUnhandledRejection", useApp());
 
 /**
  * 创建页面并关联生命周期函数
@@ -329,19 +329,11 @@ export const usePage = () => {
 export const onLoad = (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) =>
   methodOn(hook, "onLoad", usePage());
 export const onShow = (hook: WechatMiniprogram.Page.ILifetime["onShow"]) =>
-  methodOn(
-    hook,
-    "onShow",
-    getCurrentPages().length === 0 ? useApp() : usePage()
-  );
+  methodOn(hook, "onShow", usePage());
 export const onReady = (hook: WechatMiniprogram.Page.ILifetime["onReady"]) =>
   methodOn(hook, "onReady", usePage());
 export const onHide = (hook: WechatMiniprogram.Page.ILifetime["onHide"]) =>
-  methodOn(
-    hook,
-    "onHide",
-    getCurrentPages().length === 0 ? useApp() : usePage()
-  );
+  methodOn(hook, "onHide", usePage());
 export const onUnload = (hook: WechatMiniprogram.Page.ILifetime["onUnload"]) =>
   methodOn(hook, "onUnload", usePage());
 export const onRouteDone = (hook: () => void) =>

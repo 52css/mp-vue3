@@ -18,14 +18,6 @@ export type ComponentEmit = {
 export type PageHook = () => Record<string, any>;
 export type ComponentHook = (props: ComponentProps, context: Context & ComponentEmit) => Record<string, any>;
 export type Context = WechatMiniprogram.App.Instance<WechatMiniprogram.IAnyObject> | WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, Record<string, any>, WechatMiniprogram.Component.MethodOption, {}, false> | WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
-export declare function createApp(hook?: AppHook | {
-    setup?: AppHook;
-}): void;
-export declare const useApp: WechatMiniprogram.App.GetApp;
-export declare const onLaunch: (hook: Function) => void;
-export declare const onError: (hook: Function) => void;
-export declare const onPageNotFound: (hook: Function) => void;
-export declare const onUnhandledRejection: (hook: Function) => void;
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
