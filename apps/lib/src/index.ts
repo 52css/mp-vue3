@@ -1,8 +1,11 @@
 export {
   // Core
   computed,
+  type ComputedRef,
   reactive,
+  type Reactive,
   ref,
+  type Ref,
   readonly,
   // Utilities
   unref,

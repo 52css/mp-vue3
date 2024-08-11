@@ -44,8 +44,6 @@ export type ComponentEmit = {
   emit?(key: string, val: any): void;
 };
 
-export type PageHook = () => Record<string, any>;
-
 export type ComponentHook = (
   props: ComponentProps,
   context: Context & ComponentEmit
@@ -114,6 +112,32 @@ function methodOn(hook: Function, lifetimesKey: string, context: Context) {
   }
 
   context[`$${lifetimesKey}`].push(hook.bind(context));
+}
+
+function createProps(context: Context, props: Record<string, any>) {
+  return new Proxy(props, {
+    get(target, key: string, _receiver) {
+      let value = context.data[key];
+
+      if (
+        value === undefined &&
+        target[key] &&
+        typeof target[key].value !== "undefined"
+      ) {
+        value = target[key].value;
+      }
+
+      return value;
+    },
+    set: function (target, key, value, receiver) {
+      context.setData({
+        [key]: value,
+      });
+      // 发送自定义事件，传递数据
+      context.triggerEvent(key, { value });
+      return Reflect.set(target, key, value, receiver);
+    },
+  });
 }
 
 /**
@@ -251,11 +275,11 @@ function getProperties(props?: ComponentProps) {
  */
 export function definePage(
   hook?:
-    | PageHook
+    | ComponentHook
     | (WechatMiniprogram.Page.Options<
         WechatMiniprogram.Page.DataOption,
         WechatMiniprogram.Page.CustomOption
-      > & { setup?: PageHook })
+      > & { setup?: ComponentHook })
 ) {
   if (!hook) {
     return Page({});
@@ -278,7 +302,17 @@ export function definePage(
     },
     // 生命周期回调函数
     onLoad(query) {
-      hook && useHook<PageHook>(this, hook as PageHook);
+      const emit = (key: string, value: any) => {
+        this.triggerEvent(key, { value });
+      };
+      this.emit = emit;
+      const props = createProps(this, {});
+
+      hook &&
+        useHook<ComponentHook>(
+          this,
+          (hook as ComponentHook).bind(this, props, this)
+        );
       methodEmit.call(this, options, "onLoad", [query]);
     },
     onShow() {
@@ -446,10 +480,11 @@ export function defineComponent(
           this.triggerEvent(key, { value });
         };
         this.emit = emit;
+        const props = createProps(this, properties);
         hook &&
           useHook<ComponentHook>(
             this,
-            (hook as ComponentHook).bind(this, this.properties, this)
+            (hook as ComponentHook).bind(this, props, this)
           );
         methodEmit.call(this, options, "attached");
       },
@@ -484,25 +519,25 @@ export const detached = (
 export const error = (hook: WechatMiniprogram.Component.Lifetimes["error"]) =>
   methodOn(hook, "error", useComponent());
 
-export const useObserver = (key: string, fn: Function) => {
-  const defineReactive = (obj: any, key: string, callback?: Function) => {
-    let val = obj[key];
+// export const useObserver = (key: string, fn: Function) => {
+//   const defineReactive = (obj: any, key: string, callback?: Function) => {
+//     let val = obj[key];
 
-    Object.defineProperty(obj, key, {
-      get() {
-        return val;
-      },
-      set(newVal) {
-        val = newVal;
-        callback && callback(newVal);
-      },
-    });
-  };
-  if (key in _context.properties) {
-    defineReactive(_context.properties, key, fn);
-  } else if (key in _context.data) {
-    defineReactive(_context.data, key, fn);
-  } else {
-    throw new Error(`未找到可以 observer ${key}`);
-  }
-};
+//     Object.defineProperty(obj, key, {
+//       get() {
+//         return val;
+//       },
+//       set(newVal) {
+//         val = newVal;
+//         callback && callback(newVal);
+//       },
+//     });
+//   };
+//   if (key in _context.properties) {
+//     defineReactive(_context.properties, key, fn);
+//   } else if (key in _context.data) {
+//     defineReactive(_context.data, key, fn);
+//   } else {
+//     throw new Error(`未找到可以 observer ${key}`);
+//   }
+// };
