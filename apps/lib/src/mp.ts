@@ -1,5 +1,5 @@
-import { proxyRefs } from "@vue/reactivity";
-import { watch } from "./watch";
+import { isFunction } from "./utils";
+import { deepToRaw, deepWatch } from "./shared";
 import "miniprogram-api-typings";
 
 export type AppHook = () => Record<string, any>;
@@ -49,19 +49,19 @@ export type ComponentHook = (
   context: Context & ComponentEmit
 ) => Record<string, any>;
 
-export type Context =
-  | WechatMiniprogram.App.Instance<WechatMiniprogram.IAnyObject>
-  | WechatMiniprogram.Component.Instance<
-      WechatMiniprogram.Component.DataOption,
-      Record<string, any>,
-      WechatMiniprogram.Component.MethodOption,
-      {},
-      false
-    >
-  | WechatMiniprogram.Page.Instance<
-      WechatMiniprogram.Page.DataOption,
-      WechatMiniprogram.Page.CustomOption
-    >;
+export type AppInstance = Record<string, any>;
+
+export type PageInstance = WechatMiniprogram.Page.InstanceProperties &
+  WechatMiniprogram.Page.InstanceMethods<Record<string, unknown>> & {
+    [key: string]: any;
+  };
+
+export type ComponentInstance = WechatMiniprogram.Component.InstanceProperties &
+  WechatMiniprogram.Component.InstanceMethods<Record<string, unknown>> & {
+    [key: string]: any;
+  };
+
+export type Context = AppInstance | PageInstance | ComponentInstance;
 let _context: Context;
 
 function methodEmit(
@@ -147,51 +147,20 @@ function createProps(context: Context, props: Record<string, any>) {
  */
 function useHook<T>(context: Context, hook?: T) {
   _context = context;
-  const splitFieldsAndMethods = (obj: WechatMiniprogram.Page.DataOption) => {
-    const fields: WechatMiniprogram.Page.DataOption = {};
-    const methods: Record<string, Function> = {};
-    for (const k in obj) {
-      if (typeof obj[k] === "function") {
-        methods[k] = obj[k];
-      } else {
-        fields[k] = obj[k];
-      }
-    }
-    return {
-      fields,
-      methods,
-    };
-  };
-  const setData = (result: WechatMiniprogram.Page.DataOption) => {
-    // 是app，直接给当前实例赋值
-    if (getCurrentPages().length === 0) {
-      if (result) {
-        for (let key in result) {
-          context[key] = result[key];
-        }
-      }
-      return;
-    }
 
-    const { fields, methods } = splitFieldsAndMethods(result);
+  const bindings = (hook as Function).call(context);
+  if (bindings !== undefined) {
+    Object.keys(bindings).forEach((key) => {
+      const value = bindings[key];
+      if (isFunction(value)) {
+        context[key] = value;
+        return;
+      }
 
-    Object.keys(methods).forEach((key) => {
-      context[key] = methods[key];
+      context.setData({ [key]: deepToRaw(value) });
+      deepWatch.call(context, key, value);
     });
-
-    context.setData(fields);
-  };
-  const result = proxyRefs((hook as Function).call(context));
-  watch(
-    () => result,
-    (newVal) => {
-      setData(newVal);
-    },
-    {
-      deep: true,
-      immediate: true,
-    }
-  );
+  }
 }
 
 /**

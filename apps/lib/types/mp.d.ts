@@ -16,7 +16,14 @@ export type ComponentEmit = {
     emit?(key: string, val: any): void;
 };
 export type ComponentHook = (props: ComponentProps, context: Context & ComponentEmit) => Record<string, any>;
-export type Context = WechatMiniprogram.App.Instance<WechatMiniprogram.IAnyObject> | WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, Record<string, any>, WechatMiniprogram.Component.MethodOption, {}, false> | WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
+export type AppInstance = Record<string, any>;
+export type PageInstance = WechatMiniprogram.Page.InstanceProperties & WechatMiniprogram.Page.InstanceMethods<Record<string, unknown>> & {
+    [key: string]: any;
+};
+export type ComponentInstance = WechatMiniprogram.Component.InstanceProperties & WechatMiniprogram.Component.InstanceMethods<Record<string, unknown>> & {
+    [key: string]: any;
+};
+export type Context = AppInstance | PageInstance | ComponentInstance;
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
