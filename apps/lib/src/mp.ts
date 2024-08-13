@@ -1,4 +1,8 @@
 import { isFunction } from "./utils";
+import {
+  type EffectScope as TypeEffectScope,
+  EffectScope,
+} from "@vue/reactivity";
 import { deepToRaw, deepWatch } from "./shared";
 import "miniprogram-api-typings";
 
@@ -54,11 +58,13 @@ export type AppInstance = Record<string, any>;
 export type PageInstance = WechatMiniprogram.Page.InstanceProperties &
   WechatMiniprogram.Page.InstanceMethods<Record<string, unknown>> & {
     [key: string]: any;
+    __scope__: TypeEffectScope;
   };
 
 export type ComponentInstance = WechatMiniprogram.Component.InstanceProperties &
   WechatMiniprogram.Component.InstanceMethods<Record<string, unknown>> & {
     [key: string]: any;
+    __scope__: TypeEffectScope;
   };
 
 export type Context = AppInstance | PageInstance | ComponentInstance;
@@ -275,6 +281,7 @@ export function definePage(
         this.triggerEvent(key, { value });
       };
       this.emit = emit;
+      this.__scope__ = new EffectScope();
       const props = createProps(this, {});
 
       hook &&
@@ -295,6 +302,9 @@ export function definePage(
     },
     onUnload() {
       methodEmit.call(this, options, "onUnload");
+      if (this.__scope__) {
+        this.__scope__.stop();
+      }
     },
     onRouteDone() {
       methodEmit.call(this, options, "onRouteDone");
@@ -449,6 +459,8 @@ export function defineComponent(
           this.triggerEvent(key, { value });
         };
         this.emit = emit;
+        //@ts-expect-error 增加作用域
+        this.__scope__ = new EffectScope();
         const props = createProps(this, properties);
         hook &&
           useHook<ComponentHook>(
@@ -465,6 +477,10 @@ export function defineComponent(
       },
       detached() {
         methodEmit.call(this, options, "detached");
+        if (this.__scope__) {
+          //@ts-expect-error 增加作用域
+          this.__scope__.stop();
+        }
       },
       error(err: WechatMiniprogram.Error) {
         methodEmit.call(this, options, "error", [err]);

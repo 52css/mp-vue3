@@ -1,3 +1,4 @@
+import { type EffectScope as TypeEffectScope } from "@vue/reactivity";
 import "miniprogram-api-typings";
 export type AppHook = () => Record<string, any>;
 export type ComponentPropType = StringConstructor | NumberConstructor | BooleanConstructor | ArrayConstructor | ObjectConstructor | null;
@@ -19,9 +20,11 @@ export type ComponentHook = (props: ComponentProps, context: Context & Component
 export type AppInstance = Record<string, any>;
 export type PageInstance = WechatMiniprogram.Page.InstanceProperties & WechatMiniprogram.Page.InstanceMethods<Record<string, unknown>> & {
     [key: string]: any;
+    __scope__: TypeEffectScope;
 };
 export type ComponentInstance = WechatMiniprogram.Component.InstanceProperties & WechatMiniprogram.Component.InstanceMethods<Record<string, unknown>> & {
     [key: string]: any;
+    __scope__: TypeEffectScope;
 };
 export type Context = AppInstance | PageInstance | ComponentInstance;
 /**
