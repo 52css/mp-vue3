@@ -1,8 +1,5 @@
 import { isFunction } from "./utils";
-import {
-  type EffectScope as TypeEffectScope,
-  EffectScope,
-} from "@vue/reactivity";
+import { effectScope, type EffectScope } from "@vue/reactivity";
 import { deepToRaw, deepWatch } from "./shared";
 import "miniprogram-api-typings";
 
@@ -58,13 +55,13 @@ export type AppInstance = Record<string, any>;
 export type PageInstance = WechatMiniprogram.Page.InstanceProperties &
   WechatMiniprogram.Page.InstanceMethods<Record<string, unknown>> & {
     [key: string]: any;
-    __scope__: TypeEffectScope;
+    __scope__: EffectScope;
   };
 
 export type ComponentInstance = WechatMiniprogram.Component.InstanceProperties &
   WechatMiniprogram.Component.InstanceMethods<Record<string, unknown>> & {
     [key: string]: any;
-    __scope__: TypeEffectScope;
+    __scope__: EffectScope;
   };
 
 export type Context = AppInstance | PageInstance | ComponentInstance;
@@ -281,15 +278,17 @@ export function definePage(
         this.triggerEvent(key, { value });
       };
       this.emit = emit;
-      this.__scope__ = new EffectScope();
-      const props = createProps(this, {});
+      this.__scope__ = effectScope();
+      this.__scope__.run(() => {
+        const props = createProps(this, {});
 
-      hook &&
-        useHook<ComponentHook>(
-          this,
-          (hook as ComponentHook).bind(this, props, this)
-        );
-      methodEmit.call(this, options, "onLoad", [query]);
+        hook &&
+          useHook<ComponentHook>(
+            this,
+            (hook as ComponentHook).bind(this, props, this)
+          );
+        methodEmit.call(this, options, "onLoad", [query]);
+      });
     },
     onShow() {
       methodEmit.call(this, options, "onShow");
@@ -460,14 +459,17 @@ export function defineComponent(
         };
         this.emit = emit;
         //@ts-expect-error 增加作用域
-        this.__scope__ = new EffectScope();
-        const props = createProps(this, properties);
-        hook &&
-          useHook<ComponentHook>(
-            this,
-            (hook as ComponentHook).bind(this, props, this)
-          );
-        methodEmit.call(this, options, "attached");
+        this.__scope__ = effectScope();
+        //@ts-expect-error 增加作用域
+        this.__scope__.run(() => {
+          const props = createProps(this, properties);
+          hook &&
+            useHook<ComponentHook>(
+              this,
+              (hook as ComponentHook).bind(this, props, this)
+            );
+          methodEmit.call(this, options, "attached");
+        });
       },
       ready() {
         methodEmit.call(this, options, "ready");
