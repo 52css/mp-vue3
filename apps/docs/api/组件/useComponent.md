@@ -10,8 +10,8 @@ import { defineComponent, useComponent } from '@52css/mp-vue3'
 defineComponent({
   props: {},
   setup() {
-    const comp = useComponent();
-    console.log("🚀 ~ defineComponent ~ comp:", comp)
+    const instance = useComponent();
+    console.log("🚀 ~ defineComponent ~ instance:", instance)
 
     return {
     }
