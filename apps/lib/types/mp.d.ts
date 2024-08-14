@@ -1,4 +1,3 @@
-import { type EffectScope } from "@vue/reactivity";
 import "miniprogram-api-typings";
 export type AppHook = () => Record<string, any>;
 export type ComponentPropType = StringConstructor | NumberConstructor | BooleanConstructor | ArrayConstructor | ObjectConstructor | null;
@@ -13,20 +12,15 @@ export type ComponentPropDefinition<T extends ComponentPropType> = {
 export type ComponentProps = {
     [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
 };
-export type ComponentEmit = {
+export type ComponentContext = {
     emit?(key: string, val: any): void;
 };
-export type ComponentHook = (props: ComponentProps, context: Context & ComponentEmit) => Record<string, any>;
+export type ComponentHook = (props: ComponentProps, context: ComponentContext) => Record<string, any>;
 export type AppInstance = Record<string, any>;
-export type PageInstance = WechatMiniprogram.Page.InstanceProperties & WechatMiniprogram.Page.InstanceMethods<Record<string, unknown>> & {
-    [key: string]: any;
-    __scope__: EffectScope;
-};
-export type ComponentInstance = WechatMiniprogram.Component.InstanceProperties & WechatMiniprogram.Component.InstanceMethods<Record<string, unknown>> & {
-    [key: string]: any;
-    __scope__: EffectScope;
-};
-export type Context = AppInstance | PageInstance | ComponentInstance;
+export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
+export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
+export type ComponentOptions = WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
+export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
@@ -34,7 +28,7 @@ export type Context = AppInstance | PageInstance | ComponentInstance;
 export declare function definePage(hook?: ComponentHook | (WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption> & {
     setup?: ComponentHook;
 })): void;
-export declare const usePage: () => WechatMiniprogram.Page.Instance<WechatMiniprogram.IAnyObject, WechatMiniprogram.IAnyObject>;
+export declare const usePage: () => PageInstance | null;
 export declare const onLoad: (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) => void;
 export declare const onShow: (hook: WechatMiniprogram.Page.ILifetime["onShow"]) => void;
 export declare const onReady: (hook: WechatMiniprogram.Page.ILifetime["onReady"]) => void;
@@ -58,7 +52,7 @@ export declare function defineComponent(hook?: ComponentHook | (WechatMiniprogra
     props?: ComponentProps;
     setup?: ComponentHook;
 })): string | undefined;
-export declare const useComponent: () => Context;
+export declare const useComponent: () => ComponentInstance | null;
 export declare const attached: (hook: WechatMiniprogram.Component.Lifetimes["attached"]) => void;
 export declare const ready: (hook: WechatMiniprogram.Component.Lifetimes["ready"]) => void;
 export declare const moved: (hook: WechatMiniprogram.Component.Lifetimes["moved"]) => void;

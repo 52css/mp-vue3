@@ -1,5 +1,5 @@
 import { isFunction } from "./utils";
-import { effectScope, type EffectScope } from "@vue/reactivity";
+import { effectScope } from "@vue/reactivity";
 import { deepToRaw, deepWatch } from "./shared";
 import "miniprogram-api-typings";
 
@@ -41,31 +41,43 @@ export type ComponentProps = {
   [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
 };
 
-export type ComponentEmit = {
+export type ComponentContext = {
   emit?(key: string, val: any): void;
 };
 
 export type ComponentHook = (
   props: ComponentProps,
-  context: Context & ComponentEmit
+  context: ComponentContext
 ) => Record<string, any>;
 
 export type AppInstance = Record<string, any>;
 
-export type PageInstance = WechatMiniprogram.Page.InstanceProperties &
-  WechatMiniprogram.Page.InstanceMethods<Record<string, unknown>> & {
-    [key: string]: any;
-    __scope__: EffectScope;
-  };
+export type PageOptions = WechatMiniprogram.Page.Options<
+  WechatMiniprogram.Page.DataOption,
+  WechatMiniprogram.Page.CustomOption
+>;
+export type PageInstance = WechatMiniprogram.Page.Instance<
+  WechatMiniprogram.Page.DataOption,
+  WechatMiniprogram.Page.CustomOption
+>;
 
-export type ComponentInstance = WechatMiniprogram.Component.InstanceProperties &
-  WechatMiniprogram.Component.InstanceMethods<Record<string, unknown>> & {
-    [key: string]: any;
-    __scope__: EffectScope;
-  };
+export type ComponentOptions = WechatMiniprogram.Component.Options<
+  WechatMiniprogram.Component.DataOption,
+  {},
+  WechatMiniprogram.Component.MethodOption,
+  {},
+  false
+>;
+export type ComponentInstance = WechatMiniprogram.Component.Instance<
+  WechatMiniprogram.Component.DataOption,
+  {},
+  WechatMiniprogram.Component.MethodOption,
+  {},
+  false
+>;
 
-export type Context = AppInstance | PageInstance | ComponentInstance;
-let _context: Context;
+let _currentPage: PageInstance | null = null;
+let _currentComponent: ComponentInstance | null = null;
 
 function methodEmit(
   this: any,
@@ -105,22 +117,29 @@ function methodOnce(
   return this[`$${lifetimesKey}`][0].apply(this, args);
 }
 
-function methodOn(hook: Function, lifetimesKey: string, context: Context) {
-  if (!context) {
+function methodOn(
+  instance: PageInstance | ComponentInstance | null,
+  hook: Function,
+  lifetimesKey: string
+) {
+  if (!instance) {
     return;
   }
 
-  if (!context[`$${lifetimesKey}`]) {
-    context[`$${lifetimesKey}`] = [];
+  if (!instance[`$${lifetimesKey}`]) {
+    instance[`$${lifetimesKey}`] = [];
   }
 
-  context[`$${lifetimesKey}`].push(hook.bind(context));
+  instance[`$${lifetimesKey}`].push(hook.bind(instance));
 }
 
-function createProps(context: Context, props: Record<string, any>) {
+function createProps(
+  instance: PageInstance | ComponentInstance,
+  props: Record<string, any>
+) {
   return new Proxy(props, {
     get(target, key: string, _receiver) {
-      let value = context.data[key];
+      let value = instance.data[key];
 
       if (
         value === undefined &&
@@ -133,11 +152,11 @@ function createProps(context: Context, props: Record<string, any>) {
       return value;
     },
     set: function (target, key, value, receiver) {
-      context.setData({
+      instance.setData({
         [key]: value,
       });
       // 发送自定义事件，传递数据
-      context.triggerEvent(key, { value });
+      instance.triggerEvent(key as string, { value });
       return Reflect.set(target, key, value, receiver);
     },
   });
@@ -148,20 +167,23 @@ function createProps(context: Context, props: Record<string, any>) {
  * @param context - 当前上下文
  * @param hook - Hook 函数
  */
-function useHook<T>(context: Context, hook?: T) {
-  _context = context;
-
-  const bindings = (hook as Function).call(context);
+function useHook(
+  vm: PageInstance | ComponentInstance,
+  hook: ComponentHook,
+  props: ComponentProps,
+  context: ComponentContext
+) {
+  const bindings = hook(props, context);
   if (bindings !== undefined) {
     Object.keys(bindings).forEach((key) => {
       const value = bindings[key];
       if (isFunction(value)) {
-        context[key] = value;
+        vm[key] = value;
         return;
       }
 
-      context.setData({ [key]: deepToRaw(value) });
-      deepWatch.call(context, key, value);
+      vm.setData({ [key]: deepToRaw(value) });
+      deepWatch.call(vm, key, value);
     });
   }
 }
@@ -192,54 +214,6 @@ function getProperties(props?: ComponentProps) {
 
   return props;
 }
-// export function createApp(
-//   hook?:
-//     | AppHook
-//     | {
-//         setup?: AppHook;
-//       }
-// ) {
-//   if (!hook) {
-//     return App({});
-//   }
-//   let options = {};
-//   if (typeof hook !== "function") {
-//     const { setup, ...other } = hook;
-//     options = other || {};
-//     hook = setup;
-//   }
-
-//   App({
-//     ...options,
-//     // 生命周期回调函数
-//     onLaunch(object) {
-//       hook && useHook<AppHook>(this, hook as AppHook);
-//       methodEmit.call(this, options, "onLaunch", [object]);
-//     },
-//     onShow() {
-//       methodEmit.call(this, options, "onShow");
-//     },
-//     onHide() {
-//       methodEmit.call(this, options, "onHide");
-//     },
-//     onError(error) {
-//       methodEmit.call(this, options, "onError", [error]);
-//     },
-//     onPageNotFound(object) {
-//       methodEmit.call(this, options, "onPageNotFound", [object]);
-//     },
-//   });
-// }
-
-// export const useApp = getApp;
-
-// export const onLaunch = (hook: Function) =>
-//   methodOn(hook, "onLaunch", useApp());
-// export const onError = (hook: Function) => methodOn(hook, "onError", useApp());
-// export const onPageNotFound = (hook: Function) =>
-//   methodOn(hook, "onPageNotFound", useApp());
-// export const onUnhandledRejection = (hook: Function) =>
-//   methodOn(hook, "onUnhandledRejection", useApp());
 
 /**
  * 创建页面并关联生命周期函数
@@ -257,10 +231,7 @@ export function definePage(
     return Page({});
   }
 
-  let options: WechatMiniprogram.Page.Options<
-    WechatMiniprogram.Page.DataOption,
-    WechatMiniprogram.Page.CustomOption
-  > = {};
+  let options: PageOptions = {};
   if (typeof hook !== "function") {
     const { setup, ...other } = hook;
     options = other || {};
@@ -269,26 +240,22 @@ export function definePage(
 
   Page({
     ...options,
-    data: {
-      ...options.data,
-    },
     // 生命周期回调函数
     onLoad(query) {
-      const emit = (key: string, value: any) => {
-        this.triggerEvent(key, { value });
-      };
-      this.emit = emit;
+      _currentPage = this;
       this.__scope__ = effectScope();
       this.__scope__.run(() => {
         const props = createProps(this, {});
 
         hook &&
-          useHook<ComponentHook>(
-            this,
-            (hook as ComponentHook).bind(this, props, this)
-          );
+          useHook(this, hook as ComponentHook, props, {
+            emit: (key: string, value: any) => {
+              this.triggerEvent(key, { value });
+            },
+          });
         methodEmit.call(this, options, "onLoad", [query]);
       });
+      _currentPage = null;
     },
     onShow() {
       methodEmit.call(this, options, "onShow");
@@ -340,47 +307,46 @@ export function definePage(
 }
 
 export const usePage = () => {
-  const pages = getCurrentPages();
-  return pages[pages.length - 1];
+  return _currentPage;
 };
 
 export const onLoad = (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) =>
-  methodOn(hook, "onLoad", usePage());
+  methodOn(usePage(), hook, "onLoad");
 export const onShow = (hook: WechatMiniprogram.Page.ILifetime["onShow"]) =>
-  methodOn(hook, "onShow", usePage());
+  methodOn(usePage(), hook, "onShow");
 export const onReady = (hook: WechatMiniprogram.Page.ILifetime["onReady"]) =>
-  methodOn(hook, "onReady", usePage());
+  methodOn(usePage(), hook, "onReady");
 export const onHide = (hook: WechatMiniprogram.Page.ILifetime["onHide"]) =>
-  methodOn(hook, "onHide", usePage());
+  methodOn(usePage(), hook, "onHide");
 export const onUnload = (hook: WechatMiniprogram.Page.ILifetime["onUnload"]) =>
-  methodOn(hook, "onUnload", usePage());
+  methodOn(usePage(), hook, "onUnload");
 export const onRouteDone = (hook: () => void) =>
-  methodOn(hook, "onRouteDone", usePage());
+  methodOn(usePage(), hook, "onRouteDone");
 export const onPullDownRefresh = (
   hook: WechatMiniprogram.Page.ILifetime["onPullDownRefresh"]
-) => methodOn(hook, "onPullDownRefresh", usePage());
+) => methodOn(usePage(), hook, "onPullDownRefresh");
 export const onReachBottom = (
   hook: WechatMiniprogram.Page.ILifetime["onReachBottom"]
-) => methodOn(hook, "onReachBottom", usePage());
+) => methodOn(usePage(), hook, "onReachBottom");
 export const onPageScroll = (
   hook: WechatMiniprogram.Page.ILifetime["onPageScroll"]
-) => methodOn(hook, "onPageScroll", usePage());
+) => methodOn(usePage(), hook, "onPageScroll");
 export const onAddToFavorites = (
   hook: WechatMiniprogram.Page.ILifetime["onAddToFavorites"]
-) => methodOn(hook, "onAddToFavorites", usePage());
+) => methodOn(usePage(), hook, "onAddToFavorites");
 export const onShareAppMessage = (
   hook: WechatMiniprogram.Page.ILifetime["onShareAppMessage"]
-) => methodOn(hook, "onShareAppMessage", usePage());
+) => methodOn(usePage(), hook, "onShareAppMessage");
 export const onShareTimeline = (
   hook: WechatMiniprogram.Page.ILifetime["onShareTimeline"]
-) => methodOn(hook, "onShareTimeline", usePage());
+) => methodOn(usePage(), hook, "onShareTimeline");
 export const onResize = (hook: WechatMiniprogram.Page.ILifetime["onResize"]) =>
-  methodOn(hook, "onResize", usePage());
+  methodOn(usePage(), hook, "onResize");
 export const onTabItemTap = (
   hook: WechatMiniprogram.Page.ILifetime["onTabItemTap"]
-) => methodOn(hook, "onTabItemTap", usePage());
+) => methodOn(usePage(), hook, "onTabItemTap");
 export const onSaveExitState = (hook: () => void) =>
-  methodOn(hook, "onSaveExitState", usePage());
+  methodOn(usePage(), hook, "onSaveExitState");
 
 /**
  * 创建组件并关联生命周期函数
@@ -410,13 +376,7 @@ export function defineComponent(
     });
   }
 
-  let options: WechatMiniprogram.Component.Options<
-    WechatMiniprogram.Component.DataOption,
-    {},
-    WechatMiniprogram.Component.MethodOption,
-    {},
-    false
-  > = {};
+  let options: ComponentOptions = {};
   let properties = {};
   if (typeof hook !== "function") {
     const { setup, props, ...other } = hook;
@@ -449,27 +409,24 @@ export function defineComponent(
       multipleSlots: getOptionsValue("multipleSlots", true),
     },
     properties,
-    data: {
-      ...options.data,
-    },
     lifetimes: {
       attached() {
-        const emit = (key: string, value: any) => {
-          this.triggerEvent(key, { value });
-        };
-        this.emit = emit;
+        _currentComponent = this;
         //@ts-expect-error 增加作用域
         this.__scope__ = effectScope();
         //@ts-expect-error 增加作用域
         this.__scope__.run(() => {
           const props = createProps(this, properties);
           hook &&
-            useHook<ComponentHook>(
-              this,
-              (hook as ComponentHook).bind(this, props, this)
-            );
+            useHook(this, hook as ComponentHook, props, {
+              emit: (key: string, value: any) => {
+                this.triggerEvent(key, { value });
+              },
+            });
           methodEmit.call(this, options, "attached");
         });
+
+        _currentComponent = null;
       },
       ready() {
         methodEmit.call(this, options, "ready");
@@ -491,40 +448,17 @@ export function defineComponent(
   });
 }
 
-export const useComponent = () => _context;
+export const useComponent = () => _currentComponent;
 
 export const attached = (
   hook: WechatMiniprogram.Component.Lifetimes["attached"]
-) => methodOn(hook, "attached", useComponent());
+) => methodOn(useComponent(), hook, "attached");
 export const ready = (hook: WechatMiniprogram.Component.Lifetimes["ready"]) =>
-  methodOn(hook, "ready", useComponent());
+  methodOn(useComponent(), hook, "ready");
 export const moved = (hook: WechatMiniprogram.Component.Lifetimes["moved"]) =>
-  methodOn(hook, "moved", useComponent());
+  methodOn(useComponent(), hook, "moved");
 export const detached = (
   hook: WechatMiniprogram.Component.Lifetimes["detached"]
-) => methodOn(hook, "detached", useComponent());
+) => methodOn(useComponent(), hook, "detached");
 export const error = (hook: WechatMiniprogram.Component.Lifetimes["error"]) =>
-  methodOn(hook, "error", useComponent());
-
-// export const useObserver = (key: string, fn: Function) => {
-//   const defineReactive = (obj: any, key: string, callback?: Function) => {
-//     let val = obj[key];
-
-//     Object.defineProperty(obj, key, {
-//       get() {
-//         return val;
-//       },
-//       set(newVal) {
-//         val = newVal;
-//         callback && callback(newVal);
-//       },
-//     });
-//   };
-//   if (key in _context.properties) {
-//     defineReactive(_context.properties, key, fn);
-//   } else if (key in _context.data) {
-//     defineReactive(_context.data, key, fn);
-//   } else {
-//     throw new Error(`未找到可以 observer ${key}`);
-//   }
-// };
+  methodOn(useComponent(), hook, "error");
