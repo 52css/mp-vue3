@@ -80,47 +80,47 @@ let _currentPage: PageInstance | null = null;
 let _currentComponent: ComponentInstance | null = null;
 
 function methodEmit(
-  this: any,
+  instance: PageInstance | ComponentInstance,
   options: any,
   lifetimesKey: string,
-  args?: any[]
+  ...args: any[]
 ) {
   if (options && options[lifetimesKey]) {
-    options[lifetimesKey].apply(this, args);
+    options[lifetimesKey].apply(instance, args);
   }
-  if (!this[`$${lifetimesKey}`]) {
+  if (!instance[`$${lifetimesKey}`]) {
     return;
   }
 
-  this[`$${lifetimesKey}`].forEach((fn: Function) => {
-    fn.apply(this, args);
+  instance[`$${lifetimesKey}`].forEach((fn: Function) => {
+    fn(...args);
   });
 }
 
 function methodOnce(
-  this: any,
+  instance: PageInstance | ComponentInstance,
   options: any,
   lifetimesKey: string,
-  args?: any[]
+  ...args: any[]
 ) {
   if (options && options[lifetimesKey]) {
-    return options[lifetimesKey].apply(this, args);
+    return options[lifetimesKey].apply(instance, args);
   }
-  if (!this[`$${lifetimesKey}`]) {
+  if (!instance[`$${lifetimesKey}`]) {
     return;
   }
 
-  if (this[`$${lifetimesKey}`].length) {
+  if (instance[`$${lifetimesKey}`].length) {
     throw new Error(`一个page只能配置一个${lifetimesKey}`);
   }
 
-  return this[`$${lifetimesKey}`][0].apply(this, args);
+  return instance[`$${lifetimesKey}`][0](...args);
 }
 
 function methodOn(
   instance: PageInstance | ComponentInstance | null,
-  hook: Function,
-  lifetimesKey: string
+  lifetimesKey: string,
+  hook: Function
 ) {
   if (!instance) {
     return;
@@ -130,7 +130,7 @@ function methodOn(
     instance[`$${lifetimesKey}`] = [];
   }
 
-  instance[`$${lifetimesKey}`].push(hook.bind(instance));
+  instance[`$${lifetimesKey}`].push(hook);
 }
 
 function createProps(
@@ -168,7 +168,7 @@ function createProps(
  * @param hook - Hook 函数
  */
 function useHook(
-  vm: PageInstance | ComponentInstance,
+  instance: PageInstance | ComponentInstance,
   hook: ComponentHook,
   props: ComponentProps,
   context: ComponentContext
@@ -178,12 +178,12 @@ function useHook(
     Object.keys(bindings).forEach((key) => {
       const value = bindings[key];
       if (isFunction(value)) {
-        vm[key] = value;
+        instance[key] = value;
         return;
       }
 
-      vm.setData({ [key]: deepToRaw(value) });
-      deepWatch.call(vm, key, value);
+      instance.setData({ [key]: deepToRaw(value) });
+      deepWatch.call(instance, key, value);
     });
   }
 }
@@ -253,55 +253,55 @@ export function definePage(
               this.triggerEvent(key, { value });
             },
           });
-        methodEmit.call(this, options, "onLoad", [query]);
+        methodEmit(this, options, "onLoad", query);
       });
       _currentPage = null;
     },
     onShow() {
-      methodEmit.call(this, options, "onShow");
+      methodEmit(this, options, "onShow");
     },
     onReady() {
-      methodEmit.call(this, options, "onReady");
+      methodEmit(this, options, "onReady");
     },
     onHide() {
-      methodEmit.call(this, options, "onHide");
+      methodEmit(this, options, "onHide");
     },
     onUnload() {
-      methodEmit.call(this, options, "onUnload");
+      methodEmit(this, options, "onUnload");
       if (this.__scope__) {
         this.__scope__.stop();
       }
     },
     onRouteDone() {
-      methodEmit.call(this, options, "onRouteDone");
+      methodEmit(this, options, "onRouteDone");
     },
     // 页面事件处理函数
     onPullDownRefresh() {
-      methodEmit.call(this, options, "onPullDownRefresh");
+      methodEmit(this, options, "onPullDownRefresh");
     },
     onReachBottom() {
-      methodEmit.call(this, options, "onReachBottom");
+      methodEmit(this, options, "onReachBottom");
     },
-    onPageScroll(object) {
-      methodEmit.call(this, options, "onPageScroll", [object]);
+    onPageScroll(event) {
+      methodEmit(this, options, "onPageScroll", event);
     },
     onAddToFavorites(object) {
-      return methodOnce.call(this, options, "onAddToFavorites", [object]);
+      return methodOnce(this, options, "onAddToFavorites", object);
     },
     onShareAppMessage(event) {
-      return methodOnce.call(this, options, "onShareAppMessage", [event]);
+      return methodOnce(this, options, "onShareAppMessage", event);
     },
     onShareTimeline() {
-      return methodOnce.call(this, options, "onShareTimeline");
+      return methodOnce(this, options, "onShareTimeline");
     },
     onResize(event) {
-      methodEmit.call(this, options, "onResize", [event]);
+      methodEmit(this, options, "onResize", event);
     },
     onTabItemTap(object) {
-      methodEmit.call(this, options, "onTabItemTap", [object]);
+      methodEmit(this, options, "onTabItemTap", object);
     },
     onSaveExitState() {
-      methodEmit.call(this, options, "onSaveExitState");
+      methodEmit(this, options, "onSaveExitState");
     },
   });
 }
@@ -311,42 +311,42 @@ export const usePage = () => {
 };
 
 export const onLoad = (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) =>
-  methodOn(usePage(), hook, "onLoad");
+  methodOn(usePage(), "onLoad", hook);
 export const onShow = (hook: WechatMiniprogram.Page.ILifetime["onShow"]) =>
-  methodOn(usePage(), hook, "onShow");
+  methodOn(usePage(), "onShow", hook);
 export const onReady = (hook: WechatMiniprogram.Page.ILifetime["onReady"]) =>
-  methodOn(usePage(), hook, "onReady");
+  methodOn(usePage(), "onReady", hook);
 export const onHide = (hook: WechatMiniprogram.Page.ILifetime["onHide"]) =>
-  methodOn(usePage(), hook, "onHide");
+  methodOn(usePage(), "onHide", hook);
 export const onUnload = (hook: WechatMiniprogram.Page.ILifetime["onUnload"]) =>
-  methodOn(usePage(), hook, "onUnload");
+  methodOn(usePage(), "onUnload", hook);
 export const onRouteDone = (hook: () => void) =>
-  methodOn(usePage(), hook, "onRouteDone");
+  methodOn(usePage(), "onRouteDone", hook);
 export const onPullDownRefresh = (
   hook: WechatMiniprogram.Page.ILifetime["onPullDownRefresh"]
-) => methodOn(usePage(), hook, "onPullDownRefresh");
+) => methodOn(usePage(), "onPullDownRefresh", hook);
 export const onReachBottom = (
   hook: WechatMiniprogram.Page.ILifetime["onReachBottom"]
-) => methodOn(usePage(), hook, "onReachBottom");
+) => methodOn(usePage(), "onReachBottom", hook);
 export const onPageScroll = (
   hook: WechatMiniprogram.Page.ILifetime["onPageScroll"]
-) => methodOn(usePage(), hook, "onPageScroll");
+) => methodOn(usePage(), "onPageScroll", hook);
 export const onAddToFavorites = (
   hook: WechatMiniprogram.Page.ILifetime["onAddToFavorites"]
-) => methodOn(usePage(), hook, "onAddToFavorites");
+) => methodOn(usePage(), "onAddToFavorites", hook);
 export const onShareAppMessage = (
   hook: WechatMiniprogram.Page.ILifetime["onShareAppMessage"]
-) => methodOn(usePage(), hook, "onShareAppMessage");
+) => methodOn(usePage(), "onShareAppMessage", hook);
 export const onShareTimeline = (
   hook: WechatMiniprogram.Page.ILifetime["onShareTimeline"]
-) => methodOn(usePage(), hook, "onShareTimeline");
+) => methodOn(usePage(), "onShareTimeline", hook);
 export const onResize = (hook: WechatMiniprogram.Page.ILifetime["onResize"]) =>
-  methodOn(usePage(), hook, "onResize");
+  methodOn(usePage(), "onResize", hook);
 export const onTabItemTap = (
   hook: WechatMiniprogram.Page.ILifetime["onTabItemTap"]
-) => methodOn(usePage(), hook, "onTabItemTap");
+) => methodOn(usePage(), "onTabItemTap", hook);
 export const onSaveExitState = (hook: () => void) =>
-  methodOn(usePage(), hook, "onSaveExitState");
+  methodOn(usePage(), "onSaveExitState", hook);
 
 /**
  * 创建组件并关联生命周期函数
@@ -423,26 +423,26 @@ export function defineComponent(
                 this.triggerEvent(key, { value });
               },
             });
-          methodEmit.call(this, options, "attached");
+          methodEmit(this, options, "attached");
         });
 
         _currentComponent = null;
       },
       ready() {
-        methodEmit.call(this, options, "ready");
+        methodEmit(this, options, "ready");
       },
       moved() {
-        methodEmit.call(this, options, "moved");
+        methodEmit(this, options, "moved");
       },
       detached() {
-        methodEmit.call(this, options, "detached");
+        methodEmit(this, options, "detached");
         if (this.__scope__) {
           //@ts-expect-error 增加作用域
           this.__scope__.stop();
         }
       },
       error(err: WechatMiniprogram.Error) {
-        methodEmit.call(this, options, "error", [err]);
+        methodEmit(this, options, "error", err);
       },
     },
   });
@@ -452,13 +452,13 @@ export const useComponent = () => _currentComponent;
 
 export const attached = (
   hook: WechatMiniprogram.Component.Lifetimes["attached"]
-) => methodOn(useComponent(), hook, "attached");
+) => methodOn(useComponent(), "attached", hook);
 export const ready = (hook: WechatMiniprogram.Component.Lifetimes["ready"]) =>
-  methodOn(useComponent(), hook, "ready");
+  methodOn(useComponent(), "ready", hook);
 export const moved = (hook: WechatMiniprogram.Component.Lifetimes["moved"]) =>
-  methodOn(useComponent(), hook, "moved");
+  methodOn(useComponent(), "moved", hook);
 export const detached = (
   hook: WechatMiniprogram.Component.Lifetimes["detached"]
-) => methodOn(useComponent(), hook, "detached");
+) => methodOn(useComponent(), "detached", hook);
 export const error = (hook: WechatMiniprogram.Component.Lifetimes["error"]) =>
-  methodOn(useComponent(), hook, "error");
+  methodOn(useComponent(), "error", hook);
