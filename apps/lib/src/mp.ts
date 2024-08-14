@@ -183,7 +183,7 @@ function useHook(
       }
 
       instance.setData({ [key]: deepToRaw(value) });
-      deepWatch.call(instance, key, value);
+      deepWatch(instance, key, value);
     });
   }
 }
