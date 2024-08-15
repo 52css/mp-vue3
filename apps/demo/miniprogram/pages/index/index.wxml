@@ -3,3 +3,4 @@
 <view>count: {{count}}</view>
 <button bind:tap="onIncrease">增加</button>
 <hello name="李四"></hello>
+test: {{test}}
