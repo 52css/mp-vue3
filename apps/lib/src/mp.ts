@@ -245,10 +245,10 @@ export function definePage(
       _currentPage = this;
       this.__scope__ = effectScope();
       this.__scope__.run(() => {
-        const props = createProps(this, {});
+        this.__props__ = createProps(this, {});
 
         hook &&
-          useHook(this, hook as ComponentHook, props, {
+          useHook(this, hook as ComponentHook, this.__props__, {
             emit: (key: string, value: any) => {
               this.triggerEvent(key, { value });
             },
@@ -271,6 +271,10 @@ export function definePage(
       if (this.__scope__) {
         this.__scope__.stop();
       }
+      Object.keys(this).forEach((key) => {
+        delete this[key];
+      });
+      console.log("onUnload", this);
     },
     onRouteDone() {
       methodEmit(this, options, "onRouteDone");
@@ -416,9 +420,11 @@ export function defineComponent(
         this.__scope__ = effectScope();
         //@ts-expect-error 增加作用域
         this.__scope__.run(() => {
-          const props = createProps(this, properties);
+          //@ts-expect-error 增加的props
+          this.__props__ = createProps(this, properties);
           hook &&
-            useHook(this, hook as ComponentHook, props, {
+            //@ts-expect-error 增加的props
+            useHook(this, hook as ComponentHook, this.__props__, {
               emit: (key: string, value: any) => {
                 this.triggerEvent(key, { value });
               },
@@ -440,6 +446,10 @@ export function defineComponent(
           //@ts-expect-error 增加作用域
           this.__scope__.stop();
         }
+        Object.keys(this).forEach((key) => {
+          delete this[key];
+        });
+        console.log("detached", this);
       },
       error(err: WechatMiniprogram.Error) {
         methodEmit(this, options, "error", err);
