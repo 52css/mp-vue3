@@ -43,9 +43,13 @@ export type ComponentProps = {
   [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
 };
 
-export type ComponentContext = {
-  emit?(key: string, val: any): void;
-};
+export type ComponentContext = WechatMiniprogram.Component.InstanceProperties &
+  Omit<
+    WechatMiniprogram.Component.InstanceMethods<Record<string, any>>,
+    "setData" | "groupSetData" | "hasBehavior"
+  > & {
+    emit?(key: string, val: any): void;
+  };
 
 export type ComponentHook = (
   props: PageQuery | ComponentProps,
@@ -217,13 +221,43 @@ export function definePage(
     onLoad(query) {
       _currentPage = this;
       this.__scope__ = effectScope();
+
+      this.__context__ = {
+        is: this.is,
+        id: this.id,
+        dataset: this.dataset,
+        exitState: this.exitState,
+        router: this.router,
+        pageRouter: this.pageRouter,
+        renderer: this.renderer,
+        triggerEvent: this.triggerEvent.bind(this),
+        createSelectorQuery: this.createSelectorQuery.bind(this),
+        createIntersectionObserver: this.createIntersectionObserver.bind(this),
+        createMediaQueryObserver: this.createMediaQueryObserver.bind(this),
+        selectComponent: this.selectComponent.bind(this),
+        selectAllComponents: this.selectAllComponents.bind(this),
+        selectOwnerComponent: this.selectOwnerComponent.bind(this),
+        getRelationNodes: this.getRelationNodes.bind(this),
+        getTabBar: this.getTabBar.bind(this),
+        getPageId: this.getPageId.bind(this),
+        animate: this.animate.bind(this),
+        clearAnimation: this.clearAnimation.bind(this),
+        getOpenerEventChannel: this.getOpenerEventChannel.bind(this),
+        applyAnimatedStyle: this.applyAnimatedStyle.bind(this),
+        clearAnimatedStyle: this.clearAnimatedStyle.bind(this),
+        setUpdatePerformanceListener:
+          this.setUpdatePerformanceListener.bind(this),
+        getPassiveEvent: this.getPassiveEvent.bind(this),
+        setPassiveEvent: this.setPassiveEvent.bind(this),
+      };
       this.__scope__.run(() => {
         hook &&
-          useHook(this, hook as ComponentHook, query as PageQuery, {
-            emit: (key: string, value: any) => {
-              this.triggerEvent(key, { value });
-            },
-          });
+          useHook(
+            this,
+            hook as ComponentHook,
+            query as PageQuery,
+            this.__context__
+          );
         methodEmit(this, options, "onLoad", query);
       });
       _currentPage = null;
@@ -402,13 +436,48 @@ export function defineComponent(
               return Reflect.set(target, key, value, receiver);
             },
           });
+
+          //@ts-expect-error 增加context
+          this.__context__ = {
+            is: this.is,
+            id: this.id,
+            dataset: this.dataset,
+            exitState: this.exitState,
+            router: this.router,
+            pageRouter: this.pageRouter,
+            renderer: this.renderer,
+            triggerEvent: this.triggerEvent.bind(this),
+            createSelectorQuery: this.createSelectorQuery.bind(this),
+            createIntersectionObserver:
+              this.createIntersectionObserver.bind(this),
+            createMediaQueryObserver: this.createMediaQueryObserver.bind(this),
+            selectComponent: this.selectComponent.bind(this),
+            selectAllComponents: this.selectAllComponents.bind(this),
+            selectOwnerComponent: this.selectOwnerComponent.bind(this),
+            getRelationNodes: this.getRelationNodes.bind(this),
+            getTabBar: this.getTabBar.bind(this),
+            getPageId: this.getPageId.bind(this),
+            animate: this.animate.bind(this),
+            clearAnimation: this.clearAnimation.bind(this),
+            getOpenerEventChannel: this.getOpenerEventChannel.bind(this),
+            applyAnimatedStyle: this.applyAnimatedStyle.bind(this),
+            clearAnimatedStyle: this.clearAnimatedStyle.bind(this),
+            setUpdatePerformanceListener:
+              this.setUpdatePerformanceListener.bind(this),
+            getPassiveEvent: this.getPassiveEvent.bind(this),
+            setPassiveEvent: this.setPassiveEvent.bind(this),
+            emit: (key: string, value: any) => {
+              this.triggerEvent(key, { value });
+            },
+          } as ComponentContext;
           hook &&
-            //@ts-expect-error 增加的props
-            useHook(this, hook as ComponentHook, this.__props__, {
-              emit: (key: string, value: any) => {
-                this.triggerEvent(key, { value });
-              },
-            });
+            useHook(
+              this,
+              hook as ComponentHook,
+              //@ts-expect-error 增加的props
+              this.__props__,
+              this.__context__
+            );
           methodEmit(this, options, "attached");
         });
 

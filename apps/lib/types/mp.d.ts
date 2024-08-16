@@ -13,7 +13,7 @@ export type ComponentPropDefinition<T extends ComponentPropType> = {
 export type ComponentProps = {
     [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
 };
-export type ComponentContext = {
+export type ComponentContext = WechatMiniprogram.Component.InstanceProperties & Omit<WechatMiniprogram.Component.InstanceMethods<Record<string, any>>, "setData" | "groupSetData" | "hasBehavior"> & {
     emit?(key: string, val: any): void;
 };
 export type ComponentHook = (props: PageQuery | ComponentProps, context: ComponentContext) => Record<string, any>;
