@@ -1,4 +1,4 @@
-import { defineComponent, useComponent } from "@52css/mp-vue3";
+import { defineComponent, attached } from "@52css/mp-vue3";
 
 defineComponent({
   // 属性名称和 vue 一致
@@ -20,6 +20,13 @@ defineComponent({
     const onTap = () => {
       console.log("props.name", props.name);
     };
+
+    attached(() => {
+      console.log("组件加载");
+      return () => {
+        console.log("组件销毁");
+      };
+    });
 
     // 需要返回响应式数据、方法
     return {

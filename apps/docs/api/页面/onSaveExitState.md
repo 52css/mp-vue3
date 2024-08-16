@@ -9,8 +9,5 @@ definePage(() => {
   onSaveExitState(() => {
     console.log("🚀 ~ onSaveExitState ~ onSaveExitState:", onSaveExitState)
   })
-
-  return {
-  }
 });
 ```

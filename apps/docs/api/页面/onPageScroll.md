@@ -9,8 +9,5 @@ definePage(() => {
   onPageScroll((object) => {
     console.log("🚀 ~ onPageScroll ~ object:", object)
   })
-
-  return {
-  }
 });
 ```

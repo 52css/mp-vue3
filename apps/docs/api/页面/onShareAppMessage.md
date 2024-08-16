@@ -9,8 +9,5 @@ definePage(() => {
   onShareAppMessage((object) => {
     console.log("🚀 ~ onShareAppMessage ~ object:", object)
   })
-
-  return {
-  }
 });
 ```

@@ -2,5 +2,6 @@
 <navigation-bar title="Weixin" back="{{false}}" color="black" background="#FFF"></navigation-bar>
 <view>count: {{count}}</view>
 <button bind:tap="onIncrease">增加</button>
-<hello name="{{count}}"></hello>
+<hello wx:if="{{show}}" name="{{count}}"></hello>
 test: {{test}}
+<button bind:tap="onShowToggleTap">{{show?'隐藏':'显示'}}</button>

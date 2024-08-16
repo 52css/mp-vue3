@@ -10,8 +10,5 @@ import { definePage, usePage } from '@52css/mp-vue3'
 definePage(() => {
   const instance = usePage();
   console.log("🚀 ~ definePage ~ instance:", instance)
-
-  return {
-  }
 });
 ```

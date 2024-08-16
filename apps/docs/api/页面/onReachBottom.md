@@ -9,8 +9,5 @@ definePage(() => {
   onReachBottom(() => {
     console.log("🚀 ~ onReachBottom ~ onReachBottom:", onReachBottom)
   })
-
-  return {
-  }
 });
 ```

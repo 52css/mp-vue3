@@ -9,8 +9,5 @@ definePage(() => {
   onShareTimeline(() => {
     console.log("🚀 ~ onShareTimeline ~ onShareTimeline:", onShareTimeline)
   })
-
-  return {
-  }
 });
 ```

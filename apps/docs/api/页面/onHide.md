@@ -9,8 +9,5 @@ definePage(() => {
   onHide(() => {
     console.log("🚀 ~ onHide ~ onHide:", onHide)
   })
-
-  return {
-  }
 });
 ```

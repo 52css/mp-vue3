@@ -97,7 +97,3 @@ defineComponent({
 * `getPassiveEvent`
 * `setPassiveEvent`
 * `emit` 对外触发事件 `(key: string, value: any) => {this.triggerEvent(key, { value });}`
-
-## 生命周期
-
-* attached => setup

@@ -1,6 +1,6 @@
 {
   "name": "@52css/mp-vue3",
-  "version": "1.0.38",
+  "version": "1.0.41",
   "type": "module",
   "main": "dist/mp-vue3.min.js",
   "types": "types/index.d.ts",

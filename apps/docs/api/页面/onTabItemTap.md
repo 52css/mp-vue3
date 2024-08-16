@@ -9,8 +9,5 @@ definePage(() => {
   onTabItemTap((object) => {
     console.log("🚀 ~ onTabItemTap ~ object:", object)
   })
-
-  return {
-  }
 });
 ```

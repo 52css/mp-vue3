@@ -9,8 +9,5 @@ definePage(() => {
   onAddToFavorites((object) => {
     console.log("🚀 ~ onAddToFavorites ~ object:", object)
   })
-
-  return {
-  }
 });
 ```

@@ -9,8 +9,5 @@ definePage(() => {
   onPullDownRefresh(() => {
     console.log("🚀 ~ onPullDownRefresh ~ onPullDownRefresh:", onPullDownRefresh)
   })
-
-  return {
-  }
 });
 ```

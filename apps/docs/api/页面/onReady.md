@@ -9,8 +9,5 @@ definePage(() => {
   onReady(() => {
     console.log("🚀 ~ onReady ~ onReady:", onReady)
   })
-
-  return {
-  }
 });
 ```

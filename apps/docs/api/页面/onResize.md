@@ -9,8 +9,5 @@ definePage(() => {
   onResize((object) => {
     console.log("🚀 ~ onResize ~ object:", object)
   })
-
-  return {
-  }
 });
 ```

@@ -24,11 +24,19 @@ definePage((query) => {
     console.log("onPageShow");
   });
 
+  const show = ref(true);
+  const onShowToggleTap = () => {
+    show.value = !show.value;
+  };
+
   return {
     // 返回响应式数据
     count,
     // 返回事件
     onIncrease,
     test,
+
+    show,
+    onShowToggleTap,
   };
 });

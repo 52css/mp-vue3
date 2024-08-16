@@ -77,7 +77,3 @@ definePage({
 * `setUpdatePerformanceListener`
 * `getPassiveEvent`
 * `setPassiveEvent`
-
-## 生命周期
-
-* onLoad => setup

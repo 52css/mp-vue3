@@ -9,8 +9,5 @@ definePage(() => {
   onUnload(() => {
     console.log("🚀 ~ onUnload ~ onUnload:", onUnload)
   })
-
-  return {
-  }
 });
 ```

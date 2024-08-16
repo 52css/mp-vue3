@@ -109,8 +109,41 @@ function methodEmit(
     return;
   }
 
+  const eventBackMap = {
+    onLoad: "onUnload",
+    onShow: "onHide",
+    attached: "detached",
+  };
+  const lifetimesBackKey =
+    eventBackMap[lifetimesKey as keyof typeof eventBackMap];
+
   instance[`$${lifetimesKey}`].forEach((fn: Function) => {
-    fn(...args);
+    // 反面有没有对应的off
+    if (lifetimesBackKey) {
+      const backFn =
+        instance[`$${lifetimesBackKey}`] &&
+        instance[`$${lifetimesBackKey}`].find((x: any) => x.front === fn);
+
+      if (backFn) {
+        backFn();
+      }
+    }
+
+    const off = fn(...args);
+    // 调用是否返回函数，用于销毁
+    if (lifetimesBackKey && typeof off === "function") {
+      let backFn =
+        instance[`$${lifetimesBackKey}`] &&
+        instance[`$${lifetimesBackKey}`].find((x: any) => x.front === fn);
+
+      if (!backFn) {
+        off.front === fn;
+        if (!instance[`$${lifetimesBackKey}`]) {
+          instance[`$${lifetimesBackKey}`] = [];
+        }
+        instance[`$${lifetimesBackKey}`].push(off);
+      }
+    }
   });
 }
 
@@ -255,12 +288,9 @@ export function definePage(
             deepWatch(this, key, value);
           });
         }
+        methodEmit(this, options, "onLoad");
       });
       _currentPage = null;
-
-      if (options.onLoad) {
-        options.onLoad(query);
-      }
     },
     onShow() {
       methodEmit(this, options, "onShow");
@@ -498,16 +528,11 @@ export function defineComponent(
               deepWatch(this, key, value);
             });
           }
+
+          methodEmit(this, options, "attached");
         });
 
         _currentComponent = null;
-
-        const attached =
-          options && options.lifetimes && options.lifetimes.attached;
-
-        if (attached) {
-          attached();
-        }
       },
       ready() {
         methodEmit(this, options, "ready");

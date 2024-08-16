@@ -9,8 +9,5 @@ definePage(() => {
   onRouteDone(() => {
     console.log("🚀 ~ onRouteDone ~ onRouteDone:", onRouteDone)
   })
-
-  return {
-  }
 });
 ```
