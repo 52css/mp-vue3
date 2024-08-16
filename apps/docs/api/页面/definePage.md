@@ -9,7 +9,7 @@
 ```ts
 import { definePage, ref } from '@52css/mp-vue3'
 
-definePage(() => {
+definePage((query, context) => {
   const count = ref(0)
   const onIncrease = () => {
     count.value++; // 数据变更，自动响应 this.data.count
@@ -29,7 +29,7 @@ definePage(() => {
 import { definePage, ref } from '@52css/mp-vue3'
 
 definePage({
-  setup() {
+  setup(query, context) {
     const count = ref(0)
     const onIncrease = () => {
       count.value++; // 数据变更，自动响应 this.data.count

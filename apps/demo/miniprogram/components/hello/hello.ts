@@ -12,6 +12,7 @@ defineComponent({
     },
   },
   setup(props, { emit }) {
+    console.log("🚀 ~ setup ~ props:", props);
     // props 即 小程序 this.properties
     // emit 即 小程序 this.triggerEvent
     const instance = useComponent();
