@@ -5,6 +5,8 @@ import "miniprogram-api-typings";
 
 export type AppHook = () => Record<string, any>;
 
+type IAnyObject = Record<string, any>;
+
 // 定义页面
 export type ComponentPropType =
   | StringConstructor
@@ -26,7 +28,7 @@ type ComponentPropInferValueType<T> = T extends StringConstructor
   ? Record<string, any>
   : any;
 
-export type PageQuery = Record<string, string | undefined>;
+export type PageQuery<T> = T;
 
 export type ComponentPropDefinition<T extends ComponentPropType> = {
   type: T | T[];
@@ -39,17 +41,19 @@ export type ComponentPropDefinition<T extends ComponentPropType> = {
   ): void;
 };
 
-export type ComponentProps = {
+export type ComponentOptionsProps = {
   [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
 };
 
-export type ComponentContext = WechatMiniprogram.Component.InstanceProperties &
-  Omit<
-    WechatMiniprogram.Component.InstanceMethods<Record<string, any>>,
-    "setData" | "groupSetData" | "hasBehavior"
-  > & {
-    emit?(key: string, val: any): void;
-  };
+export type ComponentProps<T> = T;
+
+export type ComponentContext<T> =
+  WechatMiniprogram.Component.InstanceProperties &
+    Omit<
+      WechatMiniprogram.Component.InstanceMethods<Record<string, any>>,
+      "setData" | "groupSetData" | "hasBehavior"
+    > &
+    T;
 
 export type PageContext = WechatMiniprogram.Page.InstanceProperties &
   Omit<
@@ -57,14 +61,14 @@ export type PageContext = WechatMiniprogram.Page.InstanceProperties &
     "setData" | "groupSetData" | "hasBehavior"
   >;
 
-export type PageHook = (
-  props: PageQuery,
+export type PageHook<T> = (
+  props: PageQuery<T>,
   context: PageContext
 ) => Record<string, any>;
 
-export type ComponentHook = (
-  props: ComponentProps,
-  context: ComponentContext
+export type ComponentHook<T, E> = (
+  props: ComponentProps<T>,
+  context: ComponentContext<E>
 ) => Record<string, any>;
 
 export type AppInstance = Record<string, any>;
@@ -188,7 +192,7 @@ function methodOn(
  * @param props - 组件的属性
  * @returns 转换后的属性对象
  */
-function getProperties(props?: ComponentProps) {
+function getProperties<T>(props?: ComponentProps<T>) {
   if (!props) {
     return {};
   }
@@ -214,13 +218,13 @@ function getProperties(props?: ComponentProps) {
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export function definePage(
+export function definePage<T extends IAnyObject>(
   hook?:
-    | PageHook
+    | PageHook<T>
     | (WechatMiniprogram.Page.Options<
         WechatMiniprogram.Page.DataOption,
         WechatMiniprogram.Page.CustomOption
-      > & { setup: PageHook })
+      > & { setup: PageHook<T> })
 ) {
   if (!hook) {
     return Page({});
@@ -387,9 +391,9 @@ export const onSaveExitState = (hook: () => void) =>
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export function defineComponent(
+export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
   hook?:
-    | ComponentHook
+    | ComponentHook<T, E>
     | (WechatMiniprogram.Component.Options<
         WechatMiniprogram.Component.DataOption,
         {},
@@ -397,8 +401,8 @@ export function defineComponent(
         {},
         false
       > & {
-        props?: ComponentProps;
-        setup: ComponentHook;
+        props?: ComponentOptionsProps;
+        setup: ComponentHook<T, E>;
       })
 ) {
   if (!hook) {
@@ -504,10 +508,7 @@ export function defineComponent(
             this.setUpdatePerformanceListener.bind(this),
           getPassiveEvent: this.getPassiveEvent.bind(this),
           setPassiveEvent: this.setPassiveEvent.bind(this),
-          emit: (key: string, value: any) => {
-            this.triggerEvent(key, { value });
-          },
-        } as ComponentContext;
+        } as ComponentContext<E>;
         //@ts-expect-error 增加作用域
         this.__scope__.run(() => {
           //@ts-expect-error 不要报错

@@ -1,6 +1,11 @@
 import { defineComponent, attached } from "@52css/mp-vue3";
 
-defineComponent({
+defineComponent<
+  {
+    name: string;
+  },
+  {}
+>({
   // 属性名称和 vue 一致
   props: {
     // 定义单类型
