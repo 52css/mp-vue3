@@ -306,10 +306,6 @@ export function definePage(
       if (this.__scope__) {
         this.__scope__.stop();
       }
-      Object.keys(this).forEach((key) => {
-        delete this[key];
-      });
-      // console.log("onUnload", this);
     },
     onRouteDone() {
       methodEmit(this, options, "onRouteDone");
@@ -546,9 +542,6 @@ export function defineComponent(
           //@ts-expect-error 增加作用域
           this.__scope__.stop();
         }
-        Object.keys(this).forEach((key) => {
-          delete this[key];
-        });
       },
       error(err: WechatMiniprogram.Error) {
         methodEmit(this, options, "error", err);
