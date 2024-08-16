@@ -288,7 +288,7 @@ export function definePage(
             deepWatch(this, key, value);
           });
         }
-        methodEmit(this, options, "onLoad");
+        methodEmit(this, options, "onLoad", query);
       });
       _currentPage = null;
     },
