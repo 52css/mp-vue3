@@ -15,10 +15,9 @@ defineComponent({
     console.log("🚀 ~ setup ~ props:", props);
     // props 即 小程序 this.properties
     // emit 即 小程序 this.triggerEvent
-    const instance = useComponent();
 
     const onTap = () => {
-      console.log("instance?.properties.name", instance?.properties.name);
+      console.log("props.name", props.name);
     };
 
     // 需要返回响应式数据、方法
