@@ -16,7 +16,9 @@ export type ComponentProps = {
 export type ComponentContext = WechatMiniprogram.Component.InstanceProperties & Omit<WechatMiniprogram.Component.InstanceMethods<Record<string, any>>, "setData" | "groupSetData" | "hasBehavior"> & {
     emit?(key: string, val: any): void;
 };
-export type ComponentHook = (props: PageQuery | ComponentProps, context: ComponentContext) => Record<string, any>;
+export type PageContext = WechatMiniprogram.Page.InstanceProperties & Omit<WechatMiniprogram.Page.InstanceMethods<Record<string, any>>, "setData" | "groupSetData" | "hasBehavior">;
+export type PageHook = (props: PageQuery, context: PageContext) => Record<string, any>;
+export type ComponentHook = (props: ComponentProps, context: ComponentContext) => Record<string, any>;
 export type AppInstance = Record<string, any>;
 export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
@@ -26,8 +28,8 @@ export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMinip
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare function definePage(hook?: ComponentHook | (WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption> & {
-    setup?: ComponentHook;
+export declare function definePage(hook?: PageHook | (WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption> & {
+    setup: PageHook;
 })): void;
 export declare const usePage: () => PageInstance | null;
 export declare const onLoad: (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) => void;
@@ -51,7 +53,7 @@ export declare const onSaveExitState: (hook: () => void) => void;
  */
 export declare function defineComponent(hook?: ComponentHook | (WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false> & {
     props?: ComponentProps;
-    setup?: ComponentHook;
+    setup: ComponentHook;
 })): string | undefined;
 export declare const useComponent: () => ComponentInstance | null;
 export declare const attached: (hook: WechatMiniprogram.Component.Lifetimes["attached"]) => void;

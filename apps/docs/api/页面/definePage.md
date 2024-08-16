@@ -44,8 +44,7 @@ definePage({
 })
 ```
 
-
-## API
+## Setup 参数
 
 ### Query 属性
 
@@ -78,3 +77,7 @@ definePage({
 * `setUpdatePerformanceListener`
 * `getPassiveEvent`
 * `setPassiveEvent`
+
+## 生命周期
+
+* onLoad => setup

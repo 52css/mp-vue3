@@ -51,8 +51,19 @@ export type ComponentContext = WechatMiniprogram.Component.InstanceProperties &
     emit?(key: string, val: any): void;
   };
 
+export type PageContext = WechatMiniprogram.Page.InstanceProperties &
+  Omit<
+    WechatMiniprogram.Page.InstanceMethods<Record<string, any>>,
+    "setData" | "groupSetData" | "hasBehavior"
+  >;
+
+export type PageHook = (
+  props: PageQuery,
+  context: PageContext
+) => Record<string, any>;
+
 export type ComponentHook = (
-  props: PageQuery | ComponentProps,
+  props: ComponentProps,
   context: ComponentContext
 ) => Record<string, any>;
 
@@ -140,32 +151,6 @@ function methodOn(
 }
 
 /**
- * 使用 Hook 函数并将结果与上下文关联
- * @param context - 当前上下文
- * @param hook - Hook 函数
- */
-function useHook(
-  instance: PageInstance | ComponentInstance,
-  hook: ComponentHook,
-  props: PageQuery | ComponentProps,
-  context: ComponentContext
-) {
-  const bindings = hook(props, context);
-  if (bindings !== undefined) {
-    Object.keys(bindings).forEach((key) => {
-      const value = bindings[key];
-      if (isFunction(value)) {
-        instance[key] = value;
-        return;
-      }
-
-      instance.setData({ [key]: deepToRaw(value) });
-      deepWatch(instance, key, value);
-    });
-  }
-}
-
-/**
  * 获取属性并将其转换为组件属性格式
  * @param props - 组件的属性
  * @returns 转换后的属性对象
@@ -198,11 +183,11 @@ function getProperties(props?: ComponentProps) {
  */
 export function definePage(
   hook?:
-    | ComponentHook
+    | PageHook
     | (WechatMiniprogram.Page.Options<
         WechatMiniprogram.Page.DataOption,
         WechatMiniprogram.Page.CustomOption
-      > & { setup?: ComponentHook })
+      > & { setup: PageHook })
 ) {
   if (!hook) {
     return Page({});
@@ -215,12 +200,18 @@ export function definePage(
     hook = setup;
   }
 
+  if (!hook) {
+    return Page(options);
+  }
+
   Page({
     ...options,
     // 生命周期回调函数
     onLoad(query) {
       _currentPage = this;
       this.__scope__ = effectScope();
+
+      this.__query__ = query;
 
       this.__context__ = {
         is: this.is,
@@ -251,16 +242,25 @@ export function definePage(
         setPassiveEvent: this.setPassiveEvent.bind(this),
       };
       this.__scope__.run(() => {
-        hook &&
-          useHook(
-            this,
-            hook as ComponentHook,
-            query as PageQuery,
-            this.__context__
-          );
-        methodEmit(this, options, "onLoad", query);
+        const bindings = hook(this.__query__, this.__context__);
+        if (bindings !== undefined) {
+          Object.keys(bindings).forEach((key) => {
+            const value = bindings[key];
+            if (isFunction(value)) {
+              this[key] = value;
+              return;
+            }
+
+            this.setData({ [key]: deepToRaw(value) });
+            deepWatch(this, key, value);
+          });
+        }
       });
       _currentPage = null;
+
+      if (options.onLoad) {
+        options.onLoad(query);
+      }
     },
     onShow() {
       methodEmit(this, options, "onShow");
@@ -372,7 +372,7 @@ export function defineComponent(
         false
       > & {
         props?: ComponentProps;
-        setup?: ComponentHook;
+        setup: ComponentHook;
       })
 ) {
   if (!hook) {
@@ -397,6 +397,7 @@ export function defineComponent(
       console.warn(`属性使用"props"`);
     }
   }
+
   const optionsOptions = options.options;
   const getOptionsValue = (key: string, defaultValue: string | boolean) => {
     if (
@@ -408,6 +409,19 @@ export function defineComponent(
 
     return (optionsOptions as any)[key];
   };
+
+  if (!hook) {
+    return Component({
+      ...options,
+      options: {
+        ...optionsOptions,
+        virtualHost: getOptionsValue("virtualHost", true),
+        styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
+        multipleSlots: getOptionsValue("multipleSlots", true),
+      },
+      properties,
+    });
+  }
 
   Component({
     ...options,
@@ -423,65 +437,77 @@ export function defineComponent(
         _currentComponent = this;
         //@ts-expect-error 增加作用域
         this.__scope__ = effectScope();
+        //@ts-expect-error 增加的props
+        this.__props__ = new Proxy(this.properties, {
+          set: (target, key, value, receiver) => {
+            this.setData({
+              [key]: value,
+            });
+            // 发送自定义事件，传递数据
+            this.triggerEvent(key as string, { value });
+            return Reflect.set(target, key, value, receiver);
+          },
+        });
+
+        //@ts-expect-error 增加context
+        this.__context__ = {
+          is: this.is,
+          id: this.id,
+          dataset: this.dataset,
+          exitState: this.exitState,
+          router: this.router,
+          pageRouter: this.pageRouter,
+          renderer: this.renderer,
+          triggerEvent: this.triggerEvent.bind(this),
+          createSelectorQuery: this.createSelectorQuery.bind(this),
+          createIntersectionObserver:
+            this.createIntersectionObserver.bind(this),
+          createMediaQueryObserver: this.createMediaQueryObserver.bind(this),
+          selectComponent: this.selectComponent.bind(this),
+          selectAllComponents: this.selectAllComponents.bind(this),
+          selectOwnerComponent: this.selectOwnerComponent.bind(this),
+          getRelationNodes: this.getRelationNodes.bind(this),
+          getTabBar: this.getTabBar.bind(this),
+          getPageId: this.getPageId.bind(this),
+          animate: this.animate.bind(this),
+          clearAnimation: this.clearAnimation.bind(this),
+          getOpenerEventChannel: this.getOpenerEventChannel.bind(this),
+          applyAnimatedStyle: this.applyAnimatedStyle.bind(this),
+          clearAnimatedStyle: this.clearAnimatedStyle.bind(this),
+          setUpdatePerformanceListener:
+            this.setUpdatePerformanceListener.bind(this),
+          getPassiveEvent: this.getPassiveEvent.bind(this),
+          setPassiveEvent: this.setPassiveEvent.bind(this),
+          emit: (key: string, value: any) => {
+            this.triggerEvent(key, { value });
+          },
+        } as ComponentContext;
         //@ts-expect-error 增加作用域
         this.__scope__.run(() => {
-          //@ts-expect-error 增加的props
-          this.__props__ = new Proxy(this.properties, {
-            set: (target, key, value, receiver) => {
-              this.setData({
-                [key]: value,
-              });
-              // 发送自定义事件，传递数据
-              this.triggerEvent(key as string, { value });
-              return Reflect.set(target, key, value, receiver);
-            },
-          });
+          //@ts-expect-error 不要报错
+          const bindings = hook(this.__props__, this.__context__);
+          if (bindings !== undefined) {
+            Object.keys(bindings).forEach((key) => {
+              const value = bindings[key];
+              if (isFunction(value)) {
+                this[key] = value;
+                return;
+              }
 
-          //@ts-expect-error 增加context
-          this.__context__ = {
-            is: this.is,
-            id: this.id,
-            dataset: this.dataset,
-            exitState: this.exitState,
-            router: this.router,
-            pageRouter: this.pageRouter,
-            renderer: this.renderer,
-            triggerEvent: this.triggerEvent.bind(this),
-            createSelectorQuery: this.createSelectorQuery.bind(this),
-            createIntersectionObserver:
-              this.createIntersectionObserver.bind(this),
-            createMediaQueryObserver: this.createMediaQueryObserver.bind(this),
-            selectComponent: this.selectComponent.bind(this),
-            selectAllComponents: this.selectAllComponents.bind(this),
-            selectOwnerComponent: this.selectOwnerComponent.bind(this),
-            getRelationNodes: this.getRelationNodes.bind(this),
-            getTabBar: this.getTabBar.bind(this),
-            getPageId: this.getPageId.bind(this),
-            animate: this.animate.bind(this),
-            clearAnimation: this.clearAnimation.bind(this),
-            getOpenerEventChannel: this.getOpenerEventChannel.bind(this),
-            applyAnimatedStyle: this.applyAnimatedStyle.bind(this),
-            clearAnimatedStyle: this.clearAnimatedStyle.bind(this),
-            setUpdatePerformanceListener:
-              this.setUpdatePerformanceListener.bind(this),
-            getPassiveEvent: this.getPassiveEvent.bind(this),
-            setPassiveEvent: this.setPassiveEvent.bind(this),
-            emit: (key: string, value: any) => {
-              this.triggerEvent(key, { value });
-            },
-          } as ComponentContext;
-          hook &&
-            useHook(
-              this,
-              hook as ComponentHook,
-              //@ts-expect-error 增加的props
-              this.__props__,
-              this.__context__
-            );
-          methodEmit(this, options, "attached");
+              this.setData({ [key]: deepToRaw(value) });
+              deepWatch(this, key, value);
+            });
+          }
         });
 
         _currentComponent = null;
+
+        const attached =
+          options && options.lifetimes && options.lifetimes.attached;
+
+        if (attached) {
+          attached();
+        }
       },
       ready() {
         methodEmit(this, options, "ready");
@@ -498,7 +524,6 @@ export function defineComponent(
         Object.keys(this).forEach((key) => {
           delete this[key];
         });
-        // console.log("detached", this);
       },
       error(err: WechatMiniprogram.Error) {
         methodEmit(this, options, "error", err);
