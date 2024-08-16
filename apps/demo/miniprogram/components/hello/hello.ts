@@ -1,4 +1,4 @@
-import { defineComponent } from "@52css/mp-vue3";
+import { defineComponent, useComponent } from "@52css/mp-vue3";
 
 defineComponent({
   // 属性名称和 vue 一致
@@ -14,8 +14,15 @@ defineComponent({
   setup(props, { emit }) {
     // props 即 小程序 this.properties
     // emit 即 小程序 this.triggerEvent
+    const instance = useComponent();
+
+    const onTap = () => {
+      console.log("instance?.properties.name", instance?.properties.name);
+    };
 
     // 需要返回响应式数据、方法
-    return {};
+    return {
+      onTap,
+    };
   },
 });

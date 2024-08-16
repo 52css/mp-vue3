@@ -7,7 +7,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "@52css/mp-vue3": "^1.0.30"
+    "@52css/mp-vue3": "^1.0.36"
   },
   "devDependencies": {
     "miniprogram-api-typings": "^3.12.2"

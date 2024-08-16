@@ -26,6 +26,8 @@ type ComponentPropInferValueType<T> = T extends StringConstructor
   ? Record<string, any>
   : any;
 
+export type PageQuery = Record<string, string | undefined>;
+
 export type ComponentPropDefinition<T extends ComponentPropType> = {
   type: T | T[];
   optionalTypes?: ComponentPropType[];
@@ -46,7 +48,7 @@ export type ComponentContext = {
 };
 
 export type ComponentHook = (
-  props: ComponentProps,
+  props: PageQuery | ComponentProps,
   context: ComponentContext
 ) => Record<string, any>;
 
@@ -133,35 +135,6 @@ function methodOn(
   instance[`$${lifetimesKey}`].push(hook);
 }
 
-function createProps(
-  instance: PageInstance | ComponentInstance,
-  props: Record<string, any>
-) {
-  return new Proxy(props, {
-    get(target, key: string, _receiver) {
-      let value = instance.data[key];
-
-      if (
-        value === undefined &&
-        target[key] &&
-        typeof target[key].value !== "undefined"
-      ) {
-        value = target[key].value;
-      }
-
-      return value;
-    },
-    set: function (target, key, value, receiver) {
-      instance.setData({
-        [key]: value,
-      });
-      // 发送自定义事件，传递数据
-      instance.triggerEvent(key as string, { value });
-      return Reflect.set(target, key, value, receiver);
-    },
-  });
-}
-
 /**
  * 使用 Hook 函数并将结果与上下文关联
  * @param context - 当前上下文
@@ -170,7 +143,7 @@ function createProps(
 function useHook(
   instance: PageInstance | ComponentInstance,
   hook: ComponentHook,
-  props: ComponentProps,
+  props: PageQuery | ComponentProps,
   context: ComponentContext
 ) {
   const bindings = hook(props, context);
@@ -245,10 +218,8 @@ export function definePage(
       _currentPage = this;
       this.__scope__ = effectScope();
       this.__scope__.run(() => {
-        this.__props__ = createProps(this, {});
-
         hook &&
-          useHook(this, hook as ComponentHook, this.__props__, {
+          useHook(this, hook as ComponentHook, query as PageQuery, {
             emit: (key: string, value: any) => {
               this.triggerEvent(key, { value });
             },
@@ -274,7 +245,7 @@ export function definePage(
       Object.keys(this).forEach((key) => {
         delete this[key];
       });
-      console.log("onUnload", this);
+      // console.log("onUnload", this);
     },
     onRouteDone() {
       methodEmit(this, options, "onRouteDone");
@@ -421,7 +392,16 @@ export function defineComponent(
         //@ts-expect-error 增加作用域
         this.__scope__.run(() => {
           //@ts-expect-error 增加的props
-          this.__props__ = createProps(this, properties);
+          this.__props__ = new Proxy(this.properties, {
+            set: (target, key, value, receiver) => {
+              this.setData({
+                [key]: value,
+              });
+              // 发送自定义事件，传递数据
+              this.triggerEvent(key as string, { value });
+              return Reflect.set(target, key, value, receiver);
+            },
+          });
           hook &&
             //@ts-expect-error 增加的props
             useHook(this, hook as ComponentHook, this.__props__, {
@@ -449,7 +429,7 @@ export function defineComponent(
         Object.keys(this).forEach((key) => {
           delete this[key];
         });
-        console.log("detached", this);
+        // console.log("detached", this);
       },
       error(err: WechatMiniprogram.Error) {
         methodEmit(this, options, "error", err);

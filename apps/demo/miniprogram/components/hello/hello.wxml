@@ -1,2 +1,2 @@
 <!-- components/hello/hello.wxml -->
-<view>hello {{name}}</view>
+<view bind:tap="onTap">hello {{name}}</view>

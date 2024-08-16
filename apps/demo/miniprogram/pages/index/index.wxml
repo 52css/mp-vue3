@@ -2,5 +2,5 @@
 <navigation-bar title="Weixin" back="{{false}}" color="black" background="#FFF"></navigation-bar>
 <view>count: {{count}}</view>
 <button bind:tap="onIncrease">增加</button>
-<hello name="李四"></hello>
+<hello name="{{count}}"></hello>
 test: {{test}}

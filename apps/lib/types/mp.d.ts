@@ -2,6 +2,7 @@ import "miniprogram-api-typings";
 export type AppHook = () => Record<string, any>;
 export type ComponentPropType = StringConstructor | NumberConstructor | BooleanConstructor | ArrayConstructor | ObjectConstructor | null;
 type ComponentPropInferValueType<T> = T extends StringConstructor ? string : T extends NumberConstructor ? number : T extends BooleanConstructor ? boolean : T extends ArrayConstructor ? any[] : T extends ObjectConstructor ? Record<string, any> : any;
+export type PageQuery = Record<string, string | undefined>;
 export type ComponentPropDefinition<T extends ComponentPropType> = {
     type: T | T[];
     optionalTypes?: ComponentPropType[];
@@ -15,7 +16,7 @@ export type ComponentProps = {
 export type ComponentContext = {
     emit?(key: string, val: any): void;
 };
-export type ComponentHook = (props: ComponentProps, context: ComponentContext) => Record<string, any>;
+export type ComponentHook = (props: PageQuery | ComponentProps, context: ComponentContext) => Record<string, any>;
 export type AppInstance = Record<string, any>;
 export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
