@@ -246,11 +246,11 @@ export function definePage<T extends IAnyObject>(
     // 生命周期回调函数
     onLoad(query) {
       _currentPage = this;
-      this.__scope__ = effectScope();
+      this.$scope = effectScope();
 
-      this.__query__ = query;
+      this.$query = query;
 
-      this.__context__ = {
+      this.$context = {
         is: this.is,
         id: this.id,
         dataset: this.dataset,
@@ -278,8 +278,8 @@ export function definePage<T extends IAnyObject>(
         getPassiveEvent: this.getPassiveEvent.bind(this),
         setPassiveEvent: this.setPassiveEvent.bind(this),
       };
-      this.__scope__.run(() => {
-        const bindings = hook(this.__query__, this.__context__);
+      this.$scope.run(() => {
+        const bindings = hook(this.$query, this.$context);
         if (bindings !== undefined) {
           Object.keys(bindings).forEach((key) => {
             const value = bindings[key];
@@ -307,9 +307,15 @@ export function definePage<T extends IAnyObject>(
     },
     onUnload() {
       methodEmit(this, options, "onUnload");
-      if (this.__scope__) {
-        this.__scope__.stop();
+      if (this.$scope) {
+        this.$scope.stop();
       }
+      // 删除自己创建的变量
+      Object.keys(this).forEach((key) => {
+        if (/^\$/.test(key)) {
+          delete this[key];
+        }
+      });
     },
     onRouteDone() {
       methodEmit(this, options, "onRouteDone");
@@ -466,9 +472,9 @@ export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
       attached() {
         _currentComponent = this;
         //@ts-expect-error 增加作用域
-        this.__scope__ = effectScope();
+        this.$scope = effectScope();
         //@ts-expect-error 增加的props
-        this.__props__ = new Proxy(this.properties, {
+        this.$prop = new Proxy(this.properties, {
           set: (target, key, value, receiver) => {
             this.setData({
               [key]: value,
@@ -480,7 +486,7 @@ export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
         });
 
         //@ts-expect-error 增加context
-        this.__context__ = {
+        this.$content = {
           is: this.is,
           id: this.id,
           dataset: this.dataset,
@@ -510,9 +516,9 @@ export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
           setPassiveEvent: this.setPassiveEvent.bind(this),
         } as ComponentContext<E>;
         //@ts-expect-error 增加作用域
-        this.__scope__.run(() => {
+        this.$scope.run(() => {
           //@ts-expect-error 不要报错
-          const bindings = hook(this.__props__, this.__context__);
+          const bindings = hook(this.$prop, this.$context);
           if (bindings !== undefined) {
             Object.keys(bindings).forEach((key) => {
               const value = bindings[key];
@@ -539,10 +545,17 @@ export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
       },
       detached() {
         methodEmit(this, options, "detached");
-        if (this.__scope__) {
+        if (this.$scope) {
           //@ts-expect-error 增加作用域
-          this.__scope__.stop();
+          this.$scope.stop();
         }
+
+        // 删除自己创建的变量
+        Object.keys(this).forEach((key) => {
+          if (/^\$/.test(key)) {
+            delete this[key];
+          }
+        });
       },
       error(err: WechatMiniprogram.Error) {
         methodEmit(this, options, "error", err);
