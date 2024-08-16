@@ -59,3 +59,41 @@ defineComponent({
   }
 })
 ```
+
+## API
+
+### Props 属性
+
+* 读取小程序 `this.properties`属性
+* 扩展可以 `props.propName = 'value'` 赋值, 同时调用
+  - 调用 `this.setData({'propName': 'value'})`
+  - 调用 `this.triggerEvent('propName', { value })`
+
+### Context 属性
+
+* `is`
+* `id`
+* `dataset`
+* `exitState`
+* `router`
+* `pageRouter`
+* `renderer`
+* `triggerEvent`
+* `createSelectorQuery`
+* `createIntersectionObserver`
+* `createMediaQueryObserver`
+* `selectComponent`
+* `selectAllComponents`
+* `selectOwnerComponent`
+* `getRelationNodes`
+* `getTabBar`
+* `getPageId`
+* `animate`
+* `clearAnimation`
+* `getOpenerEventChannel`
+* `applyAnimatedStyle`
+* `clearAnimatedStyle`
+* `setUpdatePerformanceListener`
+* `getPassiveEvent`
+* `setPassiveEvent`
+* `emit` 对外触发事件 `(key: string, value: any) => {this.triggerEvent(key, { value });}`

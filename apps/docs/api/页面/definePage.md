@@ -43,3 +43,38 @@ definePage({
   }
 })
 ```
+
+
+## API
+
+### Query 属性
+
+* 读取`onLoad`对应query
+
+### Context 属性
+
+* `is`
+* `id`
+* `dataset`
+* `exitState`
+* `router`
+* `pageRouter`
+* `renderer`
+* `triggerEvent`
+* `createSelectorQuery`
+* `createIntersectionObserver`
+* `createMediaQueryObserver`
+* `selectComponent`
+* `selectAllComponents`
+* `selectOwnerComponent`
+* `getRelationNodes`
+* `getTabBar`
+* `getPageId`
+* `animate`
+* `clearAnimation`
+* `getOpenerEventChannel`
+* `applyAnimatedStyle`
+* `clearAnimatedStyle`
+* `setUpdatePerformanceListener`
+* `getPassiveEvent`
+* `setPassiveEvent`
