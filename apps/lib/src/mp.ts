@@ -514,6 +514,9 @@ export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
             this.setUpdatePerformanceListener.bind(this),
           getPassiveEvent: this.getPassiveEvent.bind(this),
           setPassiveEvent: this.setPassiveEvent.bind(this),
+          emit: (key: string, value: any) => {
+            this.triggerEvent(key, { value });
+          },
         } as ComponentContext<E>;
         //@ts-expect-error 增加作用域
         this.$scope.run(() => {
