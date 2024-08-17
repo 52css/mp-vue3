@@ -486,7 +486,7 @@ export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
         });
 
         //@ts-expect-error 增加context
-        this.$content = {
+        this.$context = {
           is: this.is,
           id: this.id,
           dataset: this.dataset,
