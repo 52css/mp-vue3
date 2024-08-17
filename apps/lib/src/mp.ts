@@ -310,10 +310,12 @@ export function definePage<T extends IAnyObject>(
       if (this.$scope) {
         this.$scope.stop();
       }
-      // 删除自己创建的变量
+      // 手动销毁
       Object.keys(this).forEach((key) => {
-        if (/^\$/.test(key)) {
+        try {
           delete this[key];
+        } catch (ex) {
+          console.error("销毁异常", ex);
         }
       });
     },
@@ -553,10 +555,12 @@ export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
           this.$scope.stop();
         }
 
-        // 删除自己创建的变量
+        // 手动销毁
         Object.keys(this).forEach((key) => {
-          if (/^\$/.test(key)) {
+          try {
             delete this[key];
+          } catch (ex) {
+            console.error("销毁异常", ex);
           }
         });
       },
