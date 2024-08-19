@@ -100,12 +100,12 @@ export type ComponentInstance = WechatMiniprogram.Component.Instance<
 let _currentPage: PageInstance | null = null;
 let _currentComponent: ComponentInstance | null = null;
 
-function methodEmit(
+const methodEmit = (
   instance: PageInstance | ComponentInstance,
   options: any,
   lifetimesKey: string,
   ...args: any[]
-) {
+) => {
   if (options && options[lifetimesKey]) {
     options[lifetimesKey].apply(instance, args);
   }
@@ -149,14 +149,14 @@ function methodEmit(
       }
     }
   });
-}
+};
 
-function methodOnce(
+const methodOnce = (
   instance: PageInstance | ComponentInstance,
   options: any,
   lifetimesKey: string,
   ...args: any[]
-) {
+) => {
   if (options && options[lifetimesKey]) {
     return options[lifetimesKey].apply(instance, args);
   }
@@ -169,13 +169,13 @@ function methodOnce(
   }
 
   return instance[`$${lifetimesKey}`][0](...args);
-}
+};
 
-function methodOn(
+const methodOn = (
   instance: PageInstance | ComponentInstance | null,
   lifetimesKey: string,
   hook: Function
-) {
+) => {
   if (!instance) {
     return;
   }
@@ -185,14 +185,14 @@ function methodOn(
   }
 
   instance[`$${lifetimesKey}`].push(hook);
-}
+};
 
 /**
  * 获取属性并将其转换为组件属性格式
  * @param props - 组件的属性
  * @returns 转换后的属性对象
  */
-function getProperties<T>(props?: ComponentProps<T>) {
+const getProperties = <T>(props?: ComponentProps<T>) => {
   if (!props) {
     return {};
   }
@@ -212,20 +212,20 @@ function getProperties<T>(props?: ComponentProps<T>) {
   }
 
   return props;
-}
+};
 
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export function definePage<T extends IAnyObject>(
+export const definePage = <T extends IAnyObject>(
   hook?:
     | PageHook<T>
     | (WechatMiniprogram.Page.Options<
         WechatMiniprogram.Page.DataOption,
         WechatMiniprogram.Page.CustomOption
       > & { setup: PageHook<T> })
-) {
+) => {
   if (!hook) {
     return Page({});
   }
@@ -351,7 +351,7 @@ export function definePage<T extends IAnyObject>(
       methodEmit(this, options, "onSaveExitState");
     },
   });
-}
+};
 
 export const usePage = () => {
   return _currentPage;
@@ -399,7 +399,7 @@ export const onSaveExitState = (hook: () => void) =>
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
+export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
   hook?:
     | ComponentHook<T, E>
     | (WechatMiniprogram.Component.Options<
@@ -412,7 +412,7 @@ export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
         props?: ComponentOptionsProps;
         setup: ComponentHook<T, E>;
       })
-) {
+) => {
   if (!hook) {
     return Component({
       options: {
@@ -569,7 +569,7 @@ export function defineComponent<T extends IAnyObject, E extends IAnyObject>(
       },
     },
   });
-}
+};
 
 export const useComponent = () => _currentComponent;
 
