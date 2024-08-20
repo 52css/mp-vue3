@@ -404,28 +404,8 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
     hook = setup;
   }
 
-  const optionsOptions = options.options;
-  const getOptionsValue = (key: string, defaultValue: string | boolean) => {
-    if (
-      !optionsOptions ||
-      typeof (optionsOptions as any)[key] === "undefined"
-    ) {
-      return defaultValue;
-    }
-
-    return (optionsOptions as any)[key];
-  };
-
   if (!hook) {
-    return Component({
-      ...options,
-      options: {
-        ...optionsOptions,
-        virtualHost: getOptionsValue("virtualHost", true),
-        styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
-        multipleSlots: getOptionsValue("multipleSlots", true),
-      },
-    });
+    return Component(options);
   }
 
   let properties: string[] | null = null;
@@ -462,12 +442,6 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
 
   Component({
     ...options,
-    options: {
-      ...optionsOptions,
-      virtualHost: getOptionsValue("virtualHost", true),
-      styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
-      multipleSlots: getOptionsValue("multipleSlots", true),
-    },
     lifetimes: {
       attached(this: ComponentInstance) {
         _currentComponent = this;
