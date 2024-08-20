@@ -188,33 +188,6 @@ const methodOn = (
 };
 
 /**
- * 获取属性并将其转换为组件属性格式
- * @param props - 组件的属性
- * @returns 转换后的属性对象
- */
-const getProperties = <T>(props?: ComponentProps<T>) => {
-  if (!props) {
-    return {};
-  }
-  for (let prop in props) {
-    const val = props[prop] as ComponentPropDefinition<ComponentPropType>;
-    if (val && val.type) {
-      val.value = typeof val.default !== "undefined" ? val.default : val.value;
-      if (Array.isArray(val.type)) {
-        const optionalTypes = val.type;
-        val.type = optionalTypes[0];
-        val.optionalTypes =
-          typeof val.optionalTypes !== "undefined"
-            ? val.optionalTypes
-            : optionalTypes;
-      }
-    }
-  }
-
-  return props;
-};
-
-/**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
@@ -424,16 +397,11 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
   }
 
   let options: ComponentOptions = {};
-  let properties = {};
   if (typeof hook !== "function") {
-    const { setup, props, ...other } = hook;
+    const { setup, ...other } = hook;
 
     options = other;
-    properties = getProperties(props);
     hook = setup;
-    if ("properties" in other) {
-      console.warn(`属性使用"props"`);
-    }
   }
 
   const optionsOptions = options.options;
@@ -457,7 +425,6 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
         styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
         multipleSlots: getOptionsValue("multipleSlots", true),
       },
-      properties,
     });
   }
 
@@ -469,7 +436,6 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
       styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
       multipleSlots: getOptionsValue("multipleSlots", true),
     },
-    properties,
     lifetimes: {
       attached(this: ComponentInstance) {
         _currentComponent = this;

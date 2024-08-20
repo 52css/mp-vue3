@@ -28,9 +28,9 @@ export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMinip
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare function definePage<T extends IAnyObject>(hook?: PageHook<T> | (WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption> & {
+export declare const definePage: <T extends IAnyObject>(hook?: PageHook<T> | (WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption> & {
     setup: PageHook<T>;
-})): void;
+})) => void;
 export declare const usePage: () => PageInstance | null;
 export declare const onLoad: (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) => void;
 export declare const onShow: (hook: WechatMiniprogram.Page.ILifetime["onShow"]) => void;
@@ -51,10 +51,10 @@ export declare const onSaveExitState: (hook: () => void) => void;
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare function defineComponent<T extends IAnyObject, E extends IAnyObject>(hook?: ComponentHook<T, E> | (WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false> & {
+export declare const defineComponent: <T extends IAnyObject, E extends IAnyObject>(hook?: ComponentHook<T, E> | (WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false> & {
     props?: ComponentOptionsProps;
     setup: ComponentHook<T, E>;
-})): string | undefined;
+})) => string | undefined;
 export declare const useComponent: () => ComponentInstance | null;
 export declare const attached: (hook: WechatMiniprogram.Component.Lifetimes["attached"]) => void;
 export declare const ready: (hook: WechatMiniprogram.Component.Lifetimes["ready"]) => void;

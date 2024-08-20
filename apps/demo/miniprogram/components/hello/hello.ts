@@ -1,19 +1,14 @@
 import { defineComponent, attached } from "@52css/mp-vue3";
 
-defineComponent<
-  {
-    name: string;
-  },
-  {}
->({
+defineComponent({
   // 属性名称和 vue 一致
-  props: {
+  properties: {
     // 定义单类型
     name: String,
     // 定义对象，通过default控制默认值
     border: {
       type: Boolean,
-      default: false,
+      value: false,
     },
   },
   setup(props, context) {
