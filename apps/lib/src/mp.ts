@@ -428,6 +428,38 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
     });
   }
 
+  let properties: string[] | null = null;
+
+  if (options.properties) {
+    properties = Object.keys(options.properties);
+  }
+
+  if (properties) {
+    if (options.observers === undefined) {
+      options.observers = {};
+    }
+
+    properties.forEach((property) => {
+      //@ts-expect-error 不要报错
+      const originObserver = options.observers[property];
+      //@ts-expect-error 不要报错
+      options.observers[property] = function (
+        this: ComponentInstance,
+        value: any
+      ) {
+        // Observer executes before attached
+        if (this.$props) {
+          //@ts-expect-error 不要报错
+          this.$props[property] = value;
+        }
+
+        if (originObserver !== undefined) {
+          originObserver.call(this, value);
+        }
+      };
+    });
+  }
+
   Component({
     ...options,
     options: {

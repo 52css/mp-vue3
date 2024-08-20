@@ -1,4 +1,4 @@
-import { defineComponent, attached } from "@52css/mp-vue3";
+import { defineComponent, attached, watch } from "@52css/mp-vue3";
 
 defineComponent({
   // 属性名称和 vue 一致
@@ -20,6 +20,13 @@ defineComponent({
     const onTap = () => {
       console.log("props.name", props.name);
     };
+
+    watch(
+      () => props.name,
+      (newVal) => {
+        console.log("🚀 ~ watch ~ newVal:", newVal);
+      }
+    );
 
     attached(() => {
       console.log("组件加载");
