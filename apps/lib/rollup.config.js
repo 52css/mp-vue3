@@ -29,6 +29,6 @@ export default {
       },
       preventAssignment: true,
     }),
-    terser(), // 压缩代码
+    // terser(), // 压缩代码
   ],
 };
