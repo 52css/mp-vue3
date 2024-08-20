@@ -133,7 +133,7 @@ const methodEmit = (
       }
     }
 
-    const off = fn(...args);
+    const off = fn.apply(instance, args);
     // 调用是否返回函数，用于销毁
     if (lifetimesBackKey && typeof off === "function") {
       let backFn =
@@ -168,7 +168,7 @@ const methodOnce = (
     throw new Error(`一个page只能配置一个${lifetimesKey}`);
   }
 
-  return instance[`$${lifetimesKey}`][0](...args);
+  return instance[`$${lifetimesKey}`][0].apply(instance, args);
 };
 
 const methodOn = (
@@ -252,7 +252,7 @@ export const definePage = <T extends IAnyObject>(
         setPassiveEvent: this.setPassiveEvent.bind(this),
       };
       this.$scope.run(() => {
-        const bindings = hook(this.$query, this.$context);
+        const bindings = hook.call(this, this.$query, this.$context);
         if (bindings !== undefined) {
           Object.keys(bindings).forEach((key) => {
             const value = bindings[key];
@@ -489,7 +489,7 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
         //@ts-expect-error 增加作用域
         this.$scope.run(() => {
           //@ts-expect-error 不要报错
-          const bindings = hook(this.$prop, this.$context);
+          const bindings = hook.call(this, this.$prop, this.$context);
           if (bindings !== undefined) {
             Object.keys(bindings).forEach((key) => {
               const value = bindings[key];
