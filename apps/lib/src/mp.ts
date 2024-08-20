@@ -244,7 +244,7 @@ export const definePage = <T extends IAnyObject>(
   Page({
     ...options,
     // 生命周期回调函数
-    onLoad(query) {
+    onLoad(this: PageInstance, query) {
       _currentPage = this;
       this.$scope = effectScope();
 
@@ -296,16 +296,16 @@ export const definePage = <T extends IAnyObject>(
       });
       _currentPage = null;
     },
-    onShow() {
+    onShow(this: PageInstance) {
       methodEmit(this, options, "onShow");
     },
-    onReady() {
+    onReady(this: PageInstance) {
       methodEmit(this, options, "onReady");
     },
-    onHide() {
+    onHide(this: PageInstance) {
       methodEmit(this, options, "onHide");
     },
-    onUnload() {
+    onUnload(this: PageInstance) {
       methodEmit(this, options, "onUnload");
       if (this.$scope) {
         this.$scope.stop();
@@ -319,35 +319,35 @@ export const definePage = <T extends IAnyObject>(
         }
       });
     },
-    onRouteDone() {
+    onRouteDone(this: PageInstance) {
       methodEmit(this, options, "onRouteDone");
     },
     // 页面事件处理函数
-    onPullDownRefresh() {
+    onPullDownRefresh(this: PageInstance) {
       methodEmit(this, options, "onPullDownRefresh");
     },
-    onReachBottom() {
+    onReachBottom(this: PageInstance) {
       methodEmit(this, options, "onReachBottom");
     },
-    onPageScroll(event) {
+    onPageScroll(this: PageInstance, event) {
       methodEmit(this, options, "onPageScroll", event);
     },
-    onAddToFavorites(object) {
+    onAddToFavorites(this: PageInstance, object) {
       return methodOnce(this, options, "onAddToFavorites", object);
     },
-    onShareAppMessage(event) {
+    onShareAppMessage(this: PageInstance, event) {
       return methodOnce(this, options, "onShareAppMessage", event);
     },
-    onShareTimeline() {
+    onShareTimeline(this: PageInstance) {
       return methodOnce(this, options, "onShareTimeline");
     },
-    onResize(event) {
+    onResize(this: PageInstance, event) {
       methodEmit(this, options, "onResize", event);
     },
-    onTabItemTap(object) {
+    onTabItemTap(this: PageInstance, object) {
       methodEmit(this, options, "onTabItemTap", object);
     },
-    onSaveExitState() {
+    onSaveExitState(this: PageInstance) {
       methodEmit(this, options, "onSaveExitState");
     },
   });
@@ -471,7 +471,7 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
     },
     properties,
     lifetimes: {
-      attached() {
+      attached(this: ComponentInstance) {
         _currentComponent = this;
         //@ts-expect-error 增加作用域
         this.$scope = effectScope();
@@ -542,13 +542,13 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
 
         _currentComponent = null;
       },
-      ready() {
+      ready(this: ComponentInstance) {
         methodEmit(this, options, "ready");
       },
-      moved() {
+      moved(this: ComponentInstance) {
         methodEmit(this, options, "moved");
       },
-      detached() {
+      detached(this: ComponentInstance) {
         methodEmit(this, options, "detached");
         if (this.$scope) {
           //@ts-expect-error 增加作用域
@@ -564,7 +564,7 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
           }
         });
       },
-      error(err: WechatMiniprogram.Error) {
+      error(this: ComponentInstance, err: WechatMiniprogram.Error) {
         methodEmit(this, options, "error", err);
       },
     },

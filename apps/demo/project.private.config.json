@@ -6,5 +6,18 @@
     "urlCheck": false,
     "bigPackageSizeSupport": true
   },
-  "libVersion": "3.5.3"
+  "libVersion": "3.5.3",
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "pages/demo/demo",
+          "pathName": "pages/demo/demo",
+          "query": "a=1&b=2",
+          "launchMode": "default",
+          "scene": null
+        }
+      ]
+    }
+  }
 }
