@@ -107,7 +107,7 @@ const methodEmit = (
   ...args: any[]
 ) => {
   if (options && options[lifetimesKey]) {
-    options[lifetimesKey].apply(instance, args);
+    options[lifetimesKey](...args);
   }
   if (!instance[`$${lifetimesKey}`]) {
     return;
@@ -158,7 +158,7 @@ const methodOnce = (
   ...args: any[]
 ) => {
   if (options && options[lifetimesKey]) {
-    return options[lifetimesKey].apply(instance, args);
+    return options[lifetimesKey](...args);
   }
   if (!instance[`$${lifetimesKey}`]) {
     return;
