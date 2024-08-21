@@ -11,9 +11,10 @@ defineComponent({
       value: false,
     },
   },
-  setup(props, context) {
-    console.log("🚀 ~ setup ~ context:", context);
-    console.log("🚀 ~ setup ~ props:", props);
+  setup(props) {
+    console.log("this", this);
+    // console.log("🚀 ~ setup ~ context:", context);
+    // console.log("🚀 ~ setup ~ props:", props);
     // props 即 小程序 this.properties
     // emit 即 小程序 this.triggerEvent
 

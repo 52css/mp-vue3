@@ -1,5 +1,5 @@
 import { isFunction } from "./utils";
-import { effectScope } from "@vue/reactivity";
+import { effectScope, shallowReactive } from "@vue/reactivity";
 import { deepToRaw, deepWatch } from "./shared";
 import "miniprogram-api-typings";
 
@@ -404,28 +404,8 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
     hook = setup;
   }
 
-  const optionsOptions = options.options;
-  const getOptionsValue = (key: string, defaultValue: string | boolean) => {
-    if (
-      !optionsOptions ||
-      typeof (optionsOptions as any)[key] === "undefined"
-    ) {
-      return defaultValue;
-    }
-
-    return (optionsOptions as any)[key];
-  };
-
   if (!hook) {
-    return Component({
-      ...options,
-      options: {
-        ...optionsOptions,
-        virtualHost: getOptionsValue("virtualHost", true),
-        styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
-        multipleSlots: getOptionsValue("multipleSlots", true),
-      },
-    });
+    return Component(options);
   }
 
   let properties: string[] | null = null;
@@ -462,28 +442,31 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
 
   Component({
     ...options,
-    options: {
-      ...optionsOptions,
-      virtualHost: getOptionsValue("virtualHost", true),
-      styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
-      multipleSlots: getOptionsValue("multipleSlots", true),
-    },
     lifetimes: {
       attached(this: ComponentInstance) {
         _currentComponent = this;
         //@ts-expect-error 增加作用域
         this.$scope = effectScope();
+        const rawProps: Record<string, any> = {};
+        if (properties) {
+          properties.forEach((property) => {
+            rawProps[property] = this.data[property];
+          });
+        }
         //@ts-expect-error 增加的props
-        this.$prop = new Proxy(this.properties, {
-          set: (target, key, value, receiver) => {
-            this.setData({
-              [key]: value,
-            });
-            // 发送自定义事件，传递数据
-            this.triggerEvent(key as string, { value });
-            return Reflect.set(target, key, value, receiver);
-          },
-        });
+        this.$props = shallowReactive(rawProps);
+        // this.$props = shallowReactive(
+        //   new Proxy(this.properties, {
+        //     set: (target, key, value, receiver) => {
+        //       this.setData({
+        //         [key]: value,
+        //       });
+        //       // 发送自定义事件，传递数据
+        //       this.triggerEvent(key as string, { value });
+        //       return Reflect.set(target, key, value, receiver);
+        //     },
+        //   })
+        // );
 
         //@ts-expect-error 增加context
         this.$context = {
@@ -521,7 +504,7 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
         //@ts-expect-error 增加作用域
         this.$scope.run(() => {
           //@ts-expect-error 不要报错
-          const bindings = hook.call(this, this.$prop, this.$context);
+          const bindings = hook.call(this, this.$props, this.$context);
           if (bindings !== undefined) {
             Object.keys(bindings).forEach((key) => {
               const value = bindings[key];
