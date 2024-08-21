@@ -1,9 +1,5 @@
 {
-  "pages": [
-    "pages/index/index",
-    "pages/logs/logs",
-    "pages/demo/demo"
-  ],
+  "pages": ["pages/index/index", "pages/logs/logs"],
   "window": {
     "navigationBarTextStyle": "black",
     "navigationStyle": "custom"

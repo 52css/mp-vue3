@@ -4,12 +4,7 @@ var __DEFINE__ = function(modId, func, req) { var m = { exports: {}, _tempexport
 var __REQUIRE__ = function(modId, source) { if(!__MODS__[modId]) return require(source); if(!__MODS__[modId].status) { var m = __MODS__[modId].m; m._exports = m._tempexports; var desp = Object.getOwnPropertyDescriptor(m, "exports"); if (desp && desp.configurable) Object.defineProperty(m, "exports", { set: function (val) { if(typeof val === "object" && val !== m._exports) { m._exports.__proto__ = val.__proto__; Object.keys(val).forEach(function (k) { m._exports[k] = val[k]; }); } m._tempexports = val }, get: function () { return m._tempexports; } }); __MODS__[modId].status = 1; __MODS__[modId].func(__MODS__[modId].req, m, m.exports); } return __MODS__[modId].m.exports; };
 var __REQUIRE_WILDCARD__ = function(obj) { if(obj && obj.__esModule) { return obj; } else { var newObj = {}; if(obj != null) { for(var k in obj) { if (Object.prototype.hasOwnProperty.call(obj, k)) newObj[k] = obj[k]; } } newObj.default = obj; return newObj; } };
 var __REQUIRE_DEFAULT__ = function(obj) { return obj && obj.__esModule ? obj.default : obj; };
-<<<<<<< HEAD
-__DEFINE__(1724231829847, function(require, module, exports) {
-!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"function"==typeof define&&define.amd?define(["exports"],e):e((t="undefined"!=typeof globalThis?globalThis:t||self).MpVue3={})}(this,(function(t){
-/**
-=======
-__DEFINE__(1724162875868, function(require, module, exports) {
+__DEFINE__(1724231829848, function(require, module, exports) {
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -17,7 +12,6 @@ __DEFINE__(1724162875868, function(require, module, exports) {
 })(this, (function (exports) { 
 
   /**
->>>>>>> 56fd1ac4ba73bd1a5661b787e65c9da5807ed88c
   * @vue/shared v3.4.35
   * (c) 2018-present Yuxi (Evan) You and Vue contributors
   * @license MIT
@@ -1749,24 +1743,8 @@ __DEFINE__(1724162875868, function(require, module, exports) {
           options = other;
           hook = setup;
       }
-      const optionsOptions = options.options;
-      const getOptionsValue = (key, defaultValue) => {
-          if (!optionsOptions ||
-              typeof optionsOptions[key] === "undefined") {
-              return defaultValue;
-          }
-          return optionsOptions[key];
-      };
       if (!hook) {
-          return Component({
-              ...options,
-              options: {
-                  ...optionsOptions,
-                  virtualHost: getOptionsValue("virtualHost", true),
-                  styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
-                  multipleSlots: getOptionsValue("multipleSlots", true),
-              },
-          });
+          return Component(options);
       }
       let properties = null;
       if (options.properties) {
@@ -1794,12 +1772,6 @@ __DEFINE__(1724162875868, function(require, module, exports) {
       }
       Component({
           ...options,
-          options: {
-              ...optionsOptions,
-              virtualHost: getOptionsValue("virtualHost", true),
-              styleIsolation: getOptionsValue("styleIsolation", "apply-shared"),
-              multipleSlots: getOptionsValue("multipleSlots", true),
-          },
           lifetimes: {
               attached() {
                   _currentComponent = this;
@@ -1970,11 +1942,7 @@ __DEFINE__(1724162875868, function(require, module, exports) {
 }));
 
 }, function(modId) {var map = {}; return __REQUIRE__(map[modId], modId); })
-<<<<<<< HEAD
-return __REQUIRE__(1724231829847);
-=======
-return __REQUIRE__(1724162875868);
->>>>>>> 56fd1ac4ba73bd1a5661b787e65c9da5807ed88c
+return __REQUIRE__(1724231829848);
 })()
 //miniprogram-npm-outsideDeps=[]
 //# sourceMappingURL=index.js.map
