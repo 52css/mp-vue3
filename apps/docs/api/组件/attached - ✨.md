@@ -17,7 +17,7 @@ defineComponent({
 
 ## 销毁
 
-* 返回函数，支持`detached`销毁
+* ✨ 返回函数，支持`detached`销毁
 
 ```ts
 import { defineComponent, attached } from '@52css/mp-vue3'

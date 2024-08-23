@@ -25,30 +25,47 @@ defineComponent((props, context) => {
 
 ## 👍 对象默认下扩充 `setup` 方法
 
+* ✨ 增加 `properties` 定义, 推导 `props` 类型
+* ✨ 增加 `emits` 定义, 推导 `emit` 类型
+
 ```ts
-import { defineComponent, ref } from '@52css/mp-vue3'
+import { defineComponent, ref, PropType } from '@52css/mp-vue3'
+
+type User = {
+  id: number;
+  name: string;
+}
 
 defineComponent({
-  props: {
+  properties: {
     // 普通类型
     name: String,
     // 支持默认值
     user: {
-      type: Object,
+      type: Object as PropType<Partial<User>>,
       default: {},
     },
     // 支持多个类型
     status: {
-      type: [String, Number],
+      type: String,
+      optionalTypes: [Number],
       default: 0
     }
   },
+  emits: {
+    submit: (_data: { name: string; age: number }) => void 0,
+    change: (_value: string | number) => void 0,
+    test: () => void 0,
+  },
   setup(props, { emit }) {
+    // 根据 options.properties 推导 props
     console.log("🚀 ~ setup ~ props:", props) // 获取props值
     const count = ref(0)
     const onIncrease = () => {
       count.value++; // 数据变更，自动响应 this.data.count
+      // 根据 options.emits 推导 emit
       emit('change', count.value) // 调用 this.triggerEvent('change', {value: count.value})
+      emit("test");
     }
 
     // 所有的数据和方法需要返回
@@ -62,38 +79,10 @@ defineComponent({
 
 ## Setup 参数
 
-### Props 属性
+### ComponentProps 属性
 
-* 读取小程序 `this.properties`属性
-* 扩展可以 `props.propName = 'value'` 赋值, 同时调用
-  - 调用 `this.setData({'propName': 'value'})`
-  - 调用 `this.triggerEvent('propName', { value })`
+* 读取小程序 `this.properties`属性转换的响应式数据，可以`watch`
 
-### Context 属性
+### ComponentContext 属性
 
-* `is`
-* `id`
-* `dataset`
-* `exitState`
-* `router`
-* `pageRouter`
-* `renderer`
-* `triggerEvent`
-* `createSelectorQuery`
-* `createIntersectionObserver`
-* `createMediaQueryObserver`
-* `selectComponent`
-* `selectAllComponents`
-* `selectOwnerComponent`
-* `getRelationNodes`
-* `getTabBar`
-* `getPageId`
-* `animate`
-* `clearAnimation`
-* `getOpenerEventChannel`
-* `applyAnimatedStyle`
-* `clearAnimatedStyle`
-* `setUpdatePerformanceListener`
-* `getPassiveEvent`
-* `setPassiveEvent`
 * `emit` 对外触发事件 `(key: string, value: any) => {this.triggerEvent(key, { value });}`

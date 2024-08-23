@@ -14,7 +14,7 @@ definePage(() => {
 
 ## 销毁
 
-* 返回函数，支持`onUnload`销毁
+* ✨ 返回函数，支持`onUnload`销毁
 
 ```ts
 import { definePage, onLoad } from '@52css/mp-vue3'

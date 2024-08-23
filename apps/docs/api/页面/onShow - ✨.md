@@ -14,7 +14,7 @@ definePage(() => {
 
 ## 销毁
 
-* 返回函数，支持`onHide`销毁
+* ✨ 返回函数，支持`onHide`销毁
 
 ```ts
 import { definePage, onShow } from '@52css/mp-vue3'
