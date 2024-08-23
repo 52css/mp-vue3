@@ -45,14 +45,6 @@ export type ComponentOptionsProps = {
   [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
 };
 
-export type ComponentContext<T> =
-  WechatMiniprogram.Component.InstanceProperties &
-    Omit<
-      WechatMiniprogram.Component.InstanceMethods<Record<string, any>>,
-      "setData" | "groupSetData" | "hasBehavior"
-    > &
-    T;
-
 export type PageContext = WechatMiniprogram.Page.InstanceProperties &
   Omit<
     WechatMiniprogram.Page.InstanceMethods<Record<string, any>>,
@@ -64,9 +56,9 @@ export type PageHook<T> = (
   context: PageContext
 ) => Record<string, any>;
 
-export type ComponentHook<TProps, TEmits> = (
+export type ComponentHook<TProps, TContext> = (
   props: TProps,
-  context: ComponentContext<TEmits>
+  context: TContext
 ) => Record<string, any>;
 
 export type AppInstance = Record<string, any>;
@@ -80,13 +72,6 @@ export type PageInstance = WechatMiniprogram.Page.Instance<
   WechatMiniprogram.Page.CustomOption
 >;
 
-export type ComponentOptions = WechatMiniprogram.Component.Options<
-  WechatMiniprogram.Component.DataOption,
-  {},
-  WechatMiniprogram.Component.MethodOption,
-  {},
-  false
->;
 export type ComponentInstance = WechatMiniprogram.Component.Instance<
   WechatMiniprogram.Component.DataOption,
   {},
@@ -117,7 +102,24 @@ export type PropsFromProperties<T> = {
 };
 
 // Props 传递类型
-export type TProps<T> = PropsFromProperties<T>;
+export type Props<T> = PropsFromProperties<T>;
+
+export type Context<TEmits> = {
+  emit: EmitFunction<TEmits>;
+};
+
+type EmitFunction<E> = <K extends keyof E>(
+  event: K,
+  ...args: E[K] extends (...args: infer P) => any ? P : never
+) => void;
+
+export type ComponentOptions = WechatMiniprogram.Component.Options<
+  WechatMiniprogram.Component.DataOption,
+  {},
+  WechatMiniprogram.Component.MethodOption,
+  {},
+  false
+>;
 
 let _currentPage: PageInstance | null = null;
 let _currentComponent: ComponentInstance | null = null;
@@ -372,16 +374,11 @@ export const defineComponent = <
   TEmits extends object = {}
 >(
   hook?:
-    | ComponentHook<TProps<TProperties>, TEmits>
-    | (WechatMiniprogram.Component.Options<
-        WechatMiniprogram.Component.DataOption,
-        {},
-        WechatMiniprogram.Component.MethodOption,
-        {},
-        false
-      > & {
+    | ComponentHook<Props<TProperties>, Context<TEmits>>
+    | (ComponentOptions & {
         properties?: TProperties;
-        setup?: ComponentHook<TProps<TProperties>, TEmits>;
+        emits?: TEmits;
+        setup?: ComponentHook<Props<TProperties>, Context<TEmits>>;
       })
 ) => {
   if (!hook) {
@@ -465,7 +462,7 @@ export const defineComponent = <
           emit: (key: string, value: any) => {
             this.triggerEvent(key, { value });
           },
-        } as ComponentContext<TEmits>;
+        } as Context<TEmits>;
         //@ts-expect-error 增加作用域
         this.$scope.run(() => {
           //@ts-expect-error 不要报错

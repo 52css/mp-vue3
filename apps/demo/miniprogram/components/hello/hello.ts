@@ -11,7 +11,14 @@ defineComponent({
       value: false,
     },
   },
-  setup(props) {
+  emits: {
+    submit: (_data: { name: string; age: number }) => true,
+    change: (_value: string | number) => true,
+    test: () => true,
+  },
+  setup(props, { emit }) {
+    emit("change", 1);
+    emit("test");
     console.log("this", this);
     // console.log("🚀 ~ setup ~ context:", context);
     // console.log("🚀 ~ setup ~ props:", props);
