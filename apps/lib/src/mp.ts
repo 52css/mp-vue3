@@ -223,34 +223,7 @@ export const definePage = <T extends IAnyObject>(
 
       this.$query = query;
 
-      this.$context = {
-        is: this.is,
-        id: this.id,
-        dataset: this.dataset,
-        exitState: this.exitState,
-        router: this.router,
-        pageRouter: this.pageRouter,
-        renderer: this.renderer,
-        triggerEvent: this.triggerEvent.bind(this),
-        createSelectorQuery: this.createSelectorQuery.bind(this),
-        createIntersectionObserver: this.createIntersectionObserver.bind(this),
-        createMediaQueryObserver: this.createMediaQueryObserver.bind(this),
-        selectComponent: this.selectComponent.bind(this),
-        selectAllComponents: this.selectAllComponents.bind(this),
-        selectOwnerComponent: this.selectOwnerComponent.bind(this),
-        getRelationNodes: this.getRelationNodes.bind(this),
-        getTabBar: this.getTabBar.bind(this),
-        getPageId: this.getPageId.bind(this),
-        animate: this.animate.bind(this),
-        clearAnimation: this.clearAnimation.bind(this),
-        getOpenerEventChannel: this.getOpenerEventChannel.bind(this),
-        applyAnimatedStyle: this.applyAnimatedStyle.bind(this),
-        clearAnimatedStyle: this.clearAnimatedStyle.bind(this),
-        setUpdatePerformanceListener:
-          this.setUpdatePerformanceListener.bind(this),
-        getPassiveEvent: this.getPassiveEvent.bind(this),
-        setPassiveEvent: this.setPassiveEvent.bind(this),
-      };
+      this.$context = {};
       this.$scope.run(() => {
         const bindings = hook.call(this, this.$query, this.$context);
         if (bindings !== undefined) {
@@ -470,33 +443,6 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
 
         //@ts-expect-error 增加context
         this.$context = {
-          is: this.is,
-          id: this.id,
-          dataset: this.dataset,
-          exitState: this.exitState,
-          router: this.router,
-          pageRouter: this.pageRouter,
-          renderer: this.renderer,
-          triggerEvent: this.triggerEvent.bind(this),
-          createSelectorQuery: this.createSelectorQuery.bind(this),
-          createIntersectionObserver:
-            this.createIntersectionObserver.bind(this),
-          createMediaQueryObserver: this.createMediaQueryObserver.bind(this),
-          selectComponent: this.selectComponent.bind(this),
-          selectAllComponents: this.selectAllComponents.bind(this),
-          selectOwnerComponent: this.selectOwnerComponent.bind(this),
-          getRelationNodes: this.getRelationNodes.bind(this),
-          getTabBar: this.getTabBar.bind(this),
-          getPageId: this.getPageId.bind(this),
-          animate: this.animate.bind(this),
-          clearAnimation: this.clearAnimation.bind(this),
-          getOpenerEventChannel: this.getOpenerEventChannel.bind(this),
-          applyAnimatedStyle: this.applyAnimatedStyle.bind(this),
-          clearAnimatedStyle: this.clearAnimatedStyle.bind(this),
-          setUpdatePerformanceListener:
-            this.setUpdatePerformanceListener.bind(this),
-          getPassiveEvent: this.getPassiveEvent.bind(this),
-          setPassiveEvent: this.setPassiveEvent.bind(this),
           emit: (key: string, value: any) => {
             this.triggerEvent(key, { value });
           },
