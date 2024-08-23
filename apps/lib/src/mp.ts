@@ -360,13 +360,7 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
       })
 ) => {
   if (!hook) {
-    return Component({
-      options: {
-        virtualHost: true,
-        styleIsolation: "apply-shared",
-        multipleSlots: true,
-      },
-    });
+    return Component({});
   }
 
   let options: ComponentOptions = {};
