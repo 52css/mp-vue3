@@ -1,50 +1,41 @@
 import "miniprogram-api-typings";
 export type AppHook = () => Record<string, any>;
-type IAnyObject = Record<string, any>;
-export type ComponentPropType = StringConstructor | NumberConstructor | BooleanConstructor | ArrayConstructor | ObjectConstructor | null;
-type ComponentPropInferValueType<T> = T extends StringConstructor ? string : T extends NumberConstructor ? number : T extends BooleanConstructor ? boolean : T extends ArrayConstructor ? any[] : T extends ObjectConstructor ? Record<string, any> : any;
-export type PageQuery<T> = T;
-export type ComponentPropDefinition<T extends ComponentPropType> = {
-    type: T | T[];
-    optionalTypes?: ComponentPropType[];
-    default?: ComponentPropInferValueType<T>;
-    value?: ComponentPropInferValueType<T>;
-    observer?(newVal: ComponentPropInferValueType<T>, oldVal: ComponentPropInferValueType<T>): void;
-};
-export type ComponentOptionsProps = {
-    [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
-};
-export type PageContext = WechatMiniprogram.Page.InstanceProperties & Omit<WechatMiniprogram.Page.InstanceMethods<Record<string, any>>, "setData" | "groupSetData" | "hasBehavior">;
-export type PageHook<T> = (props: PageQuery<T>, context: PageContext) => Record<string, any>;
-export type ComponentHook<TProps, TContext> = (props: TProps, context: TContext) => Record<string, any>;
-export type AppInstance = Record<string, any>;
-export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
-export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
-export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
 export type PropType<T> = () => T;
-export type ExtractPropType<T> = T extends {
+export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
+export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
+export type PageHook<TQuery> = (query: TQuery, context: PageContext) => Record<string, any>;
+type PageExtractQueryType<T> = T extends PropType<infer U> ? U : T extends null ? any : undefined;
+type PageQueryFromQueries<T> = {
+    [K in keyof T]?: PageExtractQueryType<T[K]>;
+};
+export type PageQuery<T> = PageQueryFromQueries<T>;
+export type PageContext = WechatMiniprogram.Page.InstanceProperties & Omit<WechatMiniprogram.Page.InstanceMethods<Record<string, any>>, "setData" | "groupSetData" | "hasBehavior">;
+export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
+export type ComponentOptions = WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
+export type ComponentHook<TComponentProps, TComponentContext> = (props: TComponentProps, context: TComponentContext) => Record<string, any>;
+type ComponentExtractPropType<T> = T extends {
     type: PropType<infer U>;
     optionalTypes?: Array<PropType<any>>;
 } ? U | (T extends {
     optionalTypes: (infer O)[];
-} ? ExtractPropType<O> : never) : T extends {
+} ? ComponentExtractPropType<O> : never) : T extends {
     type: PropType<infer U>;
 } ? U : T extends PropType<infer U> ? U : T extends null ? any : undefined;
-export type PropsFromProperties<T> = {
-    [K in keyof T]?: ExtractPropType<T[K]>;
+type ComponentPropsFromProperties<T> = {
+    [K in keyof T]?: ComponentExtractPropType<T[K]>;
 };
-export type Props<T> = PropsFromProperties<T>;
-export type Context<TEmits> = {
+export type ComponentProps<T> = ComponentPropsFromProperties<T>;
+type EmitFunction<E> = <K extends keyof E>(event: K, ...args: E[K] extends (...args: infer P) => any ? P : never) => void;
+export type ComponentContext<TEmits> = {
     emit: EmitFunction<TEmits>;
 };
-type EmitFunction<E> = <K extends keyof E>(event: K, ...args: E[K] extends (...args: infer P) => any ? P : never) => void;
-export type ComponentOptions = WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare const definePage: <T extends IAnyObject>(hook?: PageHook<T> | (WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption> & {
-    setup: PageHook<T>;
+export declare const definePage: <TQueries extends object = {}>(hook?: PageHook<PageQuery<TQueries>> | (PageOptions & {
+    queries?: TQueries;
+    setup?: PageHook<PageQuery<TQueries>>;
 })) => void;
 export declare const usePage: () => PageInstance | null;
 export declare const onLoad: (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) => void;
@@ -66,10 +57,10 @@ export declare const onSaveExitState: (hook: () => void) => void;
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare const defineComponent: <TProperties extends object, TEmits extends object = {}>(hook?: ComponentHook<Props<TProperties>, Context<TEmits>> | (ComponentOptions & {
+export declare const defineComponent: <TProperties extends object = {}, TEmits extends object = {}>(hook?: ComponentHook<ComponentProps<TProperties>, ComponentContext<TEmits>> | (ComponentOptions & {
     properties?: TProperties;
     emits?: TEmits;
-    setup?: ComponentHook<Props<TProperties>, Context<TEmits>>;
+    setup?: ComponentHook<ComponentProps<TProperties>, ComponentContext<TEmits>>;
 })) => string | undefined;
 export declare const useComponent: () => ComponentInstance | null;
 export declare const attached: (hook: WechatMiniprogram.Component.Lifetimes["attached"]) => void;

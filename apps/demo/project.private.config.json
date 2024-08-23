@@ -11,6 +11,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "pages/index/index",
+          "pathName": "pages/index/index",
+          "query": "name=vendor",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "pages/demo/demo",
           "pathName": "pages/demo/demo",
           "query": "a=1&b=2",

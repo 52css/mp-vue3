@@ -5,73 +5,48 @@ import "miniprogram-api-typings";
 
 export type AppHook = () => Record<string, any>;
 
-type IAnyObject = Record<string, any>;
+// 定义 PropType 辅助类型
+export type PropType<T> = () => T;
 
-// 定义页面
-export type ComponentPropType =
-  | StringConstructor
-  | NumberConstructor
-  | BooleanConstructor
-  | ArrayConstructor
-  | ObjectConstructor
-  | null;
+// 页面实例
+export type PageInstance = WechatMiniprogram.Page.Instance<
+  WechatMiniprogram.Page.DataOption,
+  WechatMiniprogram.Page.CustomOption
+>;
 
-type ComponentPropInferValueType<T> = T extends StringConstructor
-  ? string
-  : T extends NumberConstructor
-  ? number
-  : T extends BooleanConstructor
-  ? boolean
-  : T extends ArrayConstructor
-  ? any[]
-  : T extends ObjectConstructor
-  ? Record<string, any>
-  : any;
+// 页面配置
+export type PageOptions = WechatMiniprogram.Page.Options<
+  WechatMiniprogram.Page.DataOption,
+  WechatMiniprogram.Page.CustomOption
+>;
 
-export type PageQuery<T> = T;
+// 页面setup函数
+export type PageHook<TQuery> = (
+  query: TQuery,
+  context: PageContext
+) => Record<string, any>;
 
-export type ComponentPropDefinition<T extends ComponentPropType> = {
-  type: T | T[];
-  optionalTypes?: ComponentPropType[];
-  default?: ComponentPropInferValueType<T>;
-  value?: ComponentPropInferValueType<T>;
-  observer?(
-    newVal: ComponentPropInferValueType<T>,
-    oldVal: ComponentPropInferValueType<T>
-  ): void;
+type PageExtractQueryType<T> = T extends PropType<infer U>
+  ? U
+  : T extends null
+  ? any
+  : undefined;
+
+type PageQueryFromQueries<T> = {
+  [K in keyof T]?: PageExtractQueryType<T[K]>;
 };
 
-export type ComponentOptionsProps = {
-  [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
-};
+// 页面setup第一个参数，query
+export type PageQuery<T> = PageQueryFromQueries<T>;
 
+// 页面setup第二参数，context
 export type PageContext = WechatMiniprogram.Page.InstanceProperties &
   Omit<
     WechatMiniprogram.Page.InstanceMethods<Record<string, any>>,
     "setData" | "groupSetData" | "hasBehavior"
   >;
 
-export type PageHook<T> = (
-  props: PageQuery<T>,
-  context: PageContext
-) => Record<string, any>;
-
-export type ComponentHook<TProps, TContext> = (
-  props: TProps,
-  context: TContext
-) => Record<string, any>;
-
-export type AppInstance = Record<string, any>;
-
-export type PageOptions = WechatMiniprogram.Page.Options<
-  WechatMiniprogram.Page.DataOption,
-  WechatMiniprogram.Page.CustomOption
->;
-export type PageInstance = WechatMiniprogram.Page.Instance<
-  WechatMiniprogram.Page.DataOption,
-  WechatMiniprogram.Page.CustomOption
->;
-
+// 组件实例
 export type ComponentInstance = WechatMiniprogram.Component.Instance<
   WechatMiniprogram.Component.DataOption,
   {},
@@ -80,15 +55,31 @@ export type ComponentInstance = WechatMiniprogram.Component.Instance<
   false
 >;
 
-// 定义 PropType 辅助类型
-export type PropType<T> = () => T;
+// 组件配置
+export type ComponentOptions = WechatMiniprogram.Component.Options<
+  WechatMiniprogram.Component.DataOption,
+  {},
+  WechatMiniprogram.Component.MethodOption,
+  {},
+  false
+>;
+
+// 组件setup函数
+export type ComponentHook<TComponentProps, TComponentContext> = (
+  props: TComponentProps,
+  context: TComponentContext
+) => Record<string, any>;
 
 // 更新 `ExtractPropType` 类型以处理 `optionalTypes`
-export type ExtractPropType<T> = T extends {
+type ComponentExtractPropType<T> = T extends {
   type: PropType<infer U>;
   optionalTypes?: Array<PropType<any>>;
 }
-  ? U | (T extends { optionalTypes: (infer O)[] } ? ExtractPropType<O> : never)
+  ?
+      | U
+      | (T extends { optionalTypes: (infer O)[] }
+          ? ComponentExtractPropType<O>
+          : never)
   : T extends { type: PropType<infer U> }
   ? U
   : T extends PropType<infer U>
@@ -97,29 +88,22 @@ export type ExtractPropType<T> = T extends {
   ? any
   : undefined;
 
-export type PropsFromProperties<T> = {
-  [K in keyof T]?: ExtractPropType<T[K]>;
+type ComponentPropsFromProperties<T> = {
+  [K in keyof T]?: ComponentExtractPropType<T[K]>;
 };
 
-// Props 传递类型
-export type Props<T> = PropsFromProperties<T>;
-
-export type Context<TEmits> = {
-  emit: EmitFunction<TEmits>;
-};
+// 组件setup第一个参数，props
+export type ComponentProps<T> = ComponentPropsFromProperties<T>;
 
 type EmitFunction<E> = <K extends keyof E>(
   event: K,
   ...args: E[K] extends (...args: infer P) => any ? P : never
 ) => void;
 
-export type ComponentOptions = WechatMiniprogram.Component.Options<
-  WechatMiniprogram.Component.DataOption,
-  {},
-  WechatMiniprogram.Component.MethodOption,
-  {},
-  false
->;
+// 组件setup第二参数，context
+export type ComponentContext<TEmits> = {
+  emit: EmitFunction<TEmits>;
+};
 
 let _currentPage: PageInstance | null = null;
 let _currentComponent: ComponentInstance | null = null;
@@ -215,13 +199,13 @@ const methodOn = (
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export const definePage = <T extends IAnyObject>(
+export const definePage = <TQueries extends object = {}>(
   hook?:
-    | PageHook<T>
-    | (WechatMiniprogram.Page.Options<
-        WechatMiniprogram.Page.DataOption,
-        WechatMiniprogram.Page.CustomOption
-      > & { setup: PageHook<T> })
+    | PageHook<PageQuery<TQueries>>
+    | (PageOptions & {
+        queries?: TQueries;
+        setup?: PageHook<PageQuery<TQueries>>;
+      })
 ) => {
   if (!hook) {
     return Page({});
@@ -370,15 +354,18 @@ export const onSaveExitState = (hook: () => void) =>
  * @param hook - Hook 函数或包含 setup 的对象
  */
 export const defineComponent = <
-  TProperties extends object,
+  TProperties extends object = {},
   TEmits extends object = {}
 >(
   hook?:
-    | ComponentHook<Props<TProperties>, Context<TEmits>>
+    | ComponentHook<ComponentProps<TProperties>, ComponentContext<TEmits>>
     | (ComponentOptions & {
         properties?: TProperties;
         emits?: TEmits;
-        setup?: ComponentHook<Props<TProperties>, Context<TEmits>>;
+        setup?: ComponentHook<
+          ComponentProps<TProperties>,
+          ComponentContext<TEmits>
+        >;
       })
 ) => {
   if (!hook) {
@@ -462,7 +449,7 @@ export const defineComponent = <
           emit: (key: string, value: any) => {
             this.triggerEvent(key, { value });
           },
-        } as Context<TEmits>;
+        } as ComponentContext<TEmits>;
         //@ts-expect-error 增加作用域
         this.$scope.run(() => {
           //@ts-expect-error 不要报错
