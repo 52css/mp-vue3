@@ -45,8 +45,6 @@ export type ComponentOptionsProps = {
   [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
 };
 
-export type ComponentProps<T> = T;
-
 export type ComponentContext<T> =
   WechatMiniprogram.Component.InstanceProperties &
     Omit<
@@ -66,9 +64,9 @@ export type PageHook<T> = (
   context: PageContext
 ) => Record<string, any>;
 
-export type ComponentHook<T, E> = (
-  props: ComponentProps<T>,
-  context: ComponentContext<E>
+export type ComponentHook<TProps, TEmits> = (
+  props: TProps,
+  context: ComponentContext<TEmits>
 ) => Record<string, any>;
 
 export type AppInstance = Record<string, any>;
@@ -96,6 +94,30 @@ export type ComponentInstance = WechatMiniprogram.Component.Instance<
   {},
   false
 >;
+
+// 定义 PropType 辅助类型
+export type PropType<T> = () => T;
+
+// 更新 `ExtractPropType` 类型以处理 `optionalTypes`
+export type ExtractPropType<T> = T extends {
+  type: PropType<infer U>;
+  optionalTypes?: Array<PropType<any>>;
+}
+  ? U | (T extends { optionalTypes: (infer O)[] } ? ExtractPropType<O> : never)
+  : T extends { type: PropType<infer U> }
+  ? U
+  : T extends PropType<infer U>
+  ? U
+  : T extends null
+  ? any
+  : undefined;
+
+export type PropsFromProperties<T> = {
+  [K in keyof T]?: ExtractPropType<T[K]>;
+};
+
+// Props 传递类型
+export type TProps<T> = PropsFromProperties<T>;
 
 let _currentPage: PageInstance | null = null;
 let _currentComponent: ComponentInstance | null = null;
@@ -345,9 +367,12 @@ export const onSaveExitState = (hook: () => void) =>
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
+export const defineComponent = <
+  TProperties extends object,
+  TEmits extends object = {}
+>(
   hook?:
-    | ComponentHook<T, E>
+    | ComponentHook<TProps<TProperties>, TEmits>
     | (WechatMiniprogram.Component.Options<
         WechatMiniprogram.Component.DataOption,
         {},
@@ -355,8 +380,8 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
         {},
         false
       > & {
-        props?: ComponentOptionsProps;
-        setup: ComponentHook<T, E>;
+        properties?: TProperties;
+        setup?: ComponentHook<TProps<TProperties>, TEmits>;
       })
 ) => {
   if (!hook) {
@@ -440,7 +465,7 @@ export const defineComponent = <T extends IAnyObject, E extends IAnyObject>(
           emit: (key: string, value: any) => {
             this.triggerEvent(key, { value });
           },
-        } as ComponentContext<E>;
+        } as ComponentContext<TEmits>;
         //@ts-expect-error 增加作用域
         this.$scope.run(() => {
           //@ts-expect-error 不要报错

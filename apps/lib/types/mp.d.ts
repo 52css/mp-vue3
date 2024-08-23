@@ -14,16 +14,28 @@ export type ComponentPropDefinition<T extends ComponentPropType> = {
 export type ComponentOptionsProps = {
     [key: string]: ComponentPropType | ComponentPropDefinition<ComponentPropType>;
 };
-export type ComponentProps<T> = T;
 export type ComponentContext<T> = WechatMiniprogram.Component.InstanceProperties & Omit<WechatMiniprogram.Component.InstanceMethods<Record<string, any>>, "setData" | "groupSetData" | "hasBehavior"> & T;
 export type PageContext = WechatMiniprogram.Page.InstanceProperties & Omit<WechatMiniprogram.Page.InstanceMethods<Record<string, any>>, "setData" | "groupSetData" | "hasBehavior">;
 export type PageHook<T> = (props: PageQuery<T>, context: PageContext) => Record<string, any>;
-export type ComponentHook<T, E> = (props: ComponentProps<T>, context: ComponentContext<E>) => Record<string, any>;
+export type ComponentHook<TProps, TEmits> = (props: TProps, context: ComponentContext<TEmits>) => Record<string, any>;
 export type AppInstance = Record<string, any>;
 export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 export type ComponentOptions = WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
 export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
+export type PropType<T> = () => T;
+export type ExtractPropType<T> = T extends {
+    type: PropType<infer U>;
+    optionalTypes?: Array<PropType<any>>;
+} ? U | (T extends {
+    optionalTypes: (infer O)[];
+} ? ExtractPropType<O> : never) : T extends {
+    type: PropType<infer U>;
+} ? U : T extends PropType<infer U> ? U : T extends null ? any : undefined;
+export type PropsFromProperties<T> = {
+    [K in keyof T]?: ExtractPropType<T[K]>;
+};
+export type TProps<T> = PropsFromProperties<T>;
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
@@ -51,9 +63,9 @@ export declare const onSaveExitState: (hook: () => void) => void;
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare const defineComponent: <T extends IAnyObject, E extends IAnyObject>(hook?: ComponentHook<T, E> | (WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false> & {
-    props?: ComponentOptionsProps;
-    setup: ComponentHook<T, E>;
+export declare const defineComponent: <TProperties extends object, TEmits extends object = {}>(hook?: ComponentHook<TProps<TProperties>, TEmits> | (WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false> & {
+    properties?: TProperties;
+    setup?: ComponentHook<TProps<TProperties>, TEmits>;
 })) => string | undefined;
 export declare const useComponent: () => ComponentInstance | null;
 export declare const attached: (hook: WechatMiniprogram.Component.Lifetimes["attached"]) => void;

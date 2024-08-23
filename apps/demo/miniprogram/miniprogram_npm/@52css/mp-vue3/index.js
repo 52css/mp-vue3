@@ -4,7 +4,7 @@ var __DEFINE__ = function(modId, func, req) { var m = { exports: {}, _tempexport
 var __REQUIRE__ = function(modId, source) { if(!__MODS__[modId]) return require(source); if(!__MODS__[modId].status) { var m = __MODS__[modId].m; m._exports = m._tempexports; var desp = Object.getOwnPropertyDescriptor(m, "exports"); if (desp && desp.configurable) Object.defineProperty(m, "exports", { set: function (val) { if(typeof val === "object" && val !== m._exports) { m._exports.__proto__ = val.__proto__; Object.keys(val).forEach(function (k) { m._exports[k] = val[k]; }); } m._tempexports = val }, get: function () { return m._tempexports; } }); __MODS__[modId].status = 1; __MODS__[modId].func(__MODS__[modId].req, m, m.exports); } return __MODS__[modId].m.exports; };
 var __REQUIRE_WILDCARD__ = function(obj) { if(obj && obj.__esModule) { return obj; } else { var newObj = {}; if(obj != null) { for(var k in obj) { if (Object.prototype.hasOwnProperty.call(obj, k)) newObj[k] = obj[k]; } } newObj.default = obj; return newObj; } };
 var __REQUIRE_DEFAULT__ = function(obj) { return obj && obj.__esModule ? obj.default : obj; };
-__DEFINE__(1724231829848, function(require, module, exports) {
+__DEFINE__(1724419107216, function(require, module, exports) {
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1604,33 +1604,7 @@ __DEFINE__(1724231829848, function(require, module, exports) {
               _currentPage = this;
               this.$scope = effectScope();
               this.$query = query;
-              this.$context = {
-                  is: this.is,
-                  id: this.id,
-                  dataset: this.dataset,
-                  exitState: this.exitState,
-                  router: this.router,
-                  pageRouter: this.pageRouter,
-                  renderer: this.renderer,
-                  triggerEvent: this.triggerEvent.bind(this),
-                  createSelectorQuery: this.createSelectorQuery.bind(this),
-                  createIntersectionObserver: this.createIntersectionObserver.bind(this),
-                  createMediaQueryObserver: this.createMediaQueryObserver.bind(this),
-                  selectComponent: this.selectComponent.bind(this),
-                  selectAllComponents: this.selectAllComponents.bind(this),
-                  selectOwnerComponent: this.selectOwnerComponent.bind(this),
-                  getRelationNodes: this.getRelationNodes.bind(this),
-                  getTabBar: this.getTabBar.bind(this),
-                  getPageId: this.getPageId.bind(this),
-                  animate: this.animate.bind(this),
-                  clearAnimation: this.clearAnimation.bind(this),
-                  getOpenerEventChannel: this.getOpenerEventChannel.bind(this),
-                  applyAnimatedStyle: this.applyAnimatedStyle.bind(this),
-                  clearAnimatedStyle: this.clearAnimatedStyle.bind(this),
-                  setUpdatePerformanceListener: this.setUpdatePerformanceListener.bind(this),
-                  getPassiveEvent: this.getPassiveEvent.bind(this),
-                  setPassiveEvent: this.setPassiveEvent.bind(this),
-              };
+              this.$context = {};
               this.$scope.run(() => {
                   const bindings = hook.call(this, this.$query, this.$context);
                   if (bindings !== undefined) {
@@ -1729,13 +1703,7 @@ __DEFINE__(1724231829848, function(require, module, exports) {
    */
   const defineComponent = (hook) => {
       if (!hook) {
-          return Component({
-              options: {
-                  virtualHost: true,
-                  styleIsolation: "apply-shared",
-                  multipleSlots: true,
-              },
-          });
+          return Component({});
       }
       let options = {};
       if (typeof hook !== "function") {
@@ -1799,31 +1767,6 @@ __DEFINE__(1724231829848, function(require, module, exports) {
                   // );
                   //@ts-expect-error 增加context
                   this.$context = {
-                      is: this.is,
-                      id: this.id,
-                      dataset: this.dataset,
-                      exitState: this.exitState,
-                      router: this.router,
-                      pageRouter: this.pageRouter,
-                      renderer: this.renderer,
-                      triggerEvent: this.triggerEvent.bind(this),
-                      createSelectorQuery: this.createSelectorQuery.bind(this),
-                      createIntersectionObserver: this.createIntersectionObserver.bind(this),
-                      createMediaQueryObserver: this.createMediaQueryObserver.bind(this),
-                      selectComponent: this.selectComponent.bind(this),
-                      selectAllComponents: this.selectAllComponents.bind(this),
-                      selectOwnerComponent: this.selectOwnerComponent.bind(this),
-                      getRelationNodes: this.getRelationNodes.bind(this),
-                      getTabBar: this.getTabBar.bind(this),
-                      getPageId: this.getPageId.bind(this),
-                      animate: this.animate.bind(this),
-                      clearAnimation: this.clearAnimation.bind(this),
-                      getOpenerEventChannel: this.getOpenerEventChannel.bind(this),
-                      applyAnimatedStyle: this.applyAnimatedStyle.bind(this),
-                      clearAnimatedStyle: this.clearAnimatedStyle.bind(this),
-                      setUpdatePerformanceListener: this.setUpdatePerformanceListener.bind(this),
-                      getPassiveEvent: this.getPassiveEvent.bind(this),
-                      setPassiveEvent: this.setPassiveEvent.bind(this),
                       emit: (key, value) => {
                           this.triggerEvent(key, { value });
                       },
@@ -1942,7 +1885,7 @@ __DEFINE__(1724231829848, function(require, module, exports) {
 }));
 
 }, function(modId) {var map = {}; return __REQUIRE__(map[modId], modId); })
-return __REQUIRE__(1724231829848);
+return __REQUIRE__(1724419107216);
 })()
 //miniprogram-npm-outsideDeps=[]
 //# sourceMappingURL=index.js.map
