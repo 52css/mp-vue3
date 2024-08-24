@@ -1,7 +1,12 @@
+import { type EffectScope } from "@vue/reactivity";
 import "miniprogram-api-typings";
 import { type PropType } from "./shared";
 export type AppHook = () => Record<string, any>;
-export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, WechatMiniprogram.Component.PropertyOption, WechatMiniprogram.Component.MethodOption, {}, false>;
+export type ComponentInstance<TEmits extends object = {}> = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, WechatMiniprogram.Component.PropertyOption, WechatMiniprogram.Component.MethodOption, {
+    $scope: EffectScope;
+    $props: Record<string, any>;
+    $context: ComponentContext<TEmits>;
+}, false>;
 export type ComponentOptions = WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, WechatMiniprogram.Component.PropertyOption, WechatMiniprogram.Component.MethodOption, {}, false>;
 type ComponentPropertiesValue<T> = T extends {
     type: null;
@@ -34,7 +39,7 @@ type ComponentPropertiesValue<T> = T extends {
 export type ComponentProperties<T> = {
     [K in keyof T]?: ComponentPropertiesValue<T[K]>;
 };
-export type ComponentHook<TComponentProps, TComponentContext> = (props: TComponentProps, context: TComponentContext) => Record<string, any>;
+export type ComponentHook<TComponentProps, TComponentContext> = (this: ComponentInstance, props: TComponentProps, context: TComponentContext) => Record<string, any>;
 type ComponentPropsValue<T> = T extends {
     type: PropType<infer U>;
     optionalTypes?: Array<PropType<any>>;
@@ -67,7 +72,7 @@ export declare const defineComponent: <TProperties extends ComponentProperties<T
     emits?: TEmits;
     setup?: ComponentHook<ComponentProps<TProperties>, ComponentContext<TEmits>>;
 })) => string | undefined;
-export declare const useComponent: () => ComponentInstance | null;
+export declare const useComponent: () => ComponentInstance<{}> | null;
 export declare const attached: (hook: WechatMiniprogram.Component.Lifetimes["attached"]) => void;
 export declare const ready: (hook: WechatMiniprogram.Component.Lifetimes["ready"]) => void;
 export declare const moved: (hook: WechatMiniprogram.Component.Lifetimes["moved"]) => void;

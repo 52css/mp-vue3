@@ -1,11 +1,15 @@
-import { effectScope } from "@vue/reactivity";
+import { effectScope, type EffectScope } from "@vue/reactivity";
 import { deepToRaw, deepWatch, type PropType } from "./shared";
 import { isFunction } from "./utils";
 import { lifetimeEmit, lifetimeOnce, lifetimeOn } from "./lifetime";
 // 页面实例
 export type PageInstance = WechatMiniprogram.Page.Instance<
   WechatMiniprogram.Page.DataOption,
-  WechatMiniprogram.Page.CustomOption
+  WechatMiniprogram.Page.CustomOption & {
+    $scope: EffectScope;
+    $query: Record<string, any>;
+    $context: {};
+  }
 >;
 
 // 页面配置
@@ -39,6 +43,7 @@ export type PageQueries<T> = {
 
 // 页面setup函数
 export type PageHook<TQuery> = (
+  this: PageInstance,
   query: TQuery,
   context: PageContext
 ) => Record<string, any>;

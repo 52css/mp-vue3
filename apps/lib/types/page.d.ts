@@ -1,5 +1,10 @@
+import { type EffectScope } from "@vue/reactivity";
 import { type PropType } from "./shared";
-export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
+export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption & {
+    $scope: EffectScope;
+    $query: Record<string, any>;
+    $context: {};
+}>;
 export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 type PageQueriesValue<T> = T extends {
     type: PropType<infer U>;
@@ -10,7 +15,7 @@ type PageQueriesValue<T> = T extends {
 export type PageQueries<T> = {
     [K in keyof T]?: PageQueriesValue<T[K]>;
 };
-export type PageHook<TQuery> = (query: TQuery, context: PageContext) => Record<string, any>;
+export type PageHook<TQuery> = (this: PageInstance, query: TQuery, context: PageContext) => Record<string, any>;
 type PageQueryValue<T> = T extends PropType<infer U> ? U : T extends null ? any : undefined;
 export type PageQuery<T> = {
     [K in keyof T]?: PageQueryValue<T[K]>;

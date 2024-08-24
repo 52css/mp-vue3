@@ -1,5 +1,9 @@
 import { isFunction } from "./utils";
-import { effectScope, shallowReactive } from "@vue/reactivity";
+import {
+  effectScope,
+  shallowReactive,
+  type EffectScope,
+} from "@vue/reactivity";
 import { deepToRaw, deepWatch } from "./shared";
 import "miniprogram-api-typings";
 import { type PropType } from "./shared";
@@ -8,13 +12,18 @@ import { lifetimeEmit, lifetimeOn } from "./lifetime";
 export type AppHook = () => Record<string, any>;
 
 // 组件实例
-export type ComponentInstance = WechatMiniprogram.Component.Instance<
-  WechatMiniprogram.Component.DataOption,
-  WechatMiniprogram.Component.PropertyOption,
-  WechatMiniprogram.Component.MethodOption,
-  {},
-  false
->;
+export type ComponentInstance<TEmits extends object = {}> =
+  WechatMiniprogram.Component.Instance<
+    WechatMiniprogram.Component.DataOption,
+    WechatMiniprogram.Component.PropertyOption,
+    WechatMiniprogram.Component.MethodOption,
+    {
+      $scope: EffectScope;
+      $props: Record<string, any>;
+      $context: ComponentContext<TEmits>;
+    },
+    false
+  >;
 
 // 组件配置
 export type ComponentOptions = WechatMiniprogram.Component.Options<
@@ -88,6 +97,7 @@ export type ComponentProperties<T> = {
 
 // 组件setup函数
 export type ComponentHook<TComponentProps, TComponentContext> = (
+  this: ComponentInstance,
   props: TComponentProps,
   context: TComponentContext
 ) => Record<string, any>;
@@ -195,21 +205,18 @@ export const defineComponent = <
   }
 
   if (properties) {
-    if (options.observers === undefined) {
-      options.observers = {};
-    }
-
     properties.forEach((property) => {
-      //@ts-expect-error 不要报错
+      if (options.observers === undefined) {
+        options.observers = {};
+      }
+
       const originObserver = options.observers[property];
-      //@ts-expect-error 不要报错
       options.observers[property] = function (
         this: ComponentInstance,
         value: any
       ) {
         // Observer executes before attached
         if (this.$props) {
-          //@ts-expect-error 不要报错
           this.$props[property] = value;
         }
 
@@ -227,7 +234,6 @@ export const defineComponent = <
     lifetimes: {
       attached(this: ComponentInstance) {
         _currentComponent = this;
-        //@ts-expect-error 增加作用域
         this.$scope = effectScope();
         const rawProps: Record<string, any> = {};
         if (properties) {
@@ -235,7 +241,6 @@ export const defineComponent = <
             rawProps[property] = this.data[property];
           });
         }
-        //@ts-expect-error 增加的props
         this.$props = shallowReactive(rawProps);
         // this.$props = shallowReactive(
         //   new Proxy(this.properties, {
@@ -250,16 +255,18 @@ export const defineComponent = <
         //   })
         // );
 
-        //@ts-expect-error 增加context
         this.$context = {
-          emit: (key: string, value: any) => {
-            this.triggerEvent(key, { value });
+          emit: (key: string, ...args: any[]) => {
+            this.triggerEvent(key, { value: args[0] });
           },
-        } as ComponentContext<TEmits>;
-        //@ts-expect-error 增加作用域
+        };
         this.$scope.run(() => {
-          //@ts-expect-error 不要报错
-          const bindings = hook.call(this, this.$props, this.$context);
+          const bindings = (
+            hook as ComponentHook<
+              ComponentProps<TProperties>,
+              ComponentContext<TEmits>
+            >
+          ).call(this, this.$props, this.$context);
           if (bindings !== undefined) {
             Object.keys(bindings).forEach((key) => {
               const value = bindings[key];
@@ -281,7 +288,6 @@ export const defineComponent = <
       detached(this: ComponentInstance) {
         lifetimeEmit(this, options, "detached");
         if (this.$scope) {
-          //@ts-expect-error 增加作用域
           this.$scope.stop();
         }
 
