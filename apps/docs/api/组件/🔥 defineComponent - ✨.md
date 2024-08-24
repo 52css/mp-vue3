@@ -27,6 +27,7 @@ defineComponent((props, context) => {
 
 * ✨ 增加 `properties` 定义, 推导 `props` 类型
 * ✨ 增加 `emits` 定义, 推导 `emit` 类型
+* ✨ 增强 `properties` 下的 `value` 根据 `type` 和 `optionalTypes` 来推导
 
 ```ts
 import { defineComponent, ref, PropType } from '@52css/mp-vue3'
@@ -40,33 +41,35 @@ defineComponent({
   properties: {
     // 普通类型
     name: String,
-    // 支持默认值
-    user: {
-      type: Object as PropType<Partial<User>>,
-      default: {},
+    border: {
+      type: Boolean,
+      optionalTypes: [String],
+      value: "12", // 类型 string | number; 有value根据`type` 和 `optionalTypes`推导对应类型
     },
-    // 支持多个类型
-    status: {
-      type: String,
-      optionalTypes: [Number],
-      default: 0
-    }
+    user: Object as PropType<User>,
+    userList: Array as PropType<User[]>,
   },
   emits: {
-    submit: (_data: { name: string; age: number }) => void 0,
     change: (_value: string | number) => void 0,
     test: () => void 0,
   },
   setup(props, { emit }) {
-    // 根据 options.properties 推导 props
-    console.log("🚀 ~ setup ~ props:", props) // 获取props值
+    console.log("🚀 ~ setup ~ this:", this); // 自动获取当前实例
+    console.log("🚀 ~ setup ~ props:", props); // 转换成 shallowReactive(this.properties) 这样可以watch
     const count = ref(0)
     const onIncrease = () => {
       count.value++; // 数据变更，自动响应 this.data.count
       // 根据 options.emits 推导 emit
-      emit('change', count.value) // 调用 this.triggerEvent('change', {value: count.value})
+      emit('change', count.value) // 相当于调用 this.triggerEvent('change', {value: count.value})
       emit("test");
     }
+
+    watch(
+      () => props.name,
+      (newVal) => {
+        console.log("🚀 ~ watch ~ newVal:", newVal);
+      }
+    );
 
     // 所有的数据和方法需要返回
     return {
