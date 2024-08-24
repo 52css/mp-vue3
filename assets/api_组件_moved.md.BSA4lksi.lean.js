@@ -1,0 +1,1 @@
+import{_ as s,c as i,o as a,a4 as e}from"./chunks/framework.DsvKXnjw.js";const m=JSON.parse('{"title":"moved","description":"","frontmatter":{},"headers":[],"relativePath":"api/组件/moved.md","filePath":"api/组件/moved.md"}'),n={name:"api/组件/moved.md"},t=e("",3),p=[t];function l(h,k,o,d,r,E){return a(),i("div",null,p)}const g=s(n,[["render",l]]);export{m as __pageData,g as default};
