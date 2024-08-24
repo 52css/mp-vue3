@@ -29,7 +29,12 @@ definePage((query, context) => {
 * ✨ 增加 `query` 对应配置类型数据转换
 
 ```ts
-import { definePage, ref } from '@52css/mp-vue3'
+import { definePage, ref, PropType } from '@52css/mp-vue3'
+
+type User = {
+  id: number;
+  name: string;
+}
 
 definePage({
   // 如果这里定义了
