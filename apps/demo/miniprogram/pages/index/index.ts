@@ -1,6 +1,11 @@
-import { ref, definePage, onShow } from "@52css/mp-vue3";
+import { ref, definePage, onShow, PropType } from "@52css/mp-vue3";
 
 var app = getApp();
+
+type User = {
+  id: number;
+  name: string;
+};
 
 const useTest = () => {
   const test = ref(0);
@@ -15,9 +20,14 @@ const useTest = () => {
 definePage({
   queries: {
     name: String,
+    a: Boolean,
+    b: Number,
+    // 需要兼容这个定义
+    user: Object as PropType<User>,
   },
   setup(query) {
-    console.log("🚀 ~ definePage ~ query:", query);
+    // 需要兼容这个类型
+    console.log("🚀 ~ definePage ~ query:", query.user);
     const count = ref(0);
     const onIncrease = () => {
       count.value++;

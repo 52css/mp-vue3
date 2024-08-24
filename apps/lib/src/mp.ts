@@ -28,12 +28,17 @@ type PageQueriesType =
   | ObjectConstructor
   | null;
 
+type PageQueriesValue<T> = T extends {
+  type: PropType<infer U>;
+}
+  ? {
+      type: PropType<U>;
+      formatter?: (value: string) => U;
+    }
+  : PageQueriesType;
+
 export type PageQueries<T> = {
-  [K in keyof T]?:
-    | {
-        type: PageQueriesType;
-      }
-    | PageQueriesType;
+  [K in keyof T]?: PageQueriesValue<T[K]>;
 };
 
 // 页面setup函数
@@ -268,6 +273,77 @@ const methodOn = (
   instance[`$${lifetimesKey}`].push(hook);
 };
 
+// type PageQueriesConfigObject = {
+//   type: PageQueriesType;
+//   formatter?: (val: string | undefined) => any;
+// };
+// type PageQueriesConfig = PageQueriesConfigObject | PageQueriesType;
+
+const createQuery = <TQueries extends PageQueries<TQueries>>(
+  query: Record<string, string | undefined>,
+  queries?: TQueries
+) => {
+  if (!queries) {
+    return query;
+  }
+
+  let rtv: { [key: string]: any } = {};
+
+  for (let key in query) {
+    if (key in queries) {
+      const val = query[key];
+      const config: any = queries[key as keyof typeof queries];
+
+      if (!config) {
+        rtv[key] = val;
+        break;
+      }
+      const type = config.type || config;
+
+      const formatter = (val: string | undefined) => {
+        if ("formatter" in config && config.formatter !== undefined) {
+          return config.formatter(val);
+        }
+
+        if (type === Boolean) {
+          return !!val;
+        }
+
+        if (type === Number) {
+          return Number(val);
+        }
+
+        if (type === Object) {
+          return val ? JSON.parse(decodeURIComponent(val)) : {};
+        }
+
+        if (type === Array) {
+          return val ? JSON.parse(decodeURIComponent(val)) : [];
+        }
+
+        if (type === null) {
+          return val;
+        }
+
+        if (type === String) {
+          return val;
+        }
+
+        console.error("未知的·type·", type);
+
+        return val;
+      };
+
+      rtv[key] = formatter(val);
+      // 对数据转换
+    } else {
+      rtv[key] = query[key];
+    }
+  }
+
+  return rtv as PageQuery<TQueries>;
+};
+
 /**
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
@@ -302,7 +378,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
       _currentPage = this;
       this.$scope = effectScope();
 
-      this.$query = query;
+      this.$query = createQuery(query, options.queries);
 
       this.$context = {};
       this.$scope.run(() => {

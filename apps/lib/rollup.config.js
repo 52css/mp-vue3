@@ -12,7 +12,7 @@ export default {
       name: "MpVue3",
       file: "dist/mp-vue3.min.js",
       format: "umd",
-      // sourcemap: true,
+      sourcemap: true,
     },
   ],
   plugins: [
@@ -29,6 +29,6 @@ export default {
       },
       preventAssignment: true,
     }),
-    // terser(), // 压缩代码
+    terser(), // 压缩代码
   ],
 };

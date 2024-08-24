@@ -4,17 +4,20 @@ export type PropType<T> = () => T;
 export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 type PageQueriesType = StringConstructor | NumberConstructor | BooleanConstructor | ArrayConstructor | ObjectConstructor | null;
+type PageQueriesValue<T> = T extends {
+    type: PropType<infer U>;
+} ? {
+    type: PropType<U>;
+    formatter?: (value: string) => U;
+} : PageQueriesType;
 export type PageQueries<T> = {
-    [K in keyof T]?: {
-        type: PageQueriesType;
-    } | PageQueriesType;
+    [K in keyof T]?: PageQueriesValue<T[K]>;
 };
 export type PageHook<TQuery> = (query: TQuery, context: PageContext) => Record<string, any>;
-type PageExtractQueryType<T> = T extends PropType<infer U> ? U : T extends null ? any : undefined;
-type PageQueryFromQueries<T> = {
-    [K in keyof T]?: PageExtractQueryType<T[K]>;
+type PageQueryValue<T> = T extends PropType<infer U> ? U : T extends null ? any : undefined;
+export type PageQuery<T> = {
+    [K in keyof T]?: PageQueryValue<T[K]>;
 };
-export type PageQuery<T> = PageQueryFromQueries<T>;
 export type PageContext = WechatMiniprogram.Page.InstanceProperties & Omit<WechatMiniprogram.Page.InstanceMethods<Record<string, any>>, "setData" | "groupSetData" | "hasBehavior">;
 export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
 export type ComponentOptions = WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
@@ -61,9 +64,9 @@ type ComponentPropsValue<T> = T extends {
 export type ComponentProps<T> = {
     [K in keyof T]?: ComponentPropsValue<T[K]>;
 };
-type EmitFunction<E> = <K extends keyof E>(event: K, ...args: E[K] extends (...args: infer P) => any ? P : never) => void;
+type ComponentContextEmit<E> = <K extends keyof E>(event: K, ...args: E[K] extends (...args: infer P) => any ? P : never) => void;
 export type ComponentContext<TEmits> = {
-    emit: EmitFunction<TEmits>;
+    emit: ComponentContextEmit<TEmits>;
 };
 /**
  * 创建页面并关联生命周期函数
