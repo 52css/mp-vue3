@@ -8,7 +8,8 @@ defineComponent({
     // 定义对象，通过default控制默认值
     border: {
       type: Boolean,
-      value: false,
+      optionalTypes: [String],
+      value: "12",
     },
   },
   emits: {

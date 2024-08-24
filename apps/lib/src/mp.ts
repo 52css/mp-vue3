@@ -64,6 +64,59 @@ export type ComponentOptions = WechatMiniprogram.Component.Options<
   false
 >;
 
+// todo 待完善，判断有 type 返回 对应类型， 没有 type 返回 对应类型
+type ComponentExtractPropertyType<T> = T extends {
+  type: null;
+}
+  ? {
+      type: null;
+      optionalTypes?: Array<PropType<any>>;
+      value?: any;
+      observer?: (newVal: any, oldVal: any) => void;
+    }
+  : T extends {
+      type: PropType<infer U>;
+      optionalTypes?: Array<PropType<any>>;
+    }
+  ? {
+      type: PropType<U>;
+      optionalTypes?: Array<PropType<any>>;
+      value?:
+        | U
+        | (T extends { optionalTypes: (infer O)[] }
+            ? ComponentExtractPropType<O>
+            : never);
+      observer?: (
+        newVal:
+          | U
+          | (T extends { optionalTypes: (infer O)[] }
+              ? ComponentExtractPropType<O>
+              : never),
+        oldVal:
+          | U
+          | (T extends { optionalTypes: (infer O)[] }
+              ? ComponentExtractPropType<O>
+              : never)
+      ) => void;
+    }
+  : T extends {
+      type: PropType<infer U>;
+    }
+  ? {
+      type: PropType<U>;
+      value?: U;
+      observer?: (newVal: U, oldVal: U) => void;
+    }
+  : T extends null
+  ? null
+  : T extends PropType<infer U>
+  ? PropType<U>
+  : undefined;
+
+export type ComponentProperties<T> = {
+  [K in keyof T]?: ComponentExtractPropertyType<T[K]>;
+};
+
 // 组件setup函数
 export type ComponentHook<TComponentProps, TComponentContext> = (
   props: TComponentProps,
@@ -354,7 +407,7 @@ export const onSaveExitState = (hook: () => void) =>
  * @param hook - Hook 函数或包含 setup 的对象
  */
 export const defineComponent = <
-  TProperties extends object = {},
+  TProperties extends ComponentProperties<TProperties>,
   TEmits extends object = {}
 >(
   hook?:
