@@ -414,7 +414,9 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
       // 手动销毁
       Object.keys(this).forEach((key) => {
         try {
-          delete this[key];
+          if (/^$/.test(key)) {
+            delete this[key];
+          }
         } catch (ex) {
           console.error("销毁异常", ex);
         }
@@ -635,7 +637,9 @@ export const defineComponent = <
         // 手动销毁
         Object.keys(this).forEach((key) => {
           try {
-            delete this[key];
+            if (/^$/.test(key)) {
+              delete this[key];
+            }
           } catch (ex) {
             console.error("销毁异常", ex);
           }
