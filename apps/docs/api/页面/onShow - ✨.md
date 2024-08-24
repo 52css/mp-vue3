@@ -5,10 +5,13 @@
 ```ts
 import { definePage, onShow } from '@52css/mp-vue3'
 
-definePage(() => {
-  onShow(() => {
-    console.log("🚀 ~ onShow ~ onShow:", onShow)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onShow(() => {
+      console.log("🚀 ~ onShow ~ onShow:", onShow)
+    })
+  }
 });
 ```
 
@@ -19,15 +22,18 @@ definePage(() => {
 ```ts
 import { definePage, onShow } from '@52css/mp-vue3'
 
-definePage(() => {
-  onShow(() => {
-    let count = 0;
-    let timer = setInterval(() => {
-      console.log(count++)
-    }, 1000)
-    return () => {
-      clearInterval(timer)
-    }
-  })
+definePage({
+  queries: {},
+  setup() {
+    onShow(() => {
+      let count = 0;
+      let timer = setInterval(() => {
+        console.log(count++)
+      }, 1000)
+      return () => {
+        clearInterval(timer)
+      }
+    })
+  }
 });
 ```

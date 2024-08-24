@@ -6,7 +6,7 @@
 import { defineComponent, error } from '@52css/mp-vue3'
 
 defineComponent({
-  props: {},
+  properties: {},
   setup() {
     error(() => {
       console.log("🚀 ~ error ~ error:", error)

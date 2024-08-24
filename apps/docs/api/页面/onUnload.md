@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onUnload } from '@52css/mp-vue3'
 
-definePage(() => {
-  onUnload(() => {
-    console.log("🚀 ~ onUnload ~ onUnload:", onUnload)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onUnload(() => {
+      console.log("🚀 ~ onUnload ~ onUnload:", onUnload)
+    })
+  }
 });
 ```

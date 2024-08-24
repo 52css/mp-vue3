@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onReady } from '@52css/mp-vue3'
 
-definePage(() => {
-  onReady(() => {
-    console.log("🚀 ~ onReady ~ onReady:", onReady)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onReady(() => {
+      console.log("🚀 ~ onReady ~ onReady:", onReady)
+    })
+  }
 });
 ```

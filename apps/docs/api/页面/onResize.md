@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onResize } from '@52css/mp-vue3'
 
-definePage(() => {
-  onResize((object) => {
-    console.log("🚀 ~ onResize ~ object:", object)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onResize((object) => {
+      console.log("🚀 ~ onResize ~ object:", object)
+    })
+  }
 });
 ```

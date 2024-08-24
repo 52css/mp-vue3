@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onPullDownRefresh } from '@52css/mp-vue3'
 
-definePage(() => {
-  onPullDownRefresh(() => {
-    console.log("🚀 ~ onPullDownRefresh ~ onPullDownRefresh:", onPullDownRefresh)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onPullDownRefresh(() => {
+      console.log("🚀 ~ onPullDownRefresh ~ onPullDownRefresh:", onPullDownRefresh)
+    })
+  }
 });
 ```

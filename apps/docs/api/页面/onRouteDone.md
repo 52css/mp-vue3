@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onRouteDone } from '@52css/mp-vue3'
 
-definePage(() => {
-  onRouteDone(() => {
-    console.log("🚀 ~ onRouteDone ~ onRouteDone:", onRouteDone)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onRouteDone(() => {
+      console.log("🚀 ~ onRouteDone ~ onRouteDone:", onRouteDone)
+    })
+  }
 });
 ```

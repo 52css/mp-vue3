@@ -6,7 +6,7 @@
 import { defineComponent, useComponent } from '@52css/mp-vue3'
 
 defineComponent({
-  props: {},
+  properties: {},
   setup() {
     const instance = useComponent();
     console.log("🚀 ~ defineComponent ~ instance:", instance)

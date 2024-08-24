@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onShareTimeline } from '@52css/mp-vue3'
 
-definePage(() => {
-  onShareTimeline(() => {
-    console.log("🚀 ~ onShareTimeline ~ onShareTimeline:", onShareTimeline)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onShareTimeline(() => {
+      console.log("🚀 ~ onShareTimeline ~ onShareTimeline:", onShareTimeline)
+    })
+  }
 });
 ```

@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onTabItemTap } from '@52css/mp-vue3'
 
-definePage(() => {
-  onTabItemTap((object) => {
-    console.log("🚀 ~ onTabItemTap ~ object:", object)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onTabItemTap((object) => {
+      console.log("🚀 ~ onTabItemTap ~ object:", object)
+    })
+  }
 });
 ```

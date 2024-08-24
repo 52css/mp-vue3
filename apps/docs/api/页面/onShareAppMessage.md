@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onShareAppMessage } from '@52css/mp-vue3'
 
-definePage(() => {
-  onShareAppMessage((object) => {
-    console.log("🚀 ~ onShareAppMessage ~ object:", object)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onShareAppMessage((object) => {
+      console.log("🚀 ~ onShareAppMessage ~ object:", object)
+    })
+  }
 });
 ```

@@ -6,7 +6,7 @@
 import { defineComponent, moved } from '@52css/mp-vue3'
 
 defineComponent({
-  props: {},
+  properties: {},
   setup() {
     moved(() => {
       console.log("🚀 ~ moved ~ moved:", moved)

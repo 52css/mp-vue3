@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onSaveExitState } from '@52css/mp-vue3'
 
-definePage(() => {
-  onSaveExitState(() => {
-    console.log("🚀 ~ onSaveExitState ~ onSaveExitState:", onSaveExitState)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onSaveExitState(() => {
+      console.log("🚀 ~ onSaveExitState ~ onSaveExitState:", onSaveExitState)
+    })
+  }
 });
 ```

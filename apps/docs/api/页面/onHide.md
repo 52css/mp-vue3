@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onHide } from '@52css/mp-vue3'
 
-definePage(() => {
-  onHide(() => {
-    console.log("🚀 ~ onHide ~ onHide:", onHide)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onHide(() => {
+      console.log("🚀 ~ onHide ~ onHide:", onHide)
+    })
+  }
 });
-```
+  ```

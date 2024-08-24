@@ -6,7 +6,7 @@
 import { defineComponent, detached } from '@52css/mp-vue3'
 
 defineComponent({
-  props: {},
+  properties: {},
   setup() {
     detached(() => {
       console.log("🚀 ~ detached ~ detached:", detached)

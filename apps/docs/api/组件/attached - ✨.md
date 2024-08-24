@@ -6,7 +6,7 @@
 import { defineComponent, attached } from '@52css/mp-vue3'
 
 defineComponent({
-  props: {},
+  properties: {},
   setup() {
     attached(() => {
       console.log("🚀 ~ attached ~ attached:", attached)
@@ -23,7 +23,7 @@ defineComponent({
 import { defineComponent, attached } from '@52css/mp-vue3'
 
 defineComponent({
-  props: {},
+  properties: {},
   setup() {
     attached(() => {
       let count = 0;

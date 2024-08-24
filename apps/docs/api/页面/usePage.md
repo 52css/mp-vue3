@@ -7,8 +7,11 @@
 ```ts
 import { definePage, usePage } from '@52css/mp-vue3'
 
-definePage(() => {
-  const instance = usePage();
-  console.log("🚀 ~ definePage ~ instance:", instance)
+definePage({
+  queries: {},
+  setup() {
+    const instance = usePage();
+    console.log("🚀 ~ definePage ~ instance:", instance)
+  }
 });
 ```

@@ -6,7 +6,7 @@
 import { defineComponent, ready } from '@52css/mp-vue3'
 
 defineComponent({
-  props: {},
+  properties: {},
   setup() {
     ready(() => {
       console.log("🚀 ~ ready ~ ready:", ready)

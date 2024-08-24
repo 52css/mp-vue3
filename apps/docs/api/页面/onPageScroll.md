@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onPageScroll } from '@52css/mp-vue3'
 
-definePage(() => {
-  onPageScroll((object) => {
-    console.log("🚀 ~ onPageScroll ~ object:", object)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onPageScroll((object) => {
+      console.log("🚀 ~ onPageScroll ~ object:", object)
+    })
+  }
 });
 ```

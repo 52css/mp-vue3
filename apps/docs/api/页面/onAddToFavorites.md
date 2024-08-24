@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onAddToFavorites } from '@52css/mp-vue3'
 
-definePage(() => {
-  onAddToFavorites((object) => {
-    console.log("🚀 ~ onAddToFavorites ~ object:", object)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onAddToFavorites((object) => {
+      console.log("🚀 ~ onAddToFavorites ~ object:", object)
+    })
+  }
 });
 ```

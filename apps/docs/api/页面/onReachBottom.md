@@ -5,9 +5,12 @@
 ```ts
 import { definePage, onReachBottom } from '@52css/mp-vue3'
 
-definePage(() => {
-  onReachBottom(() => {
-    console.log("🚀 ~ onReachBottom ~ onReachBottom:", onReachBottom)
-  })
+definePage({
+  queries: {},
+  setup() {
+    onReachBottom(() => {
+      console.log("🚀 ~ onReachBottom ~ onReachBottom:", onReachBottom)
+    })
+  }
 });
 ```
