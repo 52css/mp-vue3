@@ -6,9 +6,9 @@ hero:
   name: "🅥 MP Vue3"
   text: "基于 Vue 3 的小程序框架：轻松构建高效应用"
   tagline: 简洁、高效、性能卓越。让开发更轻松的小程序框架，助你轻松实现需求，准时下班！
-  # image:
-  #   src: ./icon.png
-  #   alt: VitePress
+  image:
+    src: /image.webp
+    alt: VitePress
   actions:
     - theme: brand
       text: 开始
