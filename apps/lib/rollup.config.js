@@ -12,7 +12,7 @@ export default {
       name: "MpVue3",
       file: "dist/mp-vue3.min.js",
       format: "umd",
-      sourcemap: true,
+      // sourcemap: true,
     },
   ],
   plugins: [

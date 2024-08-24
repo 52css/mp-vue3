@@ -3,13 +3,12 @@ export type AppHook = () => Record<string, any>;
 export type PropType<T> = () => T;
 export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
-type PageQueriesType = StringConstructor | NumberConstructor | BooleanConstructor | ArrayConstructor | ObjectConstructor | null;
 type PageQueriesValue<T> = T extends {
     type: PropType<infer U>;
 } ? {
     type: PropType<U>;
     formatter?: (value: string) => U;
-} : PageQueriesType;
+} : T extends PropType<infer U> ? PropType<U> : undefined;
 export type PageQueries<T> = {
     [K in keyof T]?: PageQueriesValue<T[K]>;
 };

@@ -20,13 +20,13 @@ export type PageOptions = WechatMiniprogram.Page.Options<
   WechatMiniprogram.Page.CustomOption
 >;
 
-type PageQueriesType =
-  | StringConstructor
-  | NumberConstructor
-  | BooleanConstructor
-  | ArrayConstructor
-  | ObjectConstructor
-  | null;
+// type PageQueriesType =
+//   | StringConstructor
+//   | NumberConstructor
+//   | BooleanConstructor
+//   | ArrayConstructor
+//   | ObjectConstructor
+//   | null;
 
 type PageQueriesValue<T> = T extends {
   type: PropType<infer U>;
@@ -35,7 +35,9 @@ type PageQueriesValue<T> = T extends {
       type: PropType<U>;
       formatter?: (value: string) => U;
     }
-  : PageQueriesType;
+  : T extends PropType<infer U>
+  ? PropType<U>
+  : undefined;
 
 export type PageQueries<T> = {
   [K in keyof T]?: PageQueriesValue<T[K]>;
@@ -272,12 +274,6 @@ const methodOn = (
 
   instance[`$${lifetimesKey}`].push(hook);
 };
-
-// type PageQueriesConfigObject = {
-//   type: PageQueriesType;
-//   formatter?: (val: string | undefined) => any;
-// };
-// type PageQueriesConfig = PageQueriesConfigObject | PageQueriesType;
 
 const createQuery = <TQueries extends PageQueries<TQueries>>(
   query: Record<string, string | undefined>,

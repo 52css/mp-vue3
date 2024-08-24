@@ -27,7 +27,7 @@ definePage({
   },
   setup(query) {
     // 需要兼容这个类型
-    console.log("🚀 ~ definePage ~ query:", query.user);
+    console.log("🚀 ~ definePage ~ query:", query);
     const count = ref(0);
     const onIncrease = () => {
       count.value++;
