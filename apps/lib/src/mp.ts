@@ -20,24 +20,38 @@ export type PageOptions = WechatMiniprogram.Page.Options<
   WechatMiniprogram.Page.CustomOption
 >;
 
+type PageQueriesType =
+  | StringConstructor
+  | NumberConstructor
+  | BooleanConstructor
+  | ArrayConstructor
+  | ObjectConstructor
+  | null;
+
+export type PageQueries<T> = {
+  [K in keyof T]?:
+    | {
+        type: PageQueriesType;
+      }
+    | PageQueriesType;
+};
+
 // 页面setup函数
 export type PageHook<TQuery> = (
   query: TQuery,
   context: PageContext
 ) => Record<string, any>;
 
-type PageExtractQueryType<T> = T extends PropType<infer U>
+type PageQueryValue<T> = T extends PropType<infer U>
   ? U
   : T extends null
   ? any
   : undefined;
 
-type PageQueryFromQueries<T> = {
-  [K in keyof T]?: PageExtractQueryType<T[K]>;
-};
-
 // 页面setup第一个参数，query
-export type PageQuery<T> = PageQueryFromQueries<T>;
+export type PageQuery<T> = {
+  [K in keyof T]?: PageQueryValue<T[K]>;
+};
 
 // 页面setup第二参数，context
 export type PageContext = WechatMiniprogram.Page.InstanceProperties &
@@ -64,8 +78,16 @@ export type ComponentOptions = WechatMiniprogram.Component.Options<
   false
 >;
 
-// todo 待完善，判断有 type 返回 对应类型， 没有 type 返回 对应类型
-type ComponentExtractPropertyType<T> = T extends {
+// TODO结合兼容
+// type ComponentPropertiesType =
+//   | StringConstructor
+//   | NumberConstructor
+//   | BooleanConstructor
+//   | ArrayConstructor
+//   | ObjectConstructor
+//   | null;
+
+type ComponentPropertiesValue<T> = T extends {
   type: null;
 }
   ? {
@@ -84,18 +106,18 @@ type ComponentExtractPropertyType<T> = T extends {
       value?:
         | U
         | (T extends { optionalTypes: (infer O)[] }
-            ? ComponentExtractPropType<O>
+            ? ComponentPropsValue<O>
             : never);
       observer?: (
         newVal:
           | U
           | (T extends { optionalTypes: (infer O)[] }
-              ? ComponentExtractPropType<O>
+              ? ComponentPropsValue<O>
               : never),
         oldVal:
           | U
           | (T extends { optionalTypes: (infer O)[] }
-              ? ComponentExtractPropType<O>
+              ? ComponentPropsValue<O>
               : never)
       ) => void;
     }
@@ -114,7 +136,7 @@ type ComponentExtractPropertyType<T> = T extends {
   : undefined;
 
 export type ComponentProperties<T> = {
-  [K in keyof T]?: ComponentExtractPropertyType<T[K]>;
+  [K in keyof T]?: ComponentPropertiesValue<T[K]>;
 };
 
 // 组件setup函数
@@ -124,14 +146,14 @@ export type ComponentHook<TComponentProps, TComponentContext> = (
 ) => Record<string, any>;
 
 // 更新 `ExtractPropType` 类型以处理 `optionalTypes`
-type ComponentExtractPropType<T> = T extends {
+type ComponentPropsValue<T> = T extends {
   type: PropType<infer U>;
   optionalTypes?: Array<PropType<any>>;
 }
   ?
       | U
       | (T extends { optionalTypes: (infer O)[] }
-          ? ComponentExtractPropType<O>
+          ? ComponentPropsValue<O>
           : never)
   : T extends { type: PropType<infer U> }
   ? U
@@ -141,21 +163,19 @@ type ComponentExtractPropType<T> = T extends {
   ? any
   : undefined;
 
-type ComponentPropsFromProperties<T> = {
-  [K in keyof T]?: ComponentExtractPropType<T[K]>;
+// 组件setup第一个参数，props
+export type ComponentProps<T> = {
+  [K in keyof T]?: ComponentPropsValue<T[K]>;
 };
 
-// 组件setup第一个参数，props
-export type ComponentProps<T> = ComponentPropsFromProperties<T>;
-
-type EmitFunction<E> = <K extends keyof E>(
+type ComponentContextEmit<E> = <K extends keyof E>(
   event: K,
   ...args: E[K] extends (...args: infer P) => any ? P : never
 ) => void;
 
 // 组件setup第二参数，context
 export type ComponentContext<TEmits> = {
-  emit: EmitFunction<TEmits>;
+  emit: ComponentContextEmit<TEmits>;
 };
 
 let _currentPage: PageInstance | null = null;
@@ -252,7 +272,7 @@ const methodOn = (
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export const definePage = <TQueries extends object = {}>(
+export const definePage = <TQueries extends PageQueries<TQueries>>(
   hook?:
     | PageHook<PageQuery<TQueries>>
     | (PageOptions & {

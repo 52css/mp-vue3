@@ -13,6 +13,13 @@
         {
           "name": "pages/index/index",
           "pathName": "pages/index/index",
+          "query": "name=vendor&a=&b=123",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "pages/index/index",
+          "pathName": "pages/index/index",
           "query": "name=vendor",
           "launchMode": "default",
           "scene": null

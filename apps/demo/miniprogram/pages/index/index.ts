@@ -17,7 +17,7 @@ definePage({
     name: String,
   },
   setup(query) {
-    console.log("🚀 ~ definePage ~ query.name:", query.name);
+    console.log("🚀 ~ definePage ~ query:", query);
     const count = ref(0);
     const onIncrease = () => {
       count.value++;

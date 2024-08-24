@@ -3,6 +3,12 @@ export type AppHook = () => Record<string, any>;
 export type PropType<T> = () => T;
 export type PageInstance = WechatMiniprogram.Page.Instance<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
 export type PageOptions = WechatMiniprogram.Page.Options<WechatMiniprogram.Page.DataOption, WechatMiniprogram.Page.CustomOption>;
+type PageQueriesType = StringConstructor | NumberConstructor | BooleanConstructor | ArrayConstructor | ObjectConstructor | null;
+export type PageQueries<T> = {
+    [K in keyof T]?: {
+        type: PageQueriesType;
+    } | PageQueriesType;
+};
 export type PageHook<TQuery> = (query: TQuery, context: PageContext) => Record<string, any>;
 type PageExtractQueryType<T> = T extends PropType<infer U> ? U : T extends null ? any : undefined;
 type PageQueryFromQueries<T> = {
@@ -12,12 +18,13 @@ export type PageQuery<T> = PageQueryFromQueries<T>;
 export type PageContext = WechatMiniprogram.Page.InstanceProperties & Omit<WechatMiniprogram.Page.InstanceMethods<Record<string, any>>, "setData" | "groupSetData" | "hasBehavior">;
 export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
 export type ComponentOptions = WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
-type ComponentExtractPropertyType<T> = T extends {
+type ComponentPropertiesValue<T> = T extends {
     type: null;
 } ? {
     type: null;
     optionalTypes?: Array<PropType<any>>;
     value?: any;
+    observer?: (newVal: any, oldVal: any) => void;
 } : T extends {
     type: PropType<infer U>;
     optionalTypes?: Array<PropType<any>>;
@@ -26,29 +33,34 @@ type ComponentExtractPropertyType<T> = T extends {
     optionalTypes?: Array<PropType<any>>;
     value?: U | (T extends {
         optionalTypes: (infer O)[];
-    } ? ComponentExtractPropType<O> : never);
+    } ? ComponentPropsValue<O> : never);
+    observer?: (newVal: U | (T extends {
+        optionalTypes: (infer O)[];
+    } ? ComponentPropsValue<O> : never), oldVal: U | (T extends {
+        optionalTypes: (infer O)[];
+    } ? ComponentPropsValue<O> : never)) => void;
 } : T extends {
     type: PropType<infer U>;
 } ? {
     type: PropType<U>;
     value?: U;
+    observer?: (newVal: U, oldVal: U) => void;
 } : T extends null ? null : T extends PropType<infer U> ? PropType<U> : undefined;
 export type ComponentProperties<T> = {
-    [K in keyof T]?: ComponentExtractPropertyType<T[K]>;
+    [K in keyof T]?: ComponentPropertiesValue<T[K]>;
 };
 export type ComponentHook<TComponentProps, TComponentContext> = (props: TComponentProps, context: TComponentContext) => Record<string, any>;
-type ComponentExtractPropType<T> = T extends {
+type ComponentPropsValue<T> = T extends {
     type: PropType<infer U>;
     optionalTypes?: Array<PropType<any>>;
 } ? U | (T extends {
     optionalTypes: (infer O)[];
-} ? ComponentExtractPropType<O> : never) : T extends {
+} ? ComponentPropsValue<O> : never) : T extends {
     type: PropType<infer U>;
 } ? U : T extends PropType<infer U> ? U : T extends null ? any : undefined;
-type ComponentPropsFromProperties<T> = {
-    [K in keyof T]?: ComponentExtractPropType<T[K]>;
+export type ComponentProps<T> = {
+    [K in keyof T]?: ComponentPropsValue<T[K]>;
 };
-export type ComponentProps<T> = ComponentPropsFromProperties<T>;
 type EmitFunction<E> = <K extends keyof E>(event: K, ...args: E[K] extends (...args: infer P) => any ? P : never) => void;
 export type ComponentContext<TEmits> = {
     emit: EmitFunction<TEmits>;
@@ -57,7 +69,7 @@ export type ComponentContext<TEmits> = {
  * 创建页面并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
  */
-export declare const definePage: <TQueries extends object = {}>(hook?: PageHook<PageQuery<TQueries>> | (PageOptions & {
+export declare const definePage: <TQueries extends PageQueries<TQueries>>(hook?: PageHook<PageQuery<TQueries>> | (PageOptions & {
     queries?: TQueries;
     setup?: PageHook<PageQuery<TQueries>>;
 })) => void;
