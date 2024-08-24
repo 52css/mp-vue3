@@ -50,8 +50,8 @@ defineComponent({
     userList: Array as PropType<User[]>,
   },
   emits: {
-    change: (_value: string | number) => void 0,
-    test: () => void 0,
+    change: (_value: string | number) => true,
+    test: () => true,
   },
   setup(props, { emit }) {
     console.log("🚀 ~ setup ~ this:", this); // 自动获取当前实例

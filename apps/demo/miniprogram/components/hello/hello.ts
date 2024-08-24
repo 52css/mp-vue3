@@ -36,9 +36,9 @@ defineComponent({
     // },
   },
   emits: {
-    submit: (_data: { name: string; age: number }) => void 0,
-    change: (_value: string | number) => void 0,
-    test: () => void 0,
+    submit: (_data: { name: string; age: number }) => true,
+    change: (_value: string | number) => true,
+    test: () => true,
   },
   setup(props, { emit }) {
     console.log("🚀 ~ setup ~ this:", this);
