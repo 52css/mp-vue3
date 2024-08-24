@@ -1,8 +1,8 @@
 import "miniprogram-api-typings";
 import { type PropType } from "./shared";
 export type AppHook = () => Record<string, any>;
-export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
-export type ComponentOptions = WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, {}, WechatMiniprogram.Component.MethodOption, {}, false>;
+export type ComponentInstance = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, WechatMiniprogram.Component.PropertyOption, WechatMiniprogram.Component.MethodOption, {}, false>;
+export type ComponentOptions = WechatMiniprogram.Component.Options<WechatMiniprogram.Component.DataOption, WechatMiniprogram.Component.PropertyOption, WechatMiniprogram.Component.MethodOption, {}, false>;
 type ComponentPropertiesValue<T> = T extends {
     type: null;
 } ? {
@@ -49,6 +49,14 @@ export type ComponentProps<T> = {
 type ComponentContextEmit<E> = <K extends keyof E>(event: K, ...args: E[K] extends (...args: infer P) => any ? P : never) => void;
 export type ComponentContext<TEmits> = {
     emit: ComponentContextEmit<TEmits>;
+};
+export type ComponentLifetimes = {
+    created(): void;
+    attached(): void;
+    ready(): void;
+    moved(): void;
+    detached(): void;
+    error(err: Error): void;
 };
 /**
  * 创建组件并关联生命周期函数

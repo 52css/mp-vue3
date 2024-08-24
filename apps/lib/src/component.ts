@@ -10,7 +10,7 @@ export type AppHook = () => Record<string, any>;
 // 组件实例
 export type ComponentInstance = WechatMiniprogram.Component.Instance<
   WechatMiniprogram.Component.DataOption,
-  {},
+  WechatMiniprogram.Component.PropertyOption,
   WechatMiniprogram.Component.MethodOption,
   {},
   false
@@ -19,7 +19,7 @@ export type ComponentInstance = WechatMiniprogram.Component.Instance<
 // 组件配置
 export type ComponentOptions = WechatMiniprogram.Component.Options<
   WechatMiniprogram.Component.DataOption,
-  {},
+  WechatMiniprogram.Component.PropertyOption,
   WechatMiniprogram.Component.MethodOption,
   {},
   false
@@ -127,6 +127,32 @@ export type ComponentContext<TEmits> = {
 
 let _currentComponent: ComponentInstance | null = null;
 
+export type ComponentLifetimes = {
+  created(): void;
+  attached(): void;
+  ready(): void;
+  moved(): void;
+  detached(): void;
+  error(err: Error): void;
+};
+
+const lifetimeOnList = (
+  options: ComponentOptions,
+  lifetimeList: (keyof ComponentLifetimes)[]
+) => {
+  lifetimeList.forEach((lifetimeKey) => {
+    if (!options.lifetimes) {
+      options.lifetimes = {};
+    }
+    options.lifetimes[lifetimeKey] = function (
+      this: ComponentInstance,
+      ...args: any[]
+    ) {
+      lifetimeEmit(this, options, lifetimeKey, ...args);
+    };
+  });
+};
+
 /**
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
@@ -194,6 +220,8 @@ export const defineComponent = <
     });
   }
 
+  lifetimeOnList(options, ["ready", "moved", "error"]);
+
   Component({
     ...options,
     lifetimes: {
@@ -250,12 +278,6 @@ export const defineComponent = <
 
         _currentComponent = null;
       },
-      ready(this: ComponentInstance) {
-        lifetimeEmit(this, options, "ready");
-      },
-      moved(this: ComponentInstance) {
-        lifetimeEmit(this, options, "moved");
-      },
       detached(this: ComponentInstance) {
         lifetimeEmit(this, options, "detached");
         if (this.$scope) {
@@ -273,9 +295,6 @@ export const defineComponent = <
             console.error("销毁异常", ex);
           }
         });
-      },
-      error(this: ComponentInstance, err: WechatMiniprogram.Error) {
-        lifetimeEmit(this, options, "error", err);
       },
     },
   });
