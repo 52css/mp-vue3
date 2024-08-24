@@ -10,6 +10,9 @@ import {
   isFunction,
 } from "./utils";
 
+// 定义 PropType 辅助类型
+export type PropType<T> = () => T;
+
 export function deepToRaw(x: unknown): unknown {
   if (isSimpleValue(x) || isFunction(x)) {
     return x;

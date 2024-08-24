@@ -38,4 +38,5 @@ export {
 } from "@vue/reactivity";
 export { watch, watchEffect, watchPostEffect, watchSyncEffect } from "./watch";
 
-export * from "./mp";
+export * from "./component";
+export * from "./page";
