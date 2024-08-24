@@ -1,4 +1,9 @@
-import { defineComponent, attached, watch } from "@52css/mp-vue3";
+import { defineComponent, attached, watch, PropType } from "@52css/mp-vue3";
+
+type User = {
+  id: number;
+  name: string;
+};
 
 defineComponent({
   // 属性名称和 vue 一致
@@ -11,6 +16,24 @@ defineComponent({
       optionalTypes: [String],
       value: "12",
     },
+    user: Object as PropType<User>,
+    // user: {
+    //   type: Object as PropType<User>,
+    //   value: {
+    //     id: 1,
+    //     name: "",
+    //   },
+    // },
+    userList: Array as PropType<User[]>,
+    // userList: {
+    //   type: Array as PropType<User[]>,
+    //   value: [
+    //     {
+    //       id: 1,
+    //       name: "",
+    //     },
+    //   ],
+    // },
   },
   emits: {
     submit: (_data: { name: string; age: number }) => void 0,
@@ -18,16 +41,12 @@ defineComponent({
     test: () => void 0,
   },
   setup(props, { emit }) {
-    emit("change", 1);
-    emit("test");
-    console.log("this", this);
-    // console.log("🚀 ~ setup ~ context:", context);
-    // console.log("🚀 ~ setup ~ props:", props);
-    // props 即 小程序 this.properties
-    // emit 即 小程序 this.triggerEvent
-
+    console.log("🚀 ~ setup ~ this:", this);
+    console.log("🚀 ~ setup ~ props:", props);
     const onTap = () => {
       console.log("props.name", props.name);
+      emit("change", 1);
+      emit("test");
     };
 
     watch(

@@ -22,11 +22,10 @@ definePage({
     name: String,
     a: Boolean,
     b: Number,
-    // 需要兼容这个定义
     user: Object as PropType<User>,
+    userList: Array as PropType<User[]>,
   },
   setup(query) {
-    // 需要兼容这个类型
     console.log("🚀 ~ definePage ~ query:", query);
     const count = ref(0);
     const onIncrease = () => {

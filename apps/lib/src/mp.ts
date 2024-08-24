@@ -367,14 +367,16 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
     return Page(options);
   }
 
+  const { queries, ...otherOptions } = options;
+
   Page({
-    ...options,
+    ...otherOptions,
     // 生命周期回调函数
     onLoad(this: PageInstance, query) {
       _currentPage = this;
       this.$scope = effectScope();
 
-      this.$query = createQuery(query, options.queries);
+      this.$query = createQuery(query, queries);
 
       this.$context = {};
       this.$scope.run(() => {

@@ -13,21 +13,7 @@
         {
           "name": "pages/index/index",
           "pathName": "pages/index/index",
-          "query": "name=vendor&a=&b=123&user=%7B%22id%22%3A1%2C%22name%22%3A%22%E5%BC%A0%E4%B8%89%22%7D",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/index/index",
-          "pathName": "pages/index/index",
-          "query": "name=vendor&a=&b=123",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/index/index",
-          "pathName": "pages/index/index",
-          "query": "name=vendor",
+          "query": "name=vendor&a=&b=123&user=%7B%22id%22%3A1%2C%22name%22%3A%22%E5%BC%A0%E4%B8%89%22%7D&userList=%5B%7B%22id%22%3A1%2C%22name%22%3A%22%E5%BC%A0%E4%B8%89%22%7D%5D",
           "launchMode": "default",
           "scene": null
         },
