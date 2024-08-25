@@ -9,6 +9,8 @@ import {
   isPlainObject,
   isFunction,
 } from "./utils";
+import { type PageInstance } from "./page";
+import { type ComponentInstance } from "./component";
 
 // 定义 PropType 辅助类型
 export type PropType<T> = () => T;
@@ -63,3 +65,11 @@ export function deepWatch(
     }
   );
 }
+
+export let instance: PageInstance | ComponentInstance | null = null;
+export const useInstance = () => instance;
+export const setInstance = (
+  newInstance: PageInstance | ComponentInstance | null
+) => {
+  instance = newInstance;
+};

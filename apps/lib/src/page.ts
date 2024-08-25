@@ -1,7 +1,7 @@
 import { effectScope, type EffectScope } from "@vue/reactivity";
-import { deepToRaw, deepWatch, type PropType } from "./shared";
+import { deepToRaw, deepWatch, type PropType, setInstance } from "./shared";
 import { isFunction } from "./utils";
-import { lifetimeEmit, lifetimeOnce, lifetimeOn } from "./lifetime";
+import { lifetimeEmit, lifetimeEmitOnce } from "./lifetime";
 // 页面实例
 export type PageInstance = WechatMiniprogram.Page.Instance<
   WechatMiniprogram.Page.DataOption,
@@ -66,7 +66,6 @@ export type PageContext = WechatMiniprogram.Page.InstanceProperties &
     "setData" | "groupSetData" | "hasBehavior"
   >;
 
-let _currentPage: PageInstance | null = null;
 const createQuery = <TQueries extends PageQueries<TQueries>>(
   query: Record<string, string | undefined>,
   queries?: TQueries
@@ -131,7 +130,7 @@ const createQuery = <TQueries extends PageQueries<TQueries>>(
 
   return rtv as PageQuery<TQueries>;
 };
-const lifetimeOnList = (options: PageOptions, lifetimeList: string[]) => {
+const lifetimeEmitList = (options: PageOptions, lifetimeList: string[]) => {
   lifetimeList.forEach((lifetimeKey, ...args: any[]) => {
     options[lifetimeKey] = function (this: PageInstance) {
       lifetimeEmit(this, options, lifetimeKey, ...args);
@@ -139,10 +138,10 @@ const lifetimeOnList = (options: PageOptions, lifetimeList: string[]) => {
   });
 };
 
-const lifetimeOnceList = (options: PageOptions, lifetimeList: string[]) => {
+const lifetimeEmitOnceList = (options: PageOptions, lifetimeList: string[]) => {
   lifetimeList.forEach((lifetimeKey, ...args: any[]) => {
     options[lifetimeKey] = function (this: PageInstance) {
-      return lifetimeOnce(this, options, lifetimeKey, ...args);
+      return lifetimeEmitOnce(this, options, lifetimeKey, ...args);
     };
   });
 };
@@ -176,7 +175,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
 
   const { queries, ...otherOptions } = options;
 
-  lifetimeOnList(otherOptions, [
+  lifetimeEmitList(otherOptions, [
     "onShow",
     "onReady",
     "onHide",
@@ -189,7 +188,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
     "onSaveExitState",
   ]);
 
-  lifetimeOnceList(otherOptions, [
+  lifetimeEmitOnceList(otherOptions, [
     "onAddToFavorites",
     "onShareAppMessage",
     "onShareTimeline",
@@ -199,7 +198,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
     ...otherOptions,
     // 生命周期回调函数
     onLoad(this: PageInstance, query) {
-      _currentPage = this;
+      setInstance(this);
       this.$scope = effectScope();
 
       this.$query = createQuery(query, queries);
@@ -221,7 +220,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
         }
         lifetimeEmit(this, options, "onLoad", query);
       });
-      _currentPage = null;
+      setInstance(null);
     },
     onUnload(this: PageInstance) {
       lifetimeEmit(this, options, "onUnload");
@@ -242,44 +241,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
   });
 };
 
-export const usePage = () => {
-  return _currentPage;
+export const getCurrentPage = () => {
+  const pageList = getCurrentPages();
+  return pageList && pageList[pageList.length - 1];
 };
-
-export const onLoad = (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) =>
-  lifetimeOn(usePage(), "onLoad", hook);
-export const onShow = (hook: WechatMiniprogram.Page.ILifetime["onShow"]) =>
-  lifetimeOn(usePage(), "onShow", hook);
-export const onReady = (hook: WechatMiniprogram.Page.ILifetime["onReady"]) =>
-  lifetimeOn(usePage(), "onReady", hook);
-export const onHide = (hook: WechatMiniprogram.Page.ILifetime["onHide"]) =>
-  lifetimeOn(usePage(), "onHide", hook);
-export const onUnload = (hook: WechatMiniprogram.Page.ILifetime["onUnload"]) =>
-  lifetimeOn(usePage(), "onUnload", hook);
-export const onRouteDone = (hook: () => void) =>
-  lifetimeOn(usePage(), "onRouteDone", hook);
-export const onPullDownRefresh = (
-  hook: WechatMiniprogram.Page.ILifetime["onPullDownRefresh"]
-) => lifetimeOn(usePage(), "onPullDownRefresh", hook);
-export const onReachBottom = (
-  hook: WechatMiniprogram.Page.ILifetime["onReachBottom"]
-) => lifetimeOn(usePage(), "onReachBottom", hook);
-export const onPageScroll = (
-  hook: WechatMiniprogram.Page.ILifetime["onPageScroll"]
-) => lifetimeOn(usePage(), "onPageScroll", hook);
-export const onAddToFavorites = (
-  hook: WechatMiniprogram.Page.ILifetime["onAddToFavorites"]
-) => lifetimeOn(usePage(), "onAddToFavorites", hook);
-export const onShareAppMessage = (
-  hook: WechatMiniprogram.Page.ILifetime["onShareAppMessage"]
-) => lifetimeOn(usePage(), "onShareAppMessage", hook);
-export const onShareTimeline = (
-  hook: WechatMiniprogram.Page.ILifetime["onShareTimeline"]
-) => lifetimeOn(usePage(), "onShareTimeline", hook);
-export const onResize = (hook: WechatMiniprogram.Page.ILifetime["onResize"]) =>
-  lifetimeOn(usePage(), "onResize", hook);
-export const onTabItemTap = (
-  hook: WechatMiniprogram.Page.ILifetime["onTabItemTap"]
-) => lifetimeOn(usePage(), "onTabItemTap", hook);
-export const onSaveExitState = (hook: () => void) =>
-  lifetimeOn(usePage(), "onSaveExitState", hook);

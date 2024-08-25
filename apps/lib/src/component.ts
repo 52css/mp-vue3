@@ -4,10 +4,10 @@ import {
   shallowReactive,
   type EffectScope,
 } from "@vue/reactivity";
-import { deepToRaw, deepWatch } from "./shared";
+import { deepToRaw, deepWatch, setInstance } from "./shared";
 import "miniprogram-api-typings";
 import { type PropType } from "./shared";
-import { lifetimeEmit, lifetimeOn } from "./lifetime";
+import { lifetimeEmit } from "./lifetime";
 
 export type AppHook = () => Record<string, any>;
 
@@ -135,8 +135,6 @@ export type ComponentContext<TEmits> = {
   emit: ComponentContextEmit<TEmits>;
 };
 
-let _currentComponent: ComponentInstance | null = null;
-
 export type ComponentLifetimes = {
   created(): void;
   attached(): void;
@@ -146,7 +144,7 @@ export type ComponentLifetimes = {
   error(err: Error): void;
 };
 
-const lifetimeOnList = (
+const lifetimeEmitList = (
   options: ComponentOptions,
   lifetimeList: (keyof ComponentLifetimes)[]
 ) => {
@@ -227,13 +225,13 @@ export const defineComponent = <
     });
   }
 
-  lifetimeOnList(options, ["ready", "moved", "error"]);
+  lifetimeEmitList(options, ["ready", "moved", "error"]);
 
   Component({
     ...options,
     lifetimes: {
       attached(this: ComponentInstance) {
-        _currentComponent = this;
+        setInstance(this);
         this.$scope = effectScope();
         const rawProps: Record<string, any> = {};
         if (properties) {
@@ -283,7 +281,7 @@ export const defineComponent = <
           lifetimeEmit(this, options, "attached");
         });
 
-        _currentComponent = null;
+        setInstance(null);
       },
       detached(this: ComponentInstance) {
         lifetimeEmit(this, options, "detached");
@@ -305,18 +303,3 @@ export const defineComponent = <
     },
   });
 };
-
-export const useComponent = () => _currentComponent;
-
-export const attached = (
-  hook: WechatMiniprogram.Component.Lifetimes["attached"]
-) => lifetimeOn(useComponent(), "attached", hook);
-export const ready = (hook: WechatMiniprogram.Component.Lifetimes["ready"]) =>
-  lifetimeOn(useComponent(), "ready", hook);
-export const moved = (hook: WechatMiniprogram.Component.Lifetimes["moved"]) =>
-  lifetimeOn(useComponent(), "moved", hook);
-export const detached = (
-  hook: WechatMiniprogram.Component.Lifetimes["detached"]
-) => lifetimeOn(useComponent(), "detached", hook);
-export const error = (hook: WechatMiniprogram.Component.Lifetimes["error"]) =>
-  lifetimeOn(useComponent(), "error", hook);

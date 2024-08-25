@@ -72,10 +72,4 @@ export declare const defineComponent: <TProperties extends ComponentProperties<T
     emits?: TEmits;
     setup?: ComponentHook<ComponentProps<TProperties>, ComponentContext<TEmits>>;
 })) => string | undefined;
-export declare const useComponent: () => ComponentInstance<{}> | null;
-export declare const attached: (hook: WechatMiniprogram.Component.Lifetimes["attached"]) => void;
-export declare const ready: (hook: WechatMiniprogram.Component.Lifetimes["ready"]) => void;
-export declare const moved: (hook: WechatMiniprogram.Component.Lifetimes["moved"]) => void;
-export declare const detached: (hook: WechatMiniprogram.Component.Lifetimes["detached"]) => void;
-export declare const error: (hook: WechatMiniprogram.Component.Lifetimes["error"]) => void;
 export {};
