@@ -18,7 +18,7 @@ export default defineConfig({
 
     sidebar: getSidebar({
       contentRoot: "/",
-      contentDirs: ["guide", "api", "reactivity"],
+      contentDirs: ["guide", "框架接口", "reactivity"],
       collapsible: true,
       collapsed: false,
     }),
