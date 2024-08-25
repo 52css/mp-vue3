@@ -7,8 +7,8 @@ import { createApp, onUnhandledRejection } from '@52css/mp-vue3'
 
 createApp({
   setup() {
-    onUnhandledRejection(() => {
-      console.log("🚀 ~ onUnhandledRejection ~ onUnhandledRejection:", onUnhandledRejection)
+    onUnhandledRejection((result: WechatMiniprogram.OnUnhandledRejectionListenerResult) => {
+      console.log("🚀 ~ onUnhandledRejection ~ result:", result)
     })
   }
 });

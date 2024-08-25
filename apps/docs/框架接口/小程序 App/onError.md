@@ -7,8 +7,8 @@ import { createApp, onError } from '@52css/mp-vue3'
 
 createApp({
   setup() {
-    onError(() => {
-      console.log("🚀 ~ onError ~ onError:", onError)
+    onError((error: string) => {
+      console.log("🚀 ~ onError ~ error:", error)
     })
   }
 });

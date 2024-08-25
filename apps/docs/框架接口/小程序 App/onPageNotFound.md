@@ -7,8 +7,8 @@ import { createApp, onPageNotFound } from '@52css/mp-vue3'
 
 createApp({
   setup() {
-    onPageNotFound(() => {
-      console.log("🚀 ~ onPageNotFound ~ onPageNotFound:", onPageNotFound)
+    onPageNotFound((option: WechatMiniprogram.App.PageNotFoundOption) => {
+      console.log("🚀 ~ onPageNotFound ~ option:", option)
     })
   }
 });

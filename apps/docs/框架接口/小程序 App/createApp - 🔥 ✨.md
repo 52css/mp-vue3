@@ -9,8 +9,8 @@
 ```ts
 import { createApp, ref } from '@52css/mp-vue3'
 
-createApp((launchShowOption) => {
-  console.log("🚀 ~ createApp ~ launchShowOption:", launchShowOption)
+createApp((option: WechatMiniprogram.App.LaunchShowOption) => {
+  console.log("🚀 ~ createApp ~ option:", option)
 
   // 返回给 this[key] = value 绑定
   return {}
@@ -25,8 +25,8 @@ import { createApp, ref } from '@52css/mp-vue3'
 
 
 createApp({
-  setup(launchShowOption) {
-    console.log("🚀 ~ setup ~ launchShowOption:", launchShowOption)
+  setup(option: WechatMiniprogram.App.LaunchShowOption) {
+    console.log("🚀 ~ setup ~ option:", option)
 
     // 返回给 this[key] = value 绑定
     return {}

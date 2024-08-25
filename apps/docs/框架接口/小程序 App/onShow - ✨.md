@@ -7,8 +7,8 @@ import { createApp, onShow } from '@52css/mp-vue3'
 
 createApp({
   setup() {
-    onShow(() => {
-      console.log("🚀 ~ onShow ~ onShow:", onShow)
+    onShow((option: WechatMiniprogram.App.LaunchShowOption) => {
+      console.log("🚀 ~ onShow ~ option:", option)
     })
   }
 });
@@ -24,12 +24,9 @@ import { createApp, onShow } from '@52css/mp-vue3'
 createApp({
   setup() {
     onShow(() => {
-      let count = 0;
-      let timer = setInterval(() => {
-        console.log(count++)
-      }, 1000)
+      console.log('onAppShow')
       return () => {
-        clearInterval(timer)
+        console.log('onAppHide')
       }
     })
   }

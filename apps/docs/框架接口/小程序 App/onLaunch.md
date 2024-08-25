@@ -7,8 +7,8 @@ import { createApp, onLaunch } from '@52css/mp-vue3'
 
 createApp({
   setup() {
-    onLaunch(() => {
-      console.log("🚀 ~ onLaunch ~ onLaunch:", onLaunch)
+    onLaunch((option: WechatMiniprogram.App.LaunchShowOption) => {
+      console.log("🚀 ~ onLaunch ~ option:", option)
     })
   }
 });

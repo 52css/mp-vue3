@@ -7,8 +7,8 @@ import { createApp, onThemeChange } from '@52css/mp-vue3'
 
 createApp({
   setup() {
-    onThemeChange(() => {
-      console.log("🚀 ~ onThemeChange ~ onThemeChange:", onThemeChange)
+    onThemeChange((result: WechatMiniprogram.OnThemeChangeListenerResult) => {
+      console.log("🚀 ~ onThemeChange ~ result:", result)
     })
   }
 });
