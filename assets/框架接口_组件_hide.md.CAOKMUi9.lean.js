@@ -1,0 +1,1 @@
+import{_ as s,c as i,o as a,a4 as e}from"./chunks/framework.DsvKXnjw.js";const g=JSON.parse('{"title":"hide","description":"","frontmatter":{},"headers":[],"relativePath":"框架接口/组件/hide.md","filePath":"框架接口/组件/hide.md"}'),n={name:"框架接口/组件/hide.md"},t=e("",3),h=[t];function p(l,k,d,r,o,E){return a(),i("div",null,h)}const _=s(n,[["render",p]]);export{g as __pageData,_ as default};
