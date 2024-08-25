@@ -20,6 +20,7 @@ export const lifetimeEmit = (
     onLoad: "onUnload",
     onShow: "onHide",
     attached: "detached",
+    show: "hide",
   };
   const lifetimesBackKey =
     eventBackMap[lifetimeKey as keyof typeof eventBackMap];
@@ -146,6 +147,18 @@ export const detached = (
 ) => lifetimeOn(instance, "detached", hook);
 export const error = (hook: WechatMiniprogram.Component.Lifetimes["error"]) =>
   lifetimeOn(instance, "error", hook);
+
+export const show = (hook: WechatMiniprogram.Component.PageLifetimes["show"]) =>
+  lifetimeOn(instance, "show", hook);
+export const hide = (hook: WechatMiniprogram.Component.PageLifetimes["hide"]) =>
+  lifetimeOn(instance, "hide", hook);
+export const resize = (
+  hook: WechatMiniprogram.Component.PageLifetimes["resize"]
+) => lifetimeOn(instance, "resize", hook);
+export const routeDone = (
+  //@ts-expect-error 不要报错
+  hook: WechatMiniprogram.Component.PageLifetimes["routeDone"]
+) => lifetimeOn(instance, "routeDone", hook);
 
 export const onLaunch = (
   hook: WechatMiniprogram.App.Instance<{}>["onLaunch"]

@@ -24,6 +24,10 @@ export declare const ready: (hook: WechatMiniprogram.Component.Lifetimes["ready"
 export declare const moved: (hook: WechatMiniprogram.Component.Lifetimes["moved"]) => void;
 export declare const detached: (hook: WechatMiniprogram.Component.Lifetimes["detached"]) => void;
 export declare const error: (hook: WechatMiniprogram.Component.Lifetimes["error"]) => void;
+export declare const show: (hook: WechatMiniprogram.Component.PageLifetimes["show"]) => void;
+export declare const hide: (hook: WechatMiniprogram.Component.PageLifetimes["hide"]) => void;
+export declare const resize: (hook: WechatMiniprogram.Component.PageLifetimes["resize"]) => void;
+export declare const routeDone: (hook: WechatMiniprogram.Component.PageLifetimes["routeDone"]) => void;
 export declare const onLaunch: (hook: WechatMiniprogram.App.Instance<{}>["onLaunch"]) => void;
 export declare const onError: (hook: WechatMiniprogram.App.Instance<{}>["onError"]) => void;
 export declare const onPageNotFound: (hook: WechatMiniprogram.App.Instance<{}>["onPageNotFound"]) => void;

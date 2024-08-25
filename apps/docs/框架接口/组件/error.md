@@ -8,8 +8,8 @@ import { defineComponent, error } from '@52css/mp-vue3'
 defineComponent({
   properties: {},
   setup() {
-    error(() => {
-      console.log("🚀 ~ error ~ error:", error)
+    error((err: Error) => {
+      console.log("🚀 ~ error ~ err:", err)
     })
   }
 });

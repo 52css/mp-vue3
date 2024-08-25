@@ -29,7 +29,7 @@ export const createApp = (
     return App(options);
   }
 
-  App({
+  return App({
     ...options,
     onLaunch(this: AppInstance, onLaunchOption) {
       setInstance(this);

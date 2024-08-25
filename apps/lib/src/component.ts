@@ -197,7 +197,7 @@ export const defineComponent = <
     });
   }
 
-  Component({
+  return Component({
     ...options,
     lifetimes: {
       attached(this: ComponentInstance) {
@@ -278,6 +278,21 @@ export const defineComponent = <
       },
       error(this: ComponentInstance, err: WechatMiniprogram.Error) {
         lifetimeEmit(this, options, "error", err);
+      },
+    },
+    pageLifetimes: {
+      show(this: ComponentInstance) {
+        lifetimeEmit(this, options, "show");
+      },
+      hide(this: ComponentInstance) {
+        lifetimeEmit(this, options, "hide");
+      },
+      resize(this: ComponentInstance, size) {
+        lifetimeEmit(this, options, "resize", size);
+      },
+      // @ts-expect-error 不要报错
+      routeDone(this: ComponentInstance) {
+        lifetimeEmit(this, options, "routeDone");
       },
     },
   });

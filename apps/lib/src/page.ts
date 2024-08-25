@@ -160,7 +160,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
 
   const { queries, ...otherOptions } = options;
 
-  Page({
+  return Page({
     ...otherOptions,
     // 生命周期回调函数
     onLoad(this: PageInstance, query) {

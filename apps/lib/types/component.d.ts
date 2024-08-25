@@ -62,5 +62,5 @@ export declare const defineComponent: <TProperties extends ComponentProperties<T
     properties?: TProperties;
     emits?: TEmits;
     setup?: ComponentHook<ComponentProps<TProperties>, ComponentContext<TEmits>>;
-})) => string | undefined;
+})) => string;
 export {};
