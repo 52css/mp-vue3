@@ -130,21 +130,6 @@ const createQuery = <TQueries extends PageQueries<TQueries>>(
 
   return rtv as PageQuery<TQueries>;
 };
-const lifetimeEmitList = (options: PageOptions, lifetimeList: string[]) => {
-  lifetimeList.forEach((lifetimeKey, ...args: any[]) => {
-    options[lifetimeKey] = function (this: PageInstance) {
-      lifetimeEmit(this, options, lifetimeKey, ...args);
-    };
-  });
-};
-
-const lifetimeEmitOnceList = (options: PageOptions, lifetimeList: string[]) => {
-  lifetimeList.forEach((lifetimeKey, ...args: any[]) => {
-    options[lifetimeKey] = function (this: PageInstance) {
-      return lifetimeEmitOnce(this, options, lifetimeKey, ...args);
-    };
-  });
-};
 
 /**
  * 创建页面并关联生命周期函数
@@ -175,25 +160,6 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
 
   const { queries, ...otherOptions } = options;
 
-  lifetimeEmitList(otherOptions, [
-    "onShow",
-    "onReady",
-    "onHide",
-    "onRouteDone",
-    "onPullDownRefresh",
-    "onReachBottom",
-    "onPageScroll",
-    "onResize",
-    "onTabItemTap",
-    "onSaveExitState",
-  ]);
-
-  lifetimeEmitOnceList(otherOptions, [
-    "onAddToFavorites",
-    "onShareAppMessage",
-    "onShareTimeline",
-  ]);
-
   Page({
     ...otherOptions,
     // 生命周期回调函数
@@ -222,6 +188,15 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
       });
       setInstance(null);
     },
+    onShow(this: PageInstance) {
+      lifetimeEmit(this, options, "onShow");
+    },
+    onReady(this: PageInstance) {
+      lifetimeEmit(this, options, "onReady");
+    },
+    onHide(this: PageInstance) {
+      lifetimeEmit(this, options, "onHide");
+    },
     onUnload(this: PageInstance) {
       lifetimeEmit(this, options, "onUnload");
       if (this.$scope) {
@@ -237,6 +212,37 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
           console.error("销毁异常", ex);
         }
       });
+    },
+    onRouteDone(this: PageInstance) {
+      lifetimeEmit(this, options, "onRouteDone");
+    },
+    // 页面事件处理函数
+    onPullDownRefresh(this: PageInstance) {
+      lifetimeEmit(this, options, "onPullDownRefresh");
+    },
+    onReachBottom(this: PageInstance) {
+      lifetimeEmit(this, options, "onReachBottom");
+    },
+    onPageScroll(this: PageInstance, event) {
+      lifetimeEmit(this, options, "onPageScroll", event);
+    },
+    onAddToFavorites(this: PageInstance, object) {
+      return lifetimeEmitOnce(this, options, "onAddToFavorites", object);
+    },
+    onShareAppMessage(this: PageInstance, event) {
+      return lifetimeEmitOnce(this, options, "onShareAppMessage", event);
+    },
+    onShareTimeline(this: PageInstance) {
+      return lifetimeEmitOnce(this, options, "onShareTimeline");
+    },
+    onResize(this: PageInstance, event) {
+      lifetimeEmit(this, options, "onResize", event);
+    },
+    onTabItemTap(this: PageInstance, object) {
+      lifetimeEmit(this, options, "onTabItemTap", object);
+    },
+    onSaveExitState(this: PageInstance) {
+      lifetimeEmit(this, options, "onSaveExitState");
     },
   });
 };

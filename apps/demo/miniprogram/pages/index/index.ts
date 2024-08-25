@@ -1,4 +1,4 @@
-import { ref, definePage, onShow, PropType } from "@52css/mp-vue3";
+import { ref, definePage, onShow, PropType, onLoad } from "@52css/mp-vue3";
 
 var app = getApp();
 
@@ -32,6 +32,10 @@ definePage({
       count.value++;
     };
     const test = useTest();
+
+    onLoad((query) => {
+      console.log("🚀 ~ onLoad ~ query:", query);
+    });
 
     onShow(() => {
       console.log("onPageShow");

@@ -40,3 +40,5 @@ export { watch, watchEffect, watchPostEffect, watchSyncEffect } from "./watch";
 
 export * from "./component";
 export * from "./page";
+export * from "./lifetime";
+export * from "./shared";

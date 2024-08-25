@@ -55,14 +55,6 @@ type ComponentContextEmit<E> = <K extends keyof E>(event: K, ...args: E[K] exten
 export type ComponentContext<TEmits> = {
     emit: ComponentContextEmit<TEmits>;
 };
-export type ComponentLifetimes = {
-    created(): void;
-    attached(): void;
-    ready(): void;
-    moved(): void;
-    detached(): void;
-    error(err: Error): void;
-};
 /**
  * 创建组件并关联生命周期函数
  * @param hook - Hook 函数或包含 setup 的对象
