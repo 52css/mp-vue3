@@ -8,7 +8,7 @@ import { definePage, onAddToFavorites } from '@52css/mp-vue3'
 definePage({
   queries: {},
   setup() {
-    onAddToFavorites((object) => {
+    onAddToFavorites((object: WechatMiniprogram.Page.IAddToFavoritesOption) => {
       console.log("🚀 ~ onAddToFavorites ~ object:", object)
     })
   }

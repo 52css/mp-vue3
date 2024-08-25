@@ -8,7 +8,7 @@ import { definePage, onLoad } from '@52css/mp-vue3'
 definePage({
   queries: {},
   setup() {
-    onLoad((query) => {
+    onLoad((query： Record<string, string | undefined>) => {
       console.log("🚀 ~ onLoad ~ query:", query)
     })
   }
@@ -26,12 +26,9 @@ definePage({
   queries: {},
   setup() {
     onLoad(() => {
-      let count = 0;
-      let timer = setInterval(() => {
-        console.log(count++)
-      }, 1000)
+      console.log('pageOnLoad')
       return () => {
-        clearInterval(timer)
+        console.log('pageOnUnload')
       }
     })
   }

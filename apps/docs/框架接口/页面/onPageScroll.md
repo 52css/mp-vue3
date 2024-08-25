@@ -8,7 +8,7 @@ import { definePage, onPageScroll } from '@52css/mp-vue3'
 definePage({
   queries: {},
   setup() {
-    onPageScroll((object) => {
+    onPageScroll((object: WechatMiniprogram.Page.IPageScrollOption) => {
       console.log("🚀 ~ onPageScroll ~ object:", object)
     })
   }

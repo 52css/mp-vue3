@@ -26,12 +26,9 @@ definePage({
   queries: {},
   setup() {
     onShow(() => {
-      let count = 0;
-      let timer = setInterval(() => {
-        console.log(count++)
-      }, 1000)
+      console.log('pageOnShow')
       return () => {
-        clearInterval(timer)
+        console.log('pageOnHide')
       }
     })
   }

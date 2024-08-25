@@ -8,7 +8,7 @@ import { definePage, onTabItemTap } from '@52css/mp-vue3'
 definePage({
   queries: {},
   setup() {
-    onTabItemTap((object) => {
+    onTabItemTap((object: WechatMiniprogram.Page.ITabItemTapOption) => {
       console.log("🚀 ~ onTabItemTap ~ object:", object)
     })
   }

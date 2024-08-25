@@ -8,7 +8,7 @@ import { definePage, onShareAppMessage } from '@52css/mp-vue3'
 definePage({
   queries: {},
   setup() {
-    onShareAppMessage((object) => {
+    onShareAppMessage((object: WechatMiniprogram.Page.IShareAppMessageOption) => {
       console.log("🚀 ~ onShareAppMessage ~ object:", object)
     })
   }

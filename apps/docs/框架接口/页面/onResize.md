@@ -8,7 +8,7 @@ import { definePage, onResize } from '@52css/mp-vue3'
 definePage({
   queries: {},
   setup() {
-    onResize((object) => {
+    onResize((object: WechatMiniprogram.Page.IResizeOption) => {
       console.log("🚀 ~ onResize ~ object:", object)
     })
   }
