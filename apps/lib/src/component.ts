@@ -9,8 +9,6 @@ import "miniprogram-api-typings";
 import { type PropType } from "./shared";
 import { lifetimeEmit } from "./lifetime";
 
-export type AppHook = () => Record<string, any>;
-
 // 组件实例
 export type ComponentInstance<TEmits extends object = {}> =
   WechatMiniprogram.Component.Instance<
@@ -100,7 +98,7 @@ export type ComponentHook<TComponentProps, TComponentContext> = (
   this: ComponentInstance,
   props: TComponentProps,
   context: TComponentContext
-) => Record<string, any>;
+) => Record<string, any> | void;
 
 // 更新 `ExtractPropType` 类型以处理 `optionalTypes`
 type ComponentPropsValue<T> = T extends {

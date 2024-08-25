@@ -39,6 +39,9 @@ definePage({
 
     onShow(() => {
       console.log("onPageShow");
+      return () => {
+        console.log("onPageHide");
+      };
     });
 
     const show = ref(true);

@@ -1,7 +1,6 @@
 import { type EffectScope } from "@vue/reactivity";
 import "miniprogram-api-typings";
 import { type PropType } from "./shared";
-export type AppHook = () => Record<string, any>;
 export type ComponentInstance<TEmits extends object = {}> = WechatMiniprogram.Component.Instance<WechatMiniprogram.Component.DataOption, WechatMiniprogram.Component.PropertyOption, WechatMiniprogram.Component.MethodOption, {
     $scope: EffectScope;
     $props: Record<string, any>;
@@ -39,7 +38,7 @@ type ComponentPropertiesValue<T> = T extends {
 export type ComponentProperties<T> = {
     [K in keyof T]?: ComponentPropertiesValue<T[K]>;
 };
-export type ComponentHook<TComponentProps, TComponentContext> = (this: ComponentInstance, props: TComponentProps, context: TComponentContext) => Record<string, any>;
+export type ComponentHook<TComponentProps, TComponentContext> = (this: ComponentInstance, props: TComponentProps, context: TComponentContext) => Record<string, any> | void;
 type ComponentPropsValue<T> = T extends {
     type: PropType<infer U>;
     optionalTypes?: Array<PropType<any>>;

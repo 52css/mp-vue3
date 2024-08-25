@@ -15,7 +15,7 @@ type PageQueriesValue<T> = T extends {
 export type PageQueries<T> = {
     [K in keyof T]?: PageQueriesValue<T[K]>;
 };
-export type PageHook<TQuery> = (this: PageInstance, query: TQuery, context: PageContext) => Record<string, any>;
+export type PageHook<TQuery> = (this: PageInstance, query: TQuery, context: PageContext) => Record<string, any> | void;
 type PageQueryValue<T> = T extends PropType<infer U> ? U : T extends null ? any : undefined;
 export type PageQuery<T> = {
     [K in keyof T]?: PageQueryValue<T[K]>;

@@ -46,7 +46,7 @@ export type PageHook<TQuery> = (
   this: PageInstance,
   query: TQuery,
   context: PageContext
-) => Record<string, any>;
+) => Record<string, any> | void;
 
 type PageQueryValue<T> = T extends PropType<infer U>
   ? U

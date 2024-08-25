@@ -1,9 +1,10 @@
 import { type PageInstance } from "./page";
 import { type ComponentInstance } from "./component";
+import { type AppInstance } from "./app";
 import { instance } from "./shared";
 
 export const lifetimeEmit = (
-  instance: PageInstance | ComponentInstance,
+  instance: PageInstance | ComponentInstance | AppInstance,
   options: any,
   lifetimeKey: string,
   ...args: any[]
@@ -54,7 +55,7 @@ export const lifetimeEmit = (
 };
 
 export const lifetimeEmitOnce = (
-  instance: PageInstance | ComponentInstance,
+  instance: PageInstance | ComponentInstance | AppInstance,
   options: any,
   lifetimeKey: string,
   ...args: any[]
@@ -74,7 +75,7 @@ export const lifetimeEmitOnce = (
 };
 
 export const lifetimeOn = (
-  instance: PageInstance | ComponentInstance | null,
+  instance: PageInstance | ComponentInstance | AppInstance | null,
   lifetimeKey: string,
   hook: Function
 ) => {
@@ -91,12 +92,18 @@ export const lifetimeOn = (
 
 export const onLoad = (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) =>
   lifetimeOn(instance, "onLoad", hook);
-export const onShow = (hook: WechatMiniprogram.Page.ILifetime["onShow"]) =>
-  lifetimeOn(instance, "onShow", hook);
+export const onShow = (
+  hook:
+    | WechatMiniprogram.Page.ILifetime["onShow"]
+    | WechatMiniprogram.App.Instance<{}>["onShow"]
+) => lifetimeOn(instance, "onShow", hook);
 export const onReady = (hook: WechatMiniprogram.Page.ILifetime["onReady"]) =>
   lifetimeOn(instance, "onReady", hook);
-export const onHide = (hook: WechatMiniprogram.Page.ILifetime["onHide"]) =>
-  lifetimeOn(instance, "onHide", hook);
+export const onHide = (
+  hook:
+    | WechatMiniprogram.Page.ILifetime["onHide"]
+    | WechatMiniprogram.App.Instance<{}>["onHide"]
+) => lifetimeOn(instance, "onHide", hook);
 export const onUnload = (hook: WechatMiniprogram.Page.ILifetime["onUnload"]) =>
   lifetimeOn(instance, "onUnload", hook);
 export const onRouteDone = (hook: () => void) =>
@@ -139,3 +146,30 @@ export const detached = (
 ) => lifetimeOn(instance, "detached", hook);
 export const error = (hook: WechatMiniprogram.Component.Lifetimes["error"]) =>
   lifetimeOn(instance, "error", hook);
+
+export const onLaunch = (
+  hook: WechatMiniprogram.App.Instance<{}>["onLaunch"]
+) => lifetimeOn(instance, "onLaunch", hook);
+
+// export const onShow = (
+//   hook: WechatMiniprogram.App.Instance<{}>["onShow"]
+// ) => lifetimeOn(instance, "onShow", hook);
+
+// export const onHide = (
+//   hook: WechatMiniprogram.App.Instance<{}>["onHide"]
+// ) => lifetimeOn(instance, "onHide", hook);
+
+export const onError = (hook: WechatMiniprogram.App.Instance<{}>["onError"]) =>
+  lifetimeOn(instance, "onError", hook);
+
+export const onPageNotFound = (
+  hook: WechatMiniprogram.App.Instance<{}>["onPageNotFound"]
+) => lifetimeOn(instance, "onPageNotFound", hook);
+
+export const onUnhandledRejection = (
+  hook: WechatMiniprogram.App.Instance<{}>["onUnhandledRejection"]
+) => lifetimeOn(instance, "onUnhandledRejection", hook);
+
+export const onThemeChange = (
+  hook: WechatMiniprogram.App.Instance<{}>["onThemeChange"]
+) => lifetimeOn(instance, "onThemeChange", hook);

@@ -1,8 +1,8 @@
-import { createApp } from "@52css/mp-vue3";
+import { createApp, onShow } from "@52css/mp-vue3";
 // app.ts
-App<IAppOption>({
+createApp({
   globalData: {},
-  onLaunch() {
+  setup() {
     console.log("111");
     // 展示本地存储能力
     const logs = wx.getStorageSync("logs") || [];
@@ -16,5 +16,14 @@ App<IAppOption>({
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
       },
     });
+
+    onShow(() => {
+      console.log("onAppShow");
+      return () => {
+        console.log("onAppHide");
+      };
+    });
+
+    return {};
   },
 });

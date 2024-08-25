@@ -11,6 +11,7 @@ import {
 } from "./utils";
 import { type PageInstance } from "./page";
 import { type ComponentInstance } from "./component";
+import { type AppInstance } from "./app";
 
 // 定义 PropType 辅助类型
 export type PropType<T> = () => T;
@@ -66,10 +67,11 @@ export function deepWatch(
   );
 }
 
-export let instance: PageInstance | ComponentInstance | null = null;
+export let instance: PageInstance | ComponentInstance | AppInstance | null =
+  null;
 export const useInstance = () => instance;
 export const setInstance = (
-  newInstance: PageInstance | ComponentInstance | null
+  newInstance: PageInstance | ComponentInstance | AppInstance | null
 ) => {
   instance = newInstance;
 };

@@ -4,3 +4,4 @@ export * from "./component";
 export * from "./page";
 export * from "./lifetime";
 export * from "./shared";
+export * from "./app";

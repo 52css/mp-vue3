@@ -1,12 +1,13 @@
 import { type PageInstance } from "./page";
 import { type ComponentInstance } from "./component";
-export declare const lifetimeEmit: (instance: PageInstance | ComponentInstance, options: any, lifetimeKey: string, ...args: any[]) => void;
-export declare const lifetimeEmitOnce: (instance: PageInstance | ComponentInstance, options: any, lifetimeKey: string, ...args: any[]) => any;
-export declare const lifetimeOn: (instance: PageInstance | ComponentInstance | null, lifetimeKey: string, hook: Function) => void;
+import { type AppInstance } from "./app";
+export declare const lifetimeEmit: (instance: PageInstance | ComponentInstance | AppInstance, options: any, lifetimeKey: string, ...args: any[]) => void;
+export declare const lifetimeEmitOnce: (instance: PageInstance | ComponentInstance | AppInstance, options: any, lifetimeKey: string, ...args: any[]) => any;
+export declare const lifetimeOn: (instance: PageInstance | ComponentInstance | AppInstance | null, lifetimeKey: string, hook: Function) => void;
 export declare const onLoad: (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) => void;
-export declare const onShow: (hook: WechatMiniprogram.Page.ILifetime["onShow"]) => void;
+export declare const onShow: (hook: WechatMiniprogram.Page.ILifetime["onShow"] | WechatMiniprogram.App.Instance<{}>["onShow"]) => void;
 export declare const onReady: (hook: WechatMiniprogram.Page.ILifetime["onReady"]) => void;
-export declare const onHide: (hook: WechatMiniprogram.Page.ILifetime["onHide"]) => void;
+export declare const onHide: (hook: WechatMiniprogram.Page.ILifetime["onHide"] | WechatMiniprogram.App.Instance<{}>["onHide"]) => void;
 export declare const onUnload: (hook: WechatMiniprogram.Page.ILifetime["onUnload"]) => void;
 export declare const onRouteDone: (hook: () => void) => void;
 export declare const onPullDownRefresh: (hook: WechatMiniprogram.Page.ILifetime["onPullDownRefresh"]) => void;
@@ -23,3 +24,8 @@ export declare const ready: (hook: WechatMiniprogram.Component.Lifetimes["ready"
 export declare const moved: (hook: WechatMiniprogram.Component.Lifetimes["moved"]) => void;
 export declare const detached: (hook: WechatMiniprogram.Component.Lifetimes["detached"]) => void;
 export declare const error: (hook: WechatMiniprogram.Component.Lifetimes["error"]) => void;
+export declare const onLaunch: (hook: WechatMiniprogram.App.Instance<{}>["onLaunch"]) => void;
+export declare const onError: (hook: WechatMiniprogram.App.Instance<{}>["onError"]) => void;
+export declare const onPageNotFound: (hook: WechatMiniprogram.App.Instance<{}>["onPageNotFound"]) => void;
+export declare const onUnhandledRejection: (hook: WechatMiniprogram.App.Instance<{}>["onUnhandledRejection"]) => void;
+export declare const onThemeChange: (hook: WechatMiniprogram.App.Instance<{}>["onThemeChange"]) => void;
