@@ -2,5 +2,3 @@
 <button>{{ count }}</button>
 <button bind:tap="increment">+</button>
 <button bind:tap="asyncIncrement">++</button>
-<view>组件状态</view>
-<x-count />

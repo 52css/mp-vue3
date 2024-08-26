@@ -28,8 +28,5 @@ export function createPinia() {
     stores: {} as Record<string, any>,
   };
 
-  // 并且自动安装
-  pinia.install();
-
   return pinia;
 }

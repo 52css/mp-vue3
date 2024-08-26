@@ -6,6 +6,7 @@ definePage({
   setup() {
     const counterStore = useCounterStore();
     const { count } = storeToRefs(counterStore);
+    console.log("🚀 ~ definePage ~ setup ~ count:", count);
 
     return {
       count,

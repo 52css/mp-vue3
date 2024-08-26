@@ -9,6 +9,7 @@ defineComponent({
   setup() {
     const counterStore = useCounterStore();
     const { count } = storeToRefs(counterStore);
+    console.log("🚀 ~ defineComponent ~ setup ~ count:", count);
 
     return {
       count,
