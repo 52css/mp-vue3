@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "x-count": "./components/count/count"
+  }
+}

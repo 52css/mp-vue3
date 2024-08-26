@@ -1,11 +1,8 @@
 export {
   // Core
   computed,
-  type ComputedRef,
   reactive,
-  type Reactive,
   ref,
-  type Ref,
   readonly,
   // Utilities
   unref,
@@ -32,10 +29,32 @@ export {
   ReactiveEffect,
   // Effect scope
   effectScope,
-  EffectScope,
   getCurrentScope,
   onScopeDispose,
+  // Types
+  type Ref,
+  type UnwrapRef,
+  type Reactive,
+  type ComputedRef,
+  type WritableComputedRef,
+  type ShallowRef,
+  type ToRefs,
+  // type Readonly,
+  type UnwrapNestedRefs,
+  type ShallowReactive,
+  type DeepReadonly,
+  type ToRef,
+  type ShallowUnwrapRef,
+  type CustomRefFactory,
+  type RefUnwrapBailTypes,
+  type Raw,
+  type TrackOpTypes,
+  type TriggerOpTypes,
+  type EffectScope,
+  type ReactiveMarker,
+  type DebuggerOptions,
 } from "@vue/reactivity";
+
 export { watch, watchEffect, watchPostEffect, watchSyncEffect } from "./watch";
 
 export * from "./component";

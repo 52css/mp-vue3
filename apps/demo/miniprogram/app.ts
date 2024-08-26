@@ -1,8 +1,11 @@
 import { createApp, onShow } from "@52css/mp-vue3";
+import { createPinia } from "./pinia/createPinia";
+
 // app.ts
 createApp({
   globalData: {},
   setup() {
+    createPinia();
     console.log("111");
     // 展示本地存储能力
     const logs = wx.getStorageSync("logs") || [];

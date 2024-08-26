@@ -1,0 +1,8 @@
+<!-- pages/pinia/pinia.wxml -->
+<view style="margin-top: 100rpx" />
+<view>页面状态</view>
+<button bind:tap="decrement">-</button>
+<button>{{ count }}</button>
+<button bind:tap="increment">+</button>
+<view>组件状态</view>
+<x-count />
