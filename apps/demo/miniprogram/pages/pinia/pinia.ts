@@ -15,6 +15,9 @@ definePage({
       decrement() {
         counterStore.decrement();
       },
+      asyncIncrement() {
+        counterStore.asyncIncrement();
+      },
     };
   },
 });

@@ -10,9 +10,21 @@ export const useCounterStore = defineStore("counter", () => {
     count.value--;
   }
 
+  function asyncIncrement() {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        count.value++;
+        resolve();
+      }, 1000);
+    });
+  }
+
+  console.log("初始化管理");
+
   return {
     count,
     increment,
+    asyncIncrement,
     decrement,
   };
 });

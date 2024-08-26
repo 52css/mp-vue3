@@ -18,6 +18,9 @@ defineComponent({
       decrement() {
         counterStore.decrement();
       },
+      asyncIncrement() {
+        counterStore.asyncIncrement();
+      },
     };
   },
 });
