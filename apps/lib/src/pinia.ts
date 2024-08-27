@@ -8,8 +8,17 @@ import {
   toRef,
   ToRefs,
   UnwrapRef,
-} from "@52css/mp-vue3";
-import { activePinia, Pinia, setActivatePinia } from "./createPinia";
+  effectScope,
+  EffectScope,
+  ref,
+} from "@vue/reactivity";
+
+export interface Pinia {
+  install: Function;
+  scope: EffectScope;
+  stores: Record<string, any>;
+  state: Ref<any>;
+}
 
 export type _Method = (...args: any[]) => any;
 export type _UnwrapAll<SS> = { [K in keyof SS]: UnwrapRef<SS[K]> };
@@ -61,6 +70,39 @@ export type _ExtractActionsFromSetupStore<SS> = SS extends undefined | void
   ? {}
   : Pick<SS, _ExtractActionsFromSetupStore_Keys<SS>>;
 
+type ToComputedRefs<T> = {
+  [K in keyof T]: ToRef<T[K]> extends Ref<infer U>
+    ? ComputedRef<U>
+    : ToRef<T[K]>;
+};
+
+export type StoreToRefs<SS> = ToRefs<_ExtractStateFromSetupStore<SS>> &
+  ToComputedRefs<_ExtractGettersFromSetupStore<SS>>;
+
+// eslint-disable-next-line import/no-mutable-exports
+export let activePinia: Pinia | undefined;
+
+export function setActivatePinia(p: Pinia) {
+  activePinia = p;
+}
+export function createPinia() {
+  const scope = effectScope(true);
+  const state = scope.run(() => {
+    return ref({});
+  }) as Ref<any>;
+
+  const pinia: Pinia = {
+    install() {
+      setActivatePinia(pinia);
+    },
+    scope,
+    state,
+    stores: {} as Record<string, any>,
+  };
+
+  return pinia;
+}
+
 export function defineStore<Id extends string, SS>(
   id: Id,
   storeSetup: () => SS
@@ -93,15 +135,6 @@ function createStore(pinia: Pinia, id: string, setup: any) {
   Object.assign(store, setupStore);
   pinia.stores[id] = store as any;
 }
-
-type ToComputedRefs<T> = {
-  [K in keyof T]: ToRef<T[K]> extends Ref<infer U>
-    ? ComputedRef<U>
-    : ToRef<T[K]>;
-};
-
-export type StoreToRefs<SS> = ToRefs<_ExtractStateFromSetupStore<SS>> &
-  ToComputedRefs<_ExtractGettersFromSetupStore<SS>>;
 
 export function storeToRefs<SS extends {}>(store: SS): StoreToRefs<SS> {
   store = toRaw(store);

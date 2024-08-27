@@ -1,5 +1,4 @@
-import { createApp, onShow } from "@52css/mp-vue3";
-import { createPinia } from "./pinia/createPinia";
+import { createApp, onShow, createPinia } from "@52css/mp-vue3";
 
 const pinia = createPinia();
 

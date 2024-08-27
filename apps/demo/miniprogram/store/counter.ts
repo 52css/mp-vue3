@@ -1,5 +1,4 @@
-import { ref } from "@52css/mp-vue3";
-import { defineStore } from "../pinia/store";
+import { ref, defineStore } from "@52css/mp-vue3";
 
 export const useCounterStore = defineStore("counter", () => {
   const count = ref(0);

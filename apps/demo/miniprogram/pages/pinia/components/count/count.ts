@@ -1,6 +1,5 @@
-import { ref, computed, watch, defineComponent } from "@52css/mp-vue3";
+import { defineComponent, storeToRefs } from "@52css/mp-vue3";
 import { useCounterStore } from "../../../../store/counter";
-import { storeToRefs } from "../../../../pinia/store";
 
 defineComponent({
   properties: {

@@ -1,14 +1,17 @@
 {
   // 用户代码片段生成网址
   // https://snippet-generator.app/
-  "MP SFC Templat": {
+  "MP SFC Template": {
     "prefix": "sfc",
     "body": [
       "import { ref, computed, watch, defineComponent } from \"@52css/mp-vue3\";",
       "",
       "defineComponent({",
-      "  props: {",
-      "    xClass: String,",
+      "  properties: {",
+      "    prop1: String",
+      "  },",
+      "  emits: {",
+      "    event1: (_name: string) => true,",
       "  },",
       "  setup() {",
       "    return {",
@@ -17,21 +20,24 @@
       "});",
       ""
     ],
-    "description": "MP SFC Templat"
+    "description": "MP SFC Template"
   },
   "MP SFP Templat": {
     "prefix": "sfp",
     "body": [
       "import { ref, computed, watch, definePage, onLoad } from \"@52css/mp-vue3\";",
       "",
-      "definePage(() => {",
-      "",
-      "  return {",
-      "  };",
+      "definePage({",
+      "  queries: {",
+      "    query1: String",
+      "  },",
+      "  setup() {",
+      "    return {}",
+      "  }",
       "});",
       ""
     ],
-    "description": "MP SFP Templat"
+    "description": "MP SFP Template"
   },
   "Picsum Template": {
     "prefix": "picsum",
