@@ -25,6 +25,9 @@ definePage({
     user: Object as PropType<User>,
     userList: Array as PropType<User[]>,
   },
+  onShow() {
+    console.log("🚀 ~ 原生 ~ onShow:", onShow, this);
+  },
   setup(query) {
     console.log("🚀 ~ definePage ~ query:", query);
     const count = ref(0);

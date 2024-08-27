@@ -10,7 +10,7 @@ export const lifetimeEmit = (
   ...args: any[]
 ) => {
   if (options && options[lifetimeKey]) {
-    options[lifetimeKey](...args);
+    options[lifetimeKey].apply(instance, args);
   }
   if (!instance[`$${lifetimeKey}`]) {
     return;
@@ -62,7 +62,7 @@ export const lifetimeEmitOnce = (
   ...args: any[]
 ) => {
   if (options && options[lifetimeKey]) {
-    return options[lifetimeKey](...args);
+    return options[lifetimeKey].apply(instance, args);
   }
   if (!instance[`$${lifetimeKey}`]) {
     return;
@@ -88,7 +88,7 @@ export const lifetimeOn = (
     instance[`$${lifetimeKey}`] = [];
   }
 
-  instance[`$${lifetimeKey}`].push(hook);
+  instance[`$${lifetimeKey}`].push(hook.bind(instance));
 };
 
 export const onLoad = (hook: WechatMiniprogram.Page.ILifetime["onLoad"]) =>
