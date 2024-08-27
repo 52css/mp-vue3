@@ -1,3 +1,8 @@
+# defineStore
+
+* 定义`store/counter.ts`实例
+
+```ts
 import { ref, defineStore } from "@52css/mp-vue3";
 
 export const useCounterStore = defineStore("counter", () => {
@@ -25,3 +30,4 @@ export const useCounterStore = defineStore("counter", () => {
     decrement,
   };
 });
+```
