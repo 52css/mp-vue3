@@ -53,8 +53,9 @@ export {
   type EffectScope,
   type ReactiveMarker,
   type DebuggerOptions,
-  watch,
 } from "@vue/reactivity";
+
+export { watch, watchEffect, watchPostEffect, watchSyncEffect } from "./watch";
 
 export * from "./component";
 export * from "./page";
