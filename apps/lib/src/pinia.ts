@@ -11,7 +11,8 @@ import {
   effectScope,
   EffectScope,
   ref,
-  // watch,
+  shallowReactive,
+  watch,
 } from "@vue/reactivity";
 
 export interface Pinia {
@@ -108,7 +109,7 @@ export function defineStore<Id extends string, SS>(
   id: Id,
   storeSetup: () => SS,
   options?: {
-    persist: boolean;
+    persist: string[];
   }
 ): StoreDefinition<
   Id,
@@ -121,7 +122,7 @@ export function defineStore(
   id: string,
   setup: any,
   options?: {
-    persist: boolean;
+    persist: string[];
   }
 ) {
   return function useStore(pinia?: Pinia) {
@@ -139,6 +140,16 @@ export function defineStore(
   };
 }
 
+const getDefaultStore = (id: string, persist?: string[]) => {
+  if (!persist) {
+    return {};
+  }
+  return persist.reduce((prev, key) => {
+    prev[key] = wx.getStorageSync(`${id}_${key}`);
+    return prev;
+  }, {} as Record<string, any>);
+};
+
 function createStore(
   pinia: Pinia,
   id: string,
@@ -147,14 +158,20 @@ function createStore(
     persist: string[];
   }
 ) {
-  const store = options?.persist ? wx.getStorageSync(id) : {};
+  const store = getDefaultStore(id, options && options.persist);
   const setupStore = pinia.scope.run(setup);
   Object.assign(store, setupStore);
-  pinia.stores[id] = store as any;
+  pinia.stores[id] = shallowReactive(store as any);
 
-  if (options?.persist === true) {
-    console.log("pinia.stores[id]", pinia.stores[id]);
-    // watch(() => )
+  if (options && options.persist) {
+    options.persist.forEach((key) => {
+      watch(
+        () => pinia.stores[id][key],
+        (newVal: any) => {
+          wx.setStorageSync(`${id}_${key}`, newVal);
+        }
+      );
+    });
   }
 }
 

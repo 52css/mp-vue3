@@ -39,7 +39,7 @@ export declare let activePinia: Pinia | undefined;
 export declare function setActivatePinia(p: Pinia): void;
 export declare function createPinia(): Pinia;
 export declare function defineStore<Id extends string, SS>(id: Id, storeSetup: () => SS, options?: {
-    persist: boolean;
+    persist: string[];
 }): StoreDefinition<Id, _ExtractStateFromSetupStore<SS>, _ExtractGettersFromSetupStore<SS>, _ExtractActionsFromSetupStore<SS>>;
 export declare function storeToRefs<SS extends {}>(store: SS): StoreToRefs<SS>;
 export {};
