@@ -11,7 +11,6 @@ import {
   effectScope,
   EffectScope,
   ref,
-  shallowReactive,
   watch,
 } from "@vue/reactivity";
 
@@ -140,16 +139,6 @@ export function defineStore(
   };
 }
 
-const getDefaultStore = (id: string, persist?: string[]) => {
-  if (!persist) {
-    return {};
-  }
-  return persist.reduce((prev, key) => {
-    prev[key] = wx.getStorageSync(`${id}_${key}`);
-    return prev;
-  }, {} as Record<string, any>);
-};
-
 function createStore(
   pinia: Pinia,
   id: string,
@@ -158,19 +147,29 @@ function createStore(
     persist: string[];
   }
 ) {
-  const store = getDefaultStore(id, options && options.persist);
+  const store = {};
   const setupStore = pinia.scope.run(setup);
   Object.assign(store, setupStore);
-  pinia.stores[id] = shallowReactive(store as any);
+  pinia.stores[id] = store as any;
+
+  const prefix = "PINIA_" + id;
 
   if (options && options.persist) {
     options.persist.forEach((key) => {
-      watch(
-        () => pinia.stores[id][key],
-        (newVal: any) => {
-          wx.setStorageSync(`${id}_${key}`, newVal);
+      const storeVal = wx.getStorageSync(`${prefix}_${key}`);
+      const hasStore = wx
+        .getStorageInfoSync()
+        .keys.includes(`${prefix}_${key}`);
+      if (pinia.stores[id][key] && hasStore) {
+        if (isRef(pinia.stores[id][key])) {
+          pinia.stores[id][key].value = storeVal;
+        } else {
+          pinia.stores[id][key] = storeVal;
         }
-      );
+      }
+      watch(pinia.stores[id][key], (newVal: any) => {
+        wx.setStorageSync(`${prefix}_${key}`, newVal);
+      });
     });
   }
 }
