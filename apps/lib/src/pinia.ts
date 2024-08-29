@@ -11,6 +11,7 @@ import {
   effectScope,
   EffectScope,
   ref,
+  // watch,
 } from "@vue/reactivity";
 
 export interface Pinia {
@@ -105,7 +106,10 @@ export function createPinia() {
 
 export function defineStore<Id extends string, SS>(
   id: Id,
-  storeSetup: () => SS
+  storeSetup: () => SS,
+  options?: {
+    persist: boolean;
+  }
 ): StoreDefinition<
   Id,
   _ExtractStateFromSetupStore<SS>,
@@ -113,7 +117,13 @@ export function defineStore<Id extends string, SS>(
   _ExtractActionsFromSetupStore<SS>
 >;
 
-export function defineStore(id: string, setup: any) {
+export function defineStore(
+  id: string,
+  setup: any,
+  options?: {
+    persist: boolean;
+  }
+) {
   return function useStore(pinia?: Pinia) {
     if (pinia) {
       setActivatePinia(pinia);
@@ -123,17 +133,29 @@ export function defineStore(id: string, setup: any) {
       throw new Error("no active pinia");
     }
     if (!pinia.stores[id]) {
-      createStore(pinia, id, setup);
+      createStore(pinia, id, setup, options);
     }
     return pinia.stores[id] as any;
   };
 }
 
-function createStore(pinia: Pinia, id: string, setup: any) {
-  const store = {};
+function createStore(
+  pinia: Pinia,
+  id: string,
+  setup: any,
+  options?: {
+    persist: string[];
+  }
+) {
+  const store = options?.persist ? wx.getStorageSync(id) : {};
   const setupStore = pinia.scope.run(setup);
   Object.assign(store, setupStore);
   pinia.stores[id] = store as any;
+
+  if (options?.persist === true) {
+    console.log("pinia.stores[id]", pinia.stores[id]);
+    // watch(() => )
+  }
 }
 
 export function storeToRefs<SS extends {}>(store: SS): StoreToRefs<SS> {
