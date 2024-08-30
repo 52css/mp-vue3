@@ -12,7 +12,6 @@ import {
   EffectScope,
   ref,
   watch,
-  reactive,
 } from "@vue/reactivity";
 
 export interface Pinia {
@@ -152,7 +151,6 @@ function createStore(
   const setupStore = pinia.scope.run(setup);
   Object.assign(store, setupStore);
   pinia.stores[id] = store as any;
-  console.log("🚀 ~ pinia.stores[id]33:", pinia.stores[id]);
 
   const prefix = "PINIA_" + id;
 
@@ -165,16 +163,16 @@ function createStore(
         if (isRef(pinia.stores[id][key])) {
           pinia.stores[id][key].value = storeVal;
         } else {
-          pinia.stores[id][key] = reactive(storeVal);
+          Object.keys(storeVal).forEach((k) => {
+            pinia.stores[id][key][k] = storeVal[k];
+          });
         }
       }
-      console.log("watch-before-key", pinia.stores[id][key]);
       watch(
         isRef(pinia.stores[id][key])
           ? pinia.stores[id][key]
           : () => pinia.stores[id][key],
         (newVal: any) => {
-          console.log("watch3333", key, newVal);
           wx.setStorageSync(storeKey, newVal);
         },
         {

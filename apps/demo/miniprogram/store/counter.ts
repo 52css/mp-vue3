@@ -12,12 +12,10 @@ export const useCounterStore = defineStore(
     const increment = () => {
       count.value++;
       text.a++;
-      console.log("text", text);
     };
     const decrement = () => {
       count.value--;
       text.b--;
-      console.log("text", text);
     };
     const asyncIncrement = () => {
       return new Promise<void>((resolve) => {
