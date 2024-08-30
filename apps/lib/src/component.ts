@@ -8,6 +8,7 @@ import { deepToRaw, deepWatch, setInstance } from "./shared";
 import "miniprogram-api-typings";
 import { type PropType } from "./shared";
 import { lifetimeEmit } from "./lifetime";
+import { launchPromise } from "./app";
 
 // 组件实例
 export type ComponentInstance<TEmits extends object = {}> =
@@ -201,57 +202,60 @@ export const defineComponent = <
     ...options,
     lifetimes: {
       attached(this: ComponentInstance) {
-        setInstance(this);
-        this.$scope = effectScope();
-        const rawProps: Record<string, any> = {};
-        if (properties) {
-          properties.forEach((property) => {
-            rawProps[property] = this.data[property];
-          });
-        }
-        this.$props = shallowReactive(rawProps);
-        // this.$props = shallowReactive(
-        //   new Proxy(this.properties, {
-        //     set: (target, key, value, receiver) => {
-        //       this.setData({
-        //         [key]: value,
-        //       });
-        //       // 发送自定义事件，传递数据
-        //       this.triggerEvent(key as string, { value });
-        //       return Reflect.set(target, key, value, receiver);
-        //     },
-        //   })
-        // );
-
-        this.$context = {
-          emit: (key: string, ...args: any[]) => {
-            this.triggerEvent(key, { value: args[0] });
-          },
-        };
-        this.$scope.run(() => {
-          const bindings = (
-            hook as ComponentHook<
-              ComponentProps<TProperties>,
-              ComponentContext<TEmits>
-            >
-          ).call(this, this.$props, this.$context);
-          if (bindings !== undefined) {
-            Object.keys(bindings).forEach((key) => {
-              const value = bindings[key];
-              if (isFunction(value)) {
-                this[key] = value;
-                return;
-              }
-
-              this.setData({ [key]: deepToRaw(value) });
-              deepWatch(this, key, value);
+        // console.log("🚀 ~ attached ~ attached:");
+        launchPromise.then(() => {
+          setInstance(this);
+          this.$scope = effectScope();
+          const rawProps: Record<string, any> = {};
+          if (properties) {
+            properties.forEach((property) => {
+              rawProps[property] = this.data[property];
             });
           }
+          this.$props = shallowReactive(rawProps);
+          // this.$props = shallowReactive(
+          //   new Proxy(this.properties, {
+          //     set: (target, key, value, receiver) => {
+          //       this.setData({
+          //         [key]: value,
+          //       });
+          //       // 发送自定义事件，传递数据
+          //       this.triggerEvent(key as string, { value });
+          //       return Reflect.set(target, key, value, receiver);
+          //     },
+          //   })
+          // );
 
-          lifetimeEmit(this, options, "attached");
+          this.$context = {
+            emit: (key: string, ...args: any[]) => {
+              this.triggerEvent(key, { value: args[0] });
+            },
+          };
+          this.$scope.run(() => {
+            const bindings = (
+              hook as ComponentHook<
+                ComponentProps<TProperties>,
+                ComponentContext<TEmits>
+              >
+            ).call(this, this.$props, this.$context);
+            if (bindings !== undefined) {
+              Object.keys(bindings).forEach((key) => {
+                const value = bindings[key];
+                if (isFunction(value)) {
+                  this[key] = value;
+                  return;
+                }
+
+                this.setData({ [key]: deepToRaw(value) });
+                deepWatch(this, key, value);
+              });
+            }
+
+            lifetimeEmit(this, options, "attached");
+          });
+
+          setInstance(null);
         });
-
-        setInstance(null);
       },
       ready(this: ComponentInstance) {
         lifetimeEmit(this, options, "ready");

@@ -3,6 +3,8 @@ export type AppOptions = Record<string, any>;
 import { lifetimeEmit } from "./lifetime";
 import { setInstance } from "./shared";
 
+export let launchPromise: Promise<true> = Promise.resolve(true);
+
 // 页面setup函数
 export type AppHook = (
   this: AppInstance,
@@ -32,15 +34,19 @@ export const createApp = (
   return App({
     ...options,
     onLaunch(this: AppInstance, onLaunchOption) {
-      setInstance(this);
-      const bindings = hook.call(this, onLaunchOption);
-      if (bindings !== undefined) {
-        Object.keys(bindings).forEach((key) => {
-          this[key] = bindings[key];
-        });
-      }
-      lifetimeEmit(this, options, "onLaunch", onLaunchOption);
-      setInstance(null);
+      // console.log("🚀 ~ onLaunch ~ onLaunch:");
+      launchPromise = new Promise(async (resolve) => {
+        setInstance(this);
+        const bindings = await hook.call(this, onLaunchOption);
+        if (bindings !== undefined) {
+          Object.keys(bindings).forEach((key) => {
+            this[key] = bindings[key];
+          });
+        }
+        lifetimeEmit(this, options, "onLaunch", onLaunchOption);
+        setInstance(null);
+        resolve(true);
+      });
     },
     onShow(this: AppInstance, onShowOption) {
       lifetimeEmit(this, options, "onShow", onShowOption);

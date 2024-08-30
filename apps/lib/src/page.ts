@@ -2,6 +2,7 @@ import { effectScope, type EffectScope } from "@vue/reactivity";
 import { deepToRaw, deepWatch, type PropType, setInstance } from "./shared";
 import { isFunction } from "./utils";
 import { lifetimeEmit, lifetimeEmitOnce } from "./lifetime";
+import { launchPromise } from "./app";
 // 页面实例
 export type PageInstance = WechatMiniprogram.Page.Instance<
   WechatMiniprogram.Page.DataOption,
@@ -164,29 +165,32 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
     ...otherOptions,
     // 生命周期回调函数
     onLoad(this: PageInstance, query) {
-      setInstance(this);
-      this.$scope = effectScope();
+      // console.log("🚀 ~ onLoad ~ onLoad:");
+      launchPromise.then(() => {
+        setInstance(this);
+        this.$scope = effectScope();
 
-      this.$query = createQuery(query, queries);
+        this.$query = createQuery(query, queries);
 
-      this.$context = {};
-      this.$scope.run(() => {
-        const bindings = hook.call(this, this.$query, this.$context);
-        if (bindings !== undefined) {
-          Object.keys(bindings).forEach((key) => {
-            const value = bindings[key];
-            if (isFunction(value)) {
-              this[key] = value;
-              return;
-            }
+        this.$context = {};
+        this.$scope.run(() => {
+          const bindings = hook.call(this, this.$query, this.$context);
+          if (bindings !== undefined) {
+            Object.keys(bindings).forEach((key) => {
+              const value = bindings[key];
+              if (isFunction(value)) {
+                this[key] = value;
+                return;
+              }
 
-            this.setData({ [key]: deepToRaw(value) });
-            deepWatch(this, key, value);
-          });
-        }
-        lifetimeEmit(this, options, "onLoad", query);
+              this.setData({ [key]: deepToRaw(value) });
+              deepWatch(this, key, value);
+            });
+          }
+          lifetimeEmit(this, options, "onLoad", query);
+        });
+        setInstance(null);
       });
-      setInstance(null);
     },
     onShow(this: PageInstance) {
       lifetimeEmit(this, options, "onShow");
