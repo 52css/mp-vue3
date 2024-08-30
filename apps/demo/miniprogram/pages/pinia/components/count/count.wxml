@@ -2,3 +2,4 @@
 <button>{{ count }}</button>
 <button bind:tap="increment">+</button>
 <button bind:tap="asyncIncrement">++</button>
+<view>a: {{text.a}} b: {{text.b}}</view>
