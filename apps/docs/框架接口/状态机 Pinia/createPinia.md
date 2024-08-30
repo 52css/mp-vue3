@@ -2,7 +2,7 @@
 
 支持`app.ts`
 
-* 只是实现最简版状态机
+* 只是实现`最简版`状态机，只支持`setup`, 不支持`options`、`插件`、`$patch`、`$subscribe`、`$patch`
 
 ```ts
 import { createApp, createPinia } from "@52css/mp-vue3";
