@@ -6,7 +6,34 @@
 * 如何解决这个问题，我们可以在`ts`中拦截处理，通过响应式数据拦截处理，而`wxml` 和 `wxss` 保持一致
   * 体积很小
   * 通过`组合api` 集中处理逻辑
+  * 原生转换最方便
 
-## 查看文档
+## 开始
 
-* [在线文档](https://52css.github.io/mp-vue3/)
+* 请访问 [在线文档](https://52css.github.io/mp-vue3/) 并跟随文档指引。
+
+## 功能列表
+
+* [x] 支持 [响应式](https://52css.github.io/mp-vue3/reactivity/%E5%B7%A5%E5%85%B7.html) 、[App](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E5%B0%8F%E7%A8%8B%E5%BA%8F%20App/createApp%20-%20%F0%9F%94%A5%20%E2%9C%A8.html)、[Page](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/definePage%20-%20%F0%9F%94%A5%20%E2%9C%A8.html)、[Component](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/defineComponent%20-%20%F0%9F%94%A5%20%E2%9C%A8.html)
+* [x] 支持 [状态机](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%8A%B6%E6%80%81%E6%9C%BA%20Pinia/createPinia.html)、[持久化存储](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%8A%B6%E6%80%81%E6%9C%BA%20Pinia/defineStore%20-%20%F0%9F%94%A5%20%E2%9C%A8.html#%E5%A6%82%E4%BD%95%E6%9C%AC%E5%9C%B0%E5%AD%98%E5%82%A8)
+* [x] 支持 `生命周期`
+  * [x] App [onError](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E5%B0%8F%E7%A8%8B%E5%BA%8F%20App/onError.html)、[onHide](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E5%B0%8F%E7%A8%8B%E5%BA%8F%20App/onHide.html)、[onLaunch](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E5%B0%8F%E7%A8%8B%E5%BA%8F%20App/onLaunch.html)、[onPageNotFound](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E5%B0%8F%E7%A8%8B%E5%BA%8F%20App/onPageNotFound.html)、[onShow](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E5%B0%8F%E7%A8%8B%E5%BA%8F%20App/onShow%20-%20%E2%9C%A8.html)、[onThemeChange](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E5%B0%8F%E7%A8%8B%E5%BA%8F%20App/onThemeChange.html)、[onUnhandledRejection](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E5%B0%8F%E7%A8%8B%E5%BA%8F%20App/onUnhandledRejection.html)
+  * [x] Page [onAddToFavorites](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onAddToFavorites.html)、[onHide](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onHide.html)、[onLoad](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onLoad%20-%20%E2%9C%A8.html)、[onPageScroll](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onPageScroll.html)、[onPullDownRefresh](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onPullDownRefresh.html)、[onReachBottom](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onReachBottom.html)、[onReady](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onReady.html)、[onResize](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onResize.html)、[onRouteDone](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onRouteDone.html)、[onSaveExitState](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onSaveExitState.html)、[onShareAppMessage](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onShareAppMessage.html)、[onShareTimeline](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onShareTimeline.html)、[onShow](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onShow%20-%20%E2%9C%A8.html)、[onTabItemTap](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onTabItemTap.html)、[onUnload](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/onUnload.html)
+  * [x] Component [attached](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/attached%20-%20%E2%9C%A8.html)、[detached](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/detached.html)、[error](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/error.html)、[hide](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/hide.html)、[moved](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/moved.html)、[ready](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/ready.html)、[resize](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/resize.html)、[routeDone](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/routeDone.html)、[show](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E7%BB%84%E4%BB%B6%20Component/show.html)
+* [x] 支持 `Router` 目前使用原生`wx.navigateTo`跳转，页面支持[queries](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E9%A1%B5%E9%9D%A2%20Page/definePage%20-%20%F0%9F%94%A5%20%E2%9C%A8.html#%F0%9F%91%8D-%E5%AF%B9%E8%B1%A1%E9%BB%98%E8%AE%A4%E4%B8%8B%E6%89%A9%E5%85%85-setup-%E6%96%B9%E6%B3%95)定义页面接收参数，并格式化
+* [x] 支持 `Request` 目前使用原生`wx.request`
+
+## 性能
+
+* 待完善
+
+## 案例
+
+* 完成一套完成电商小程序
+
+## 许可证
+
+[MIT](https://opensource.org/license/MIT)
+
+Copyright (c) 2024-present Coze
+
