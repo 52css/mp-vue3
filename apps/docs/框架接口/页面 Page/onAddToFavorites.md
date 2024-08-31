@@ -10,6 +10,13 @@ definePage({
   setup() {
     onAddToFavorites((object: WechatMiniprogram.Page.IAddToFavoritesOption) => {
       console.log("🚀 ~ onAddToFavorites ~ object:", object)
+      // webview 页面返回 webViewUrl
+      console.log('webViewUrl: ', object.webViewUrl)
+      return {
+        title: '自定义标题',
+        imageUrl: 'http://demo.png',
+        query: 'name=xxx&age=xxx',
+      }
     })
   }
 });

@@ -10,6 +10,11 @@ definePage({
   setup() {
     onShareTimeline(() => {
       console.log("🚀 ~ onShareTimeline ~ onShareTimeline:", onShareTimeline)
+      return {
+        title: '转发标题',
+        imageUrl: '', // 图片 URL
+        query: 'a=1&b=2'
+      }
     })
   }
 });
