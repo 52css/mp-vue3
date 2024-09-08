@@ -8,3 +8,4 @@
 <view>a: {{text.a}} b: {{text.b}}</view>
 <view>组件状态</view>
 <x-count />
+<button bind:tap="goBackTap">to Back</button>

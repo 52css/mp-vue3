@@ -5,3 +5,4 @@
 <hello wx:if="{{show}}" name="{{count}}"></hello>
 test: {{test}}
 <button bind:tap="onShowToggleTap">{{show?'隐藏':'显示'}}</button>
+<button bind:tap="goPiniaTap">to Pinia</button>

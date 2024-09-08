@@ -62,3 +62,4 @@ export * from "./lifetime";
 export * from "./shared";
 export * from "./app";
 export * from "./pinia";
+export * from "./router";

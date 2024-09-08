@@ -65,11 +65,11 @@ export function deepWatch(
   );
 }
 
-export let instance: PageInstance | ComponentInstance | AppInstance | null =
+export let _instance: PageInstance | ComponentInstance | AppInstance | null =
   null;
-export const useInstance = () => instance;
+export const useInstance = () => _instance;
 export const setInstance = (
   newInstance: PageInstance | ComponentInstance | AppInstance | null
 ) => {
-  instance = newInstance;
+  _instance = newInstance;
 };

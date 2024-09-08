@@ -1,4 +1,11 @@
-import { ref, definePage, onShow, PropType, onLoad } from "@52css/mp-vue3";
+import {
+  ref,
+  definePage,
+  onShow,
+  PropType,
+  onLoad,
+  useRouter,
+} from "@52css/mp-vue3";
 
 var app = getApp();
 
@@ -52,6 +59,17 @@ definePage({
       show.value = !show.value;
     };
 
+    const router = useRouter();
+    const goPiniaTap = () => {
+      router.push({
+        path: "/pages/pinia/pinia",
+        query: {
+          a: 1,
+          b: 2,
+        },
+      });
+    };
+
     return {
       // 返回响应式数据
       count,
@@ -61,6 +79,10 @@ definePage({
 
       show,
       onShowToggleTap,
+
+      //#region 路由
+      goPiniaTap,
+      //#endregion
     };
   },
 });
