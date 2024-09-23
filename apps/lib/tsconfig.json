@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "lib": ["esnext", "dom"],
+    "target": "ES2019", // 或更高，如 ES2020
+    "module": "ESNext",
+    "lib": ["DOM", "ES2015"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "strict": true,
     "strictFunctionTypes": false,
     "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
     "moduleResolution": "node",
     "isolatedModules": true,
     "noEmit": true,

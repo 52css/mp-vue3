@@ -5,6 +5,7 @@ import {
   PropType,
   onLoad,
   useRouter,
+  request,
 } from "@52css/mp-vue3";
 
 var app = getApp();
@@ -69,6 +70,12 @@ definePage({
         },
       });
     };
+
+    onLoad(() => {
+      request.get("/users/1").then((res) => {
+        console.log("🚀 ~ onLoad ~ res:", res);
+      });
+    });
 
     return {
       // 返回响应式数据

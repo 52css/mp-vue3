@@ -23,8 +23,8 @@
 * [x] 支持 `Router` 路由
   * [x] [useRouter](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E8%B7%AF%E7%94%B1%20Router/useRouter.html)
   * [x] [useRoute](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E8%B7%AF%E7%94%B1%20Router/useRoute.html)
-
-* [ ] 支持 `Request` 还未封装，请先使用原生`wx.request`
+* [x] 支持 `Request` 请求
+  * [x] 支持[request](https://52css.github.io/mp-vue3/%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%8F%A3/%E8%AF%B7%E6%B1%82%20Request/request.html)
 
 ## 性能
 

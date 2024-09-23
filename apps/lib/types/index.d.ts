@@ -6,3 +6,4 @@ export * from "./shared";
 export * from "./app";
 export * from "./pinia";
 export * from "./router";
+export * from "./request";

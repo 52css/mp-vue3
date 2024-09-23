@@ -1,4 +1,4 @@
-# userRoute
+# useRoute
 
 * `route.query.xx` 不是响应式，如果有需要再添加
 
