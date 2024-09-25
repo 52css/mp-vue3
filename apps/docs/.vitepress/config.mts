@@ -37,5 +37,6 @@ export default defineConfig({
   },
   markdown: {
     theme: "github-dark",
+    lineNumbers: true,
   },
 });

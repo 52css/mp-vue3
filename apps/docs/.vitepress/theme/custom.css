@@ -23,3 +23,7 @@
   --vp-code-tab-hover-text-color: rgba(255, 255, 245, 0.86);
   --vp-code-tab-active-text-color: rgba(255, 255, 245, 0.86);
 }
+
+.vitepress-demo-preview__ant-design__container div[class*='language-'] {
+  background-color: var(--vp-code-block-bg);
+}
