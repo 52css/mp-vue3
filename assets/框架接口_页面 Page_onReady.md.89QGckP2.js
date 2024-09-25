@@ -1,0 +1,10 @@
+import{_ as a,c as s,o as n,a4 as e}from"./chunks/framework.DsvKXnjw.js";const u=JSON.parse('{"title":"onReady","description":"","frontmatter":{},"headers":[],"relativePath":"框架接口/页面 Page/onReady.md","filePath":"框架接口/页面 Page/onReady.md"}'),o={name:"框架接口/页面 Page/onReady.md"},l=e(`<h1 id="onready" tabindex="-1">onReady <a class="header-anchor" href="#onready" aria-label="Permalink to &quot;onReady&quot;">​</a></h1><ul><li>继承<a href="https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html#onReady" target="_blank" rel="noreferrer">微信小程序 Page.onReady</a></li></ul><div class="language-ts"><button title="Copy Code" class="copy"></button><span class="lang">ts</span><pre class="shiki github-dark vp-code" tabindex="0"><code><span class="line"><span style="color:#F97583;">import</span><span style="color:#E1E4E8;"> { definePage, onReady } </span><span style="color:#F97583;">from</span><span style="color:#9ECBFF;"> &#39;@52css/mp-vue3&#39;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0;">definePage</span><span style="color:#E1E4E8;">({</span></span>
+<span class="line"><span style="color:#E1E4E8;">  queries: {},</span></span>
+<span class="line"><span style="color:#B392F0;">  setup</span><span style="color:#E1E4E8;">() {</span></span>
+<span class="line"><span style="color:#B392F0;">    onReady</span><span style="color:#E1E4E8;">(() </span><span style="color:#F97583;">=&gt;</span><span style="color:#E1E4E8;"> {</span></span>
+<span class="line"><span style="color:#E1E4E8;">      console.</span><span style="color:#B392F0;">log</span><span style="color:#E1E4E8;">(</span><span style="color:#9ECBFF;">&quot;🚀 ~ onReady ~ onReady:&quot;</span><span style="color:#E1E4E8;">, onReady)</span></span>
+<span class="line"><span style="color:#E1E4E8;">    })</span></span>
+<span class="line"><span style="color:#E1E4E8;">  }</span></span>
+<span class="line"><span style="color:#E1E4E8;">});</span></span></code></pre></div>`,3),p=[l];function t(r,c,i,d,E,y){return n(),s("div",null,p)}const m=a(o,[["render",t]]);export{u as __pageData,m as default};
