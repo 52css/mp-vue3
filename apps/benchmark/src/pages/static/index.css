@@ -1,0 +1,80 @@
+.controls {
+  padding: 8px 24px 0 24px;
+  margin: 0;
+}
+.controls button {
+  margin-top: 16px;
+  font-size: 32px;
+}
+.body {
+  font-family: Helvetica, arial, sans-serif;
+  font-size: 28px;
+  line-height: 1.6;
+  background-color: #fff;
+  padding: 60px;
+  margin: 0;
+}
+.body image {
+  max-width: 100%;
+}
+.body view {
+  margin: 30px 0;
+}
+.body .first-child {
+  margin-top: 0 !important;
+}
+.body .last-child {
+  margin-bottom: 0 !important;
+}
+.body .h1,
+.body .h2,
+.body .h3 {
+  margin: 40px 0 20px;
+  padding: 0;
+  font-weight: bold;
+  position: relative;
+}
+.body .h1 {
+  font-size: 56px;
+}
+.body .h2 {
+  font-size: 48px;
+  border-bottom: 1px solid #ccc;
+}
+.body .h3 {
+  font-size: 36px;
+}
+.body .em {
+  font-style: italic;
+}
+.body .pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 26px;
+  line-height: 28px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  display: block;
+  font-family: monospace;
+  box-sizing: border-box;
+}
+.body .pre .code {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+.body .code {
+  display: inline;
+  margin: 0 4px;
+  padding: 0 10px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 6px;
+}
+.body .blockquote {
+  border-left: 8px solid #ddd;
+  padding: 0 30px;
+  color: #777;
+}

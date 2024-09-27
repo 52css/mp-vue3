@@ -1,0 +1,14 @@
+.couponList {
+  padding: 0 24px;
+}
+.couponList .title {
+  font-size: 32px;
+  margin-top: 24px;
+}
+.controls {
+  padding: 8px 24px 0 24px;
+}
+.controls button {
+  margin-top: 16px;
+  font-size: 32px;
+}
