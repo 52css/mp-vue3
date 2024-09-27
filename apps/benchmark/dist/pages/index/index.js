@@ -1,12 +1,14 @@
 "use strict";
 
-var _mpVue = require("@52css/mp-vue3");
+var _core = require("@vue-mini/core");
 var _data = require("../../data");
 var _proxy = require("../../proxy");
-(0, _mpVue.definePage)(() => {
-  const listData = (0, _mpVue.ref)([]);
-  const listData2 = (0, _mpVue.ref)([]);
-  const show2 = (0, _mpVue.ref)(false);
+// import { definePage, ref, onReady } from '@52css/mp-vue3';
+
+(0, _core.definePage)(() => {
+  const listData = (0, _core.ref)([]);
+  const listData2 = (0, _core.ref)([]);
+  const show2 = (0, _core.ref)(false);
   const reLaunch = () => {
     (0, _proxy.setReadyStart)();
     wx.reLaunch({
@@ -59,7 +61,7 @@ var _proxy = require("../../proxy");
       item.amount++;
     });
   };
-  (0, _mpVue.onReady)(() => {
+  (0, _core.onReady)(() => {
     (0, _proxy.getReadyTimeWithModal)();
   });
   return {

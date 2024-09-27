@@ -1,6 +1,8 @@
 "use strict";
 
 var _mpVue = require("@52css/mp-vue3");
+// import { defineComponent, ref, watch } from '@vue-mini/core';
+
 (0, _mpVue.defineComponent)({
   properties: {
     info: Object
