@@ -10,6 +10,7 @@ import {
   type PageQueries,
   type PageQuery,
 } from "./router";
+import { flushPostFlushCbs } from "./scheduler";
 
 // 页面实例
 export type PageInstance = WechatMiniprogram.Page.Instance<
@@ -96,6 +97,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
         this.$scope.run(() => {
           const bindings = hook.call(this, this.$query, this.$context);
           if (bindings !== undefined) {
+            let data: Record<string, unknown> | undefined;
             Object.keys(bindings).forEach((key) => {
               const value = bindings[key];
               if (isFunction(value)) {
@@ -103,9 +105,13 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
                 return;
               }
 
-              this.setData({ [key]: deepToRaw(value) });
-              deepWatch(this, key, value);
+              data = data || {};
+              data[key] = deepToRaw(value);
+              deepWatch.call(this, key, value);
             });
+            if (data !== undefined) {
+              this.setData(data, flushPostFlushCbs);
+            }
           }
           lifetimeEmit(this, options, "onLoad", query);
         });

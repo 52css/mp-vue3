@@ -9,6 +9,7 @@ import "miniprogram-api-typings";
 import { type PropType } from "./shared";
 import { lifetimeEmit } from "./lifetime";
 import { launchPromise } from "./app";
+import { flushPostFlushCbs } from "./scheduler";
 
 // 组件实例
 export type ComponentInstance<TEmits extends object = {}> =
@@ -213,18 +214,6 @@ export const defineComponent = <
             });
           }
           this.$props = shallowReactive(rawProps);
-          // this.$props = shallowReactive(
-          //   new Proxy(this.properties, {
-          //     set: (target, key, value, receiver) => {
-          //       this.setData({
-          //         [key]: value,
-          //       });
-          //       // 发送自定义事件，传递数据
-          //       this.triggerEvent(key as string, { value });
-          //       return Reflect.set(target, key, value, receiver);
-          //     },
-          //   })
-          // );
 
           this.$context = {
             emit: (key: string, ...args: any[]) => {
@@ -239,6 +228,7 @@ export const defineComponent = <
               >
             ).call(this, this.$props, this.$context);
             if (bindings !== undefined) {
+              let data: Record<string, unknown> | undefined;
               Object.keys(bindings).forEach((key) => {
                 const value = bindings[key];
                 if (isFunction(value)) {
@@ -246,9 +236,13 @@ export const defineComponent = <
                   return;
                 }
 
-                this.setData({ [key]: deepToRaw(value) });
-                deepWatch(this, key, value);
+                data = data || {};
+                data[key] = deepToRaw(value);
+                deepWatch.call(this, key, value);
               });
+              if (data !== undefined) {
+                this.setData(data, flushPostFlushCbs);
+              }
             }
 
             lifetimeEmit(this, options, "attached");

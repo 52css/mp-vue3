@@ -44,7 +44,7 @@ export function deepToRaw(x: unknown): unknown {
 }
 
 export function deepWatch(
-  instance: Pick<
+  this: Pick<
     WechatMiniprogram.Component.InstanceMethods<Record<string, unknown>>,
     "setData"
   >,
@@ -58,7 +58,7 @@ export function deepWatch(
   watch(
     isRef(value) ? value : () => value,
     () => {
-      instance.setData({ [key]: deepToRaw(value) }, flushPostFlushCbs);
+      this.setData({ [key]: deepToRaw(value) }, flushPostFlushCbs);
     },
     {
       deep: true,
