@@ -1,5 +1,5 @@
-// import { definePage, ref, onReady } from '@52css/mp-vue3';
-import { definePage, ref, onReady } from '@vue-mini/core';
+import { definePage, ref, onReady } from '@52css/mp-vue3';
+// import { definePage, ref, onReady } from '@vue-mini/core';
 import { buildData } from '../../data';
 import {
   getTimeWithModal,
