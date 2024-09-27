@@ -7,6 +7,7 @@ import {
   isPlainObject,
   isFunction,
 } from "./utils";
+import { flushPostFlushCbs } from "./scheduler";
 import { type PageInstance } from "./page";
 import { type ComponentInstance } from "./component";
 import { type AppInstance } from "./app";
@@ -57,7 +58,7 @@ export function deepWatch(
   watch(
     isRef(value) ? value : () => value,
     () => {
-      instance.setData({ [key]: deepToRaw(value) });
+      instance.setData({ [key]: deepToRaw(value) }, flushPostFlushCbs);
     },
     {
       deep: true,
