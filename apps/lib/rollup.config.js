@@ -10,8 +10,18 @@ export default {
   output: [
     {
       name: "MpVue3",
-      file: "dist/mp-vue3.min.js",
+      file: "dist/mp-vue3.umd.js",
       format: "umd",
+      // sourcemap: true,
+    },
+    {
+      file: "dist/mp-vue3.cjs.js",
+      format: "cjs", // CJS 格式
+      // sourcemap: true, // 开启 sourcemap
+    },
+    {
+      file: "dist/mp-vue3.esm.js", // ESM 文件
+      format: "esm", // ESM 格式
       // sourcemap: true,
     },
   ],

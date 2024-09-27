@@ -1,9 +1,11 @@
 {
   "name": "@52css/mp-vue3",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "基于 Vue 3 的小程序框架：轻松构建高效应用",
   "type": "module",
-  "main": "dist/mp-vue3.min.js",
+  "main": "dist/mp-vue3.cjs.js",
+  "module": "dist/mp-vue3.esm.js",
+  "browser": "dist/mp-vue3.umd.js",
   "types": "types/index.d.ts",
   "devDependencies": {
     "miniprogram-api-typings": "^3.12.2",
