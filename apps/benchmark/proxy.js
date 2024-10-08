@@ -21,12 +21,12 @@ function doProxy(context) {
       if (options.size) size += byteLength(JSON.stringify(data));
       if (options.console) {
         if (count) {
-          console.log('累计setData次数:', count);
+          console.log("累计setData次数:", count);
         }
         if (size) {
-          console.log('累计setData大小:', size);
+          console.log("累计setData大小:", size);
         }
-        console.log('当次setData数据:', data);
+        console.log("当次setData数据:", data);
       }
     }
     const callbackRaw = args[1];
@@ -131,19 +131,19 @@ export function proxySetData(proxyOptions = {}) {
 }
 
 export function getCurrentPageContext() {
-  if (!currentPageContext) throw new Error('CurrentPageContext is not exist!');
+  if (!currentPageContext) throw new Error("CurrentPageContext is not exist!");
   return currentPageContext;
 }
 
 export function getCount() {
   if (!options.count)
-    throw new Error('proxyOptions.count must be setted by true!');
+    throw new Error("proxyOptions.count must be setted by true!");
   return count;
 }
 
 export function getSize() {
   if (!options.size)
-    throw new Error('proxyOptions.size must be setted by true!');
+    throw new Error("proxyOptions.size must be setted by true!");
   return size;
 }
 
@@ -151,14 +151,14 @@ export function getTime(context, callback) {
   if (context) {
     if (context._setting) {
       console.warn(
-        'Last setData is not finished now, please wait for a moment and try again!',
+        "Last setData is not finished now, please wait for a moment and try again!"
       );
     }
     context._setting = 0;
     context._lastTime = +new Date();
     context._lastCallback = callback;
   } else {
-    throw new Error('Context must be passed in!');
+    throw new Error("Context must be passed in!");
   }
 }
 
