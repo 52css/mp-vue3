@@ -2,7 +2,7 @@ import { effectScope, type EffectScope } from "@vue/reactivity";
 import { deepToRaw, deepWatch, setInstance } from "./shared";
 import { isFunction } from "./utils";
 import { lifetimeEmit, lifetimeEmitOnce } from "./lifetime";
-import { launchPromise } from "./app";
+import { onAppLaunched } from "./app";
 import {
   _queries,
   createQuery,
@@ -86,7 +86,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
     // 生命周期回调函数
     onLoad(this: PageInstance, query) {
       // console.log("🚀 ~ onLoad ~ onLoad:");
-      launchPromise.then(() => {
+      onAppLaunched(() => {
         setInstance(this);
         setQueries(queries);
         this.$scope = effectScope();
@@ -97,7 +97,7 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
         this.$scope.run(() => {
           const bindings = hook.call(this, this.$query, this.$context);
           if (bindings !== undefined) {
-            let data: Record<string, unknown> | undefined;
+            let data: Record<string, unknown> | undefined = {};
             Object.keys(bindings).forEach((key) => {
               const value = bindings[key];
               if (isFunction(value)) {
@@ -105,11 +105,10 @@ export const definePage = <TQueries extends PageQueries<TQueries>>(
                 return;
               }
 
-              data = data || {};
               data[key] = deepToRaw(value);
               deepWatch.call(this, key, value);
             });
-            if (data !== undefined) {
+            if (Object.keys(data).length !== 0) {
               this.setData(data, flushPostFlushCbs);
             }
           }

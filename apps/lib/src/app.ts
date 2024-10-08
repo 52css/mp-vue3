@@ -4,6 +4,14 @@ import { lifetimeEmit } from "./lifetime";
 import { setInstance } from "./shared";
 
 export let launchPromise: Promise<true> = Promise.resolve(true);
+export let isReady = true;
+export let onAppLaunched = (fn: () => void) => {
+  if (isReady) {
+    fn();
+  } else {
+    launchPromise.then(fn);
+  }
+};
 
 // 页面setup函数
 export type AppHook = (
@@ -35,6 +43,7 @@ export const createApp = (
     ...options,
     onLaunch(this: AppInstance, onLaunchOption) {
       // console.log("🚀 ~ onLaunch ~ onLaunch:");
+      isReady = false;
       launchPromise = new Promise(async (resolve) => {
         setInstance(this);
         const bindings = await hook.call(this, onLaunchOption);
@@ -46,6 +55,7 @@ export const createApp = (
         lifetimeEmit(this, options, "onLaunch", onLaunchOption);
         setInstance(null);
         resolve(true);
+        isReady = true;
       });
     },
     onShow(this: AppInstance, onShowOption) {

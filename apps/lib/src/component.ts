@@ -8,7 +8,7 @@ import { deepToRaw, deepWatch, setInstance } from "./shared";
 import "miniprogram-api-typings";
 import { type PropType } from "./shared";
 import { lifetimeEmit } from "./lifetime";
-import { launchPromise } from "./app";
+import { onAppLaunched } from "./app";
 import { flushPostFlushCbs } from "./scheduler";
 
 // 组件实例
@@ -203,14 +203,9 @@ export const defineComponent = <
     ...options,
     lifetimes: {
       attached(this: ComponentInstance) {
-        debugger;
-        console.log("🚀 ~ attached ~ attached:");
-        launchPromise.then(() => {
-          console.log("11");
+        onAppLaunched(() => {
           setInstance(this);
-          console.log("22");
           this.$scope = effectScope();
-          console.log("33");
           const rawProps: Record<string, any> = {};
           if (properties) {
             properties.forEach((property) => {
@@ -224,9 +219,7 @@ export const defineComponent = <
               this.triggerEvent(key, { value: args[0] });
             },
           };
-          console.log("44");
           this.$scope.run(() => {
-            console.log("55");
             const bindings = (
               hook as ComponentHook<
                 ComponentProps<TProperties>,
@@ -234,7 +227,7 @@ export const defineComponent = <
               >
             ).call(this, this.$props, this.$context);
             if (bindings !== undefined) {
-              let data: Record<string, unknown> | undefined;
+              let data: Record<string, unknown> | undefined = {};
               Object.keys(bindings).forEach((key) => {
                 const value = bindings[key];
                 if (isFunction(value)) {
@@ -242,23 +235,17 @@ export const defineComponent = <
                   return;
                 }
 
-                data = data || {};
                 data[key] = deepToRaw(value);
                 deepWatch.call(this, key, value);
               });
-              if (data !== undefined) {
+              if (Object.keys(data).length !== 0) {
                 this.setData(data, flushPostFlushCbs);
               }
             }
 
             lifetimeEmit(this, options, "attached");
           });
-
-          console.log("66");
-
           setInstance(null);
-
-          console.log("77");
         });
       },
       ready(this: ComponentInstance) {
