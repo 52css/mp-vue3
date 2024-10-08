@@ -22,12 +22,16 @@
     "@vue/reactivity": "^3.5.1"
   },
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "copy-dist": "copyfiles **/* ../demo/node_modules/@52css/mp-vue3 && copyfiles **/* ../benchmark/node_modules/@52css/mp-vue3",
+    "build-and-copy": "npm run build && npm run copy-dist"
   },
   "peerDependencies": {
     "typescript": "^5.5.4"
   },
-  "dependencies": {},
+  "dependencies": {
+    "copyfiles": "^2.4.1"
+  },
   "repository": "https://github.com/52css/mp-vue3",
   "homepage": "https://52css.github.io/mp-vue3/",
   "author": "Coze <jie_wei@126.com>",

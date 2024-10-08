@@ -203,10 +203,14 @@ export const defineComponent = <
     ...options,
     lifetimes: {
       attached(this: ComponentInstance) {
-        // console.log("🚀 ~ attached ~ attached:");
+        debugger;
+        console.log("🚀 ~ attached ~ attached:");
         launchPromise.then(() => {
+          console.log("11");
           setInstance(this);
+          console.log("22");
           this.$scope = effectScope();
+          console.log("33");
           const rawProps: Record<string, any> = {};
           if (properties) {
             properties.forEach((property) => {
@@ -220,7 +224,9 @@ export const defineComponent = <
               this.triggerEvent(key, { value: args[0] });
             },
           };
+          console.log("44");
           this.$scope.run(() => {
+            console.log("55");
             const bindings = (
               hook as ComponentHook<
                 ComponentProps<TProperties>,
@@ -248,7 +254,11 @@ export const defineComponent = <
             lifetimeEmit(this, options, "attached");
           });
 
+          console.log("66");
+
           setInstance(null);
+
+          console.log("77");
         });
       },
       ready(this: ComponentInstance) {
