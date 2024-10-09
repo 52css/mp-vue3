@@ -1,6 +1,6 @@
 {
   "name": "@52css/mp-vue3",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "基于 Vue 3 的小程序框架：轻松构建高效应用",
   "type": "module",
   "main": "dist/mp-vue3.cjs.js",

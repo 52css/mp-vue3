@@ -1,1 +1,1 @@
-pnpm publish --access public --no-git-checks
+bun run build && pnpm publish --access public --no-git-checks

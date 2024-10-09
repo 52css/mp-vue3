@@ -1,1 +1,5 @@
-{ "dependencies": { "@52css/mp-vue3": "^1.1.6" } }
+{
+  "dependencies": {
+    "@52css/mp-vue3": "^1.1.7"
+  }
+}

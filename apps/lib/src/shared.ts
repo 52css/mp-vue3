@@ -1,4 +1,6 @@
-import { isRef, isProxy, toRaw, watch } from "@vue/reactivity";
+import { isRef, isProxy, toRaw } from "@vue/reactivity";
+import { watch } from "./watch";
+import { flushPostFlushCbs } from "./scheduler";
 import {
   isArray,
   getType,
@@ -7,13 +9,10 @@ import {
   isPlainObject,
   isFunction,
 } from "./utils";
-import { flushPostFlushCbs } from "./scheduler";
+
 import { type PageInstance } from "./page";
 import { type ComponentInstance } from "./component";
 import { type AppInstance } from "./app";
-
-// 定义 PropType 辅助类型
-export type PropType<T> = () => T;
 
 export function deepToRaw(x: unknown): unknown {
   if (isSimpleValue(x) || isFunction(x)) {
@@ -65,6 +64,9 @@ export function deepWatch(
     }
   );
 }
+
+// 定义 PropType 辅助类型
+export type PropType<T> = () => T;
 
 export let _instance: PageInstance | ComponentInstance | AppInstance | null =
   null;

@@ -1,12 +1,12 @@
-import { definePage, ref, onReady } from '@52css/mp-vue3';
+import { definePage, ref, onReady } from "@52css/mp-vue3";
 // import { definePage, ref, onReady } from '@vue-mini/core';
-import { buildData } from '../../data';
+import { buildData } from "../../data";
 import {
   getTimeWithModal,
   getCurrentPageContext,
   setReadyStart,
   getReadyTimeWithModal,
-} from '../../proxy';
+} from "../../proxy";
 
 definePage(() => {
   const listData = ref([]);
@@ -16,14 +16,14 @@ definePage(() => {
   const reLaunch = () => {
     setReadyStart();
     wx.reLaunch({
-      url: '/pages/index/index',
+      url: "/pages/index/index",
     });
   };
 
   const reLaunch2 = () => {
     setReadyStart();
     wx.reLaunch({
-      url: '/pages/static/index',
+      url: "/pages/static/index",
     });
   };
 
